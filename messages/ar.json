@@ -1,0 +1,228 @@
+{
+  "common": {
+    "appName": "Nile Nexus Sales",
+    "loading": "جاري التحميل...",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "create": "إنشاء",
+    "search": "بحث...",
+    "filter": "فلتر",
+    "export": "تصدير",
+    "import": "استيراد",
+    "close": "إغلاق",
+    "confirm": "تأكيد",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "yes": "أيوه",
+    "no": "لأ",
+    "noData": "مفيش بيانات",
+    "noResults": "مفيش نتايج",
+    "required": "مطلوب",
+    "optional": "اختياري",
+    "actions": "إجراءات",
+    "details": "التفاصيل",
+    "notes": "ملاحظات",
+    "status": "الحالة",
+    "date": "التاريخ",
+    "time": "الوقت",
+    "addNew": "+ جديد",
+    "viewAll": "عرض الكل",
+    "success": "عاش 👏",
+    "error": "حصل مشكلة",
+    "allGood": "الدنيا تمام 😎"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "loginTitle": "أهلاً بيك في Nile Nexus Sales 👋",
+    "loginSubtitle": "سجّل دخولك عشان تبدأ",
+    "loginButton": "دخول",
+    "resetTitle": "إعادة تعيين كلمة المرور",
+    "resetSubtitle": "هنبعتلك لينك على الإيميل",
+    "resetButton": "ابعت اللينك",
+    "resetSuccess": "تم! شيك على الإيميل 📧",
+    "invalidCredentials": "الإيميل أو كلمة المرور غلط",
+    "accountDisabled": "الحساب ده متوقف. كلّم المسؤول.",
+    "sessionExpired": "الجلسة انتهت. سجّل دخولك تاني."
+  },
+  "nav": {
+    "dashboard": "الرئيسية",
+    "potentialClients": "العملاء المحتملين",
+    "clients": "العملاء",
+    "deals": "الصفقات",
+    "pipeline": "البايبلاين",
+    "followUps": "المتابعات",
+    "tasks": "المهام",
+    "calendar": "التقويم",
+    "proposals": "العروض",
+    "approvals": "الموافقات",
+    "team": "الفريق",
+    "reports": "التقارير",
+    "notifications": "الإشعارات",
+    "settings": "الإعدادات"
+  },
+  "dashboard": {
+    "greeting": "صباح الفل يا {name} 👋",
+    "subtitle": "يلا نشوف الدنيا فيها إيه النهارده 🚀",
+    "focusTitle": "🎯 نركز على إيه دلوقتي؟",
+    "followUpsToday": "📞 متابعات النهارده",
+    "overdue": "⏰ متأخرة",
+    "hotDeals": "🔥 فرص مهمة",
+    "openDeals": "💼 صفقات مفتوحة",
+    "wonThisMonth": "🎉 كسبنا الشهر ده",
+    "waitingResponse": "بنستنى رد",
+    "needsAttention": "محتاجة اهتمام",
+    "recentWins": "مكاسب أخيرة",
+    "noOverdue": "الدنيا تمام 😎 مفيش متابعات متأخرة.",
+    "needsAttentionAdmin": "🚨 محتاجينك هنا"
+  },
+  "potentialClients": {
+    "title": "العملاء المحتملين",
+    "addNew": "عميل محتمل جديد",
+    "status": {
+      "NEW": "لسه",
+      "RESEARCHING": "شغال عليه 🔍",
+      "RESEARCHED": "البحث خلص 🔥",
+      "CONVERTED": "اتحوّل 🚀",
+      "ARCHIVED": "مؤرشف"
+    },
+    "convert": "حوّل لعميل 🚀",
+    "convertConfirm": "متأكد إنك عايز تحوّل العميل المحتمل ده لعميل؟",
+    "convertSuccess": "تم التحويل بنجاح! 🎉",
+    "duplicateWarning": "العميل ده موجود عندنا بالفعل تقريبًا 👀",
+    "researchMore": "يلا نعرف عنه أكتر 🕵️‍♂️"
+  },
+  "clients": {
+    "title": "العملاء",
+    "addNew": "عميل جديد",
+    "type": {
+      "COMPANY": "شركة",
+      "INDIVIDUAL": "فرد"
+    },
+    "quickActions": {
+      "call": "📞 اتصال",
+      "whatsapp": "💬 واتساب",
+      "email": "📧 إيميل",
+      "followUp": "⏰ متابعة",
+      "task": "✅ مهمة",
+      "deal": "💼 صفقة"
+    }
+  },
+  "deals": {
+    "title": "الصفقات",
+    "addNew": "صفقة جديدة",
+    "stages": {
+      "NEW": "جديدة",
+      "CONTACTED": "تم التواصل",
+      "INTERESTED": "مهتم 👀",
+      "PROPOSAL_SENT": "تم إرسال العرض 📄",
+      "NEGOTIATION": "مفاوضة 🤝",
+      "WON": "مكسبنا 🎉",
+      "LOST": "خسرناها",
+      "LATER": "بعدين 💤"
+    },
+    "wonSuccess": "Deal اتقفلت! 🎉🔥",
+    "lostReasons": {
+      "PRICE": "السعر",
+      "COMPETITOR": "منافس",
+      "NOT_READY": "مش جاهز",
+      "NO_RESPONSE": "مفيش رد",
+      "SERVICE_NOT_SUITABLE": "الخدمة مش مناسبة",
+      "POSTPONED": "تأجيل",
+      "OTHER": "سبب تاني"
+    },
+    "contextualActions": {
+      "NEW": "اتواصل مع العميل 📞",
+      "INTERESTED": "جهز عرض سعر 📄",
+      "PROPOSAL_SENT": "سجل متابعة ⏰",
+      "WON": "جهزه للتسليم للـ Finance 💰"
+    }
+  },
+  "followUps": {
+    "title": "المتابعات",
+    "addNew": "متابعة جديدة",
+    "status": {
+      "PENDING": "معلقة",
+      "COMPLETED": "تمت",
+      "POSTPONED": "متأجلة",
+      "CANCELLED": "ملغية"
+    },
+    "sections": {
+      "overdue": "🔴 متأخرة",
+      "today": "النهارده",
+      "tomorrow": "بكرة",
+      "thisWeek": "الأسبوع ده",
+      "later": "بعدين"
+    },
+    "completePrompt": "إيه اللي حصل؟",
+    "nextStepPrompt": "في خطوة جاية؟",
+    "completedSuccess": "عاش 👏 المتابعة اتسجلت!",
+    "postponePrompt": "حددت تاريخ جديد"
+  },
+  "proposals": {
+    "title": "العروض",
+    "addNew": "عرض جديد",
+    "builder": {
+      "client": "👤 العميل",
+      "services": "🛠️ الخدمات",
+      "pricing": "💰 التسعير",
+      "terms": "📝 الشروط",
+      "review": "👀 راجع وابعت"
+    },
+    "status": {
+      "DRAFT": "مسودة",
+      "PENDING_APPROVAL": "بتنتظر الموافقة",
+      "READY": "جاهز",
+      "SENT": "تم الإرسال",
+      "ACCEPTED": "تم القبول ✅",
+      "REJECTED": "مرفوض",
+      "EXPIRED": "انتهت الصلاحية",
+      "SUPERSEDED": "نسخة قديمة"
+    },
+    "discountApproval": "الخصم ده محتاج موافقة الإدارة 👀"
+  },
+  "tasks": {
+    "title": "المهام",
+    "addNew": "مهمة جديدة",
+    "priority": {
+      "NORMAL": "عادي",
+      "IMPORTANT": "مهم",
+      "URGENT": "عاجل 🔥"
+    }
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "company": "الشركة",
+    "users": "المستخدمين",
+    "services": "الخدمات",
+    "sales": "المبيعات",
+    "pipeline": "البايبلاين",
+    "proposals": "العروض",
+    "paymentTerms": "شروط الدفع",
+    "approvals": "الموافقات",
+    "targets": "الأهداف",
+    "commission": "العمولة",
+    "notifications": "الإشعارات",
+    "numbering": "الترقيم",
+    "languages": "اللغات",
+    "integrations": "التكاملات",
+    "features": "المميزات",
+    "audit": "سجل التدقيق"
+  },
+  "validation": {
+    "required": "الحقل ده مطلوب",
+    "invalidEmail": "الإيميل مش صحيح",
+    "invalidPhone": "رقم التليفون مش صحيح",
+    "minLength": "لازم يكون {min} حروف على الأقل",
+    "maxLength": "لازم يكون أقل من {max} حرف",
+    "positive": "لازم يكون رقم موجب",
+    "duplicateFound": "البيانات دي موجودة قبل كده"
+  }
+}

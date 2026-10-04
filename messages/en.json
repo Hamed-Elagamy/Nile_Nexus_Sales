@@ -1,0 +1,228 @@
+{
+  "common": {
+    "appName": "Nile Nexus Sales",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search...",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "close": "Close",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No",
+    "noData": "No data",
+    "noResults": "No results",
+    "required": "Required",
+    "optional": "Optional",
+    "actions": "Actions",
+    "details": "Details",
+    "notes": "Notes",
+    "status": "Status",
+    "date": "Date",
+    "time": "Time",
+    "addNew": "+ New",
+    "viewAll": "View All",
+    "success": "Done! 👏",
+    "error": "Something went wrong",
+    "allGood": "All good 😎"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "loginTitle": "Welcome to Nile Nexus Sales 👋",
+    "loginSubtitle": "Sign in to get started",
+    "loginButton": "Sign In",
+    "resetTitle": "Reset Password",
+    "resetSubtitle": "We'll send you a reset link via email",
+    "resetButton": "Send Reset Link",
+    "resetSuccess": "Done! Check your email 📧",
+    "invalidCredentials": "Invalid email or password",
+    "accountDisabled": "This account is disabled. Contact your administrator.",
+    "sessionExpired": "Session expired. Please sign in again."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "potentialClients": "Potential Clients",
+    "clients": "Clients",
+    "deals": "Deals",
+    "pipeline": "Pipeline",
+    "followUps": "Follow-ups",
+    "tasks": "Tasks",
+    "calendar": "Calendar",
+    "proposals": "Proposals",
+    "approvals": "Approvals",
+    "team": "Team",
+    "reports": "Reports",
+    "notifications": "Notifications",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "greeting": "Good morning {name} 👋",
+    "subtitle": "Let's see what's happening today 🚀",
+    "focusTitle": "🎯 What to focus on?",
+    "followUpsToday": "📞 Follow-ups Today",
+    "overdue": "⏰ Overdue",
+    "hotDeals": "🔥 Hot Opportunities",
+    "openDeals": "💼 Open Deals",
+    "wonThisMonth": "🎉 Won This Month",
+    "waitingResponse": "Waiting for Response",
+    "needsAttention": "Needs Attention",
+    "recentWins": "Recent Wins",
+    "noOverdue": "All good 😎 No overdue follow-ups.",
+    "needsAttentionAdmin": "🚨 Needs Your Attention"
+  },
+  "potentialClients": {
+    "title": "Potential Clients",
+    "addNew": "New Potential Client",
+    "status": {
+      "NEW": "New",
+      "RESEARCHING": "Researching 🔍",
+      "RESEARCHED": "Researched 🔥",
+      "CONVERTED": "Converted 🚀",
+      "ARCHIVED": "Archived"
+    },
+    "convert": "Convert to Client 🚀",
+    "convertConfirm": "Are you sure you want to convert this potential client?",
+    "convertSuccess": "Successfully converted! 🎉",
+    "duplicateWarning": "This client might already exist 👀",
+    "researchMore": "Let's find out more 🕵️‍♂️"
+  },
+  "clients": {
+    "title": "Clients",
+    "addNew": "New Client",
+    "type": {
+      "COMPANY": "Company",
+      "INDIVIDUAL": "Individual"
+    },
+    "quickActions": {
+      "call": "📞 Call",
+      "whatsapp": "💬 WhatsApp",
+      "email": "📧 Email",
+      "followUp": "⏰ Follow-up",
+      "task": "✅ Task",
+      "deal": "💼 Deal"
+    }
+  },
+  "deals": {
+    "title": "Deals",
+    "addNew": "New Deal",
+    "stages": {
+      "NEW": "New",
+      "CONTACTED": "Contacted",
+      "INTERESTED": "Interested 👀",
+      "PROPOSAL_SENT": "Proposal Sent 📄",
+      "NEGOTIATION": "Negotiation 🤝",
+      "WON": "Won 🎉",
+      "LOST": "Lost",
+      "LATER": "Later 💤"
+    },
+    "wonSuccess": "Deal closed! 🎉🔥",
+    "lostReasons": {
+      "PRICE": "Price",
+      "COMPETITOR": "Competitor",
+      "NOT_READY": "Not Ready",
+      "NO_RESPONSE": "No Response",
+      "SERVICE_NOT_SUITABLE": "Service Not Suitable",
+      "POSTPONED": "Postponed",
+      "OTHER": "Other"
+    },
+    "contextualActions": {
+      "NEW": "Contact the client 📞",
+      "INTERESTED": "Prepare a proposal 📄",
+      "PROPOSAL_SENT": "Schedule a follow-up ⏰",
+      "WON": "Prepare for Finance handoff 💰"
+    }
+  },
+  "followUps": {
+    "title": "Follow-ups",
+    "addNew": "New Follow-up",
+    "status": {
+      "PENDING": "Pending",
+      "COMPLETED": "Completed",
+      "POSTPONED": "Postponed",
+      "CANCELLED": "Cancelled"
+    },
+    "sections": {
+      "overdue": "🔴 Overdue",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "thisWeek": "This Week",
+      "later": "Later"
+    },
+    "completePrompt": "What happened?",
+    "nextStepPrompt": "Any next steps?",
+    "completedSuccess": "Done! Follow-up recorded 👏",
+    "postponePrompt": "Set a new date"
+  },
+  "proposals": {
+    "title": "Proposals",
+    "addNew": "New Proposal",
+    "builder": {
+      "client": "👤 Client",
+      "services": "🛠️ Services",
+      "pricing": "💰 Pricing",
+      "terms": "📝 Terms",
+      "review": "👀 Review & Send"
+    },
+    "status": {
+      "DRAFT": "Draft",
+      "PENDING_APPROVAL": "Pending Approval",
+      "READY": "Ready",
+      "SENT": "Sent",
+      "ACCEPTED": "Accepted ✅",
+      "REJECTED": "Rejected",
+      "EXPIRED": "Expired",
+      "SUPERSEDED": "Superseded"
+    },
+    "discountApproval": "This discount requires management approval 👀"
+  },
+  "tasks": {
+    "title": "Tasks",
+    "addNew": "New Task",
+    "priority": {
+      "NORMAL": "Normal",
+      "IMPORTANT": "Important",
+      "URGENT": "Urgent 🔥"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "company": "Company",
+    "users": "Users",
+    "services": "Services",
+    "sales": "Sales",
+    "pipeline": "Pipeline",
+    "proposals": "Proposals",
+    "paymentTerms": "Payment Terms",
+    "approvals": "Approvals",
+    "targets": "Targets",
+    "commission": "Commission",
+    "notifications": "Notifications",
+    "numbering": "Numbering",
+    "languages": "Languages",
+    "integrations": "Integrations",
+    "features": "Features",
+    "audit": "Audit Log"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "invalidPhone": "Invalid phone number",
+    "minLength": "Must be at least {min} characters",
+    "maxLength": "Must be less than {max} characters",
+    "positive": "Must be a positive number",
+    "duplicateFound": "This data already exists"
+  }
+}

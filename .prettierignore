@@ -1,0 +1,15 @@
+node_modules
+.next
+.env
+.env.local
+.env.production
+.env*.local
+out
+dist
+build
+coverage
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+playwright-report
+test-results
