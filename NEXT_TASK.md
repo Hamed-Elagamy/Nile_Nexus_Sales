@@ -1,29 +1,31 @@
 # Next Task
 
 ## Goal
-Initialize Next.js 15 project with App Router, TypeScript strict mode, Tailwind CSS, ESLint, and Prettier. Then install and configure shadcn/ui, Lucide icons, and Supabase client libraries.
+Initialize shadcn/ui component library, then build the CRM Core: Potential Clients list/create/view pages with Server Actions, Zod validation, and the research workflow status transitions. Connect to Supabase via the existing server client, with proper ownership-aware patterns matching the RLS policies in migration 002.
 
 ## Relevant Files
-- `package.json`
-- `tsconfig.json`
-- `tailwind.config.ts`
-- `components.json` (shadcn config)
-- `.eslintrc.json`
-- `.prettierrc`
-- `.env.local`
+- `src/app/(authenticated)/potential-clients/page.tsx` — list page
+- `src/app/(authenticated)/potential-clients/[id]/page.tsx` — detail page
+- `src/components/potential-clients/` — UI components
+- `src/lib/actions/potential-clients.ts` — Server Actions
+- `src/lib/schemas/potential-client.ts` — Zod schemas
+- `messages/ar.json`, `messages/en.json` — translations
 
 ## Acceptance Criteria
-- Build passes (`npm run build`).
-- Lint passes (`npm run lint`).
-- Typecheck passes (`tsc --noEmit`).
-- Project runs locally without errors.
-- shadcn/ui is configured and ready for component installation.
+- shadcn/ui components (Button, Input, Card, Dialog, Select, Badge, Textarea, Table, Skeleton) available
+- Potential Client list page with search, filter by status, and pagination
+- Create Potential Client form with validation
+- View/edit Potential Client detail page
+- Status transitions: NEW → RESEARCHING → RESEARCHED
+- Opportunity indicators support
+- All Server Actions use Supabase server client
+- TypeScript strict, lint clean, build passes
+- At least 2 new test files covering schemas and actions
 
-## Commands to Run After
+## Commands After Completion
 ```bash
-npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*" --use-npm
-npx shadcn-ui@latest init
-npm install @supabase/supabase-js @supabase/ssr
-npm run build
+npm run typecheck
 npm run lint
+npm run test
+npm run build
 ```
