@@ -1,32 +1,28 @@
 # Next Task
 
 ## Goal
-Implement Client Management (`COMPANY` and `INDIVIDUAL` client types) with multiple Contacts per client, duplicate detection, search/filtering, detail page with contacts & deals tabs, Server Actions with ownership-aware RLS, and Vitest coverage.
+Implement Sales Execution Module (Follow-ups, Activity Logging & Reminders) with daily due list, overdue counter, quick complete modal with next step scheduling, activity feed integration, and Vitest test coverage.
 
 ## Relevant Files
-- `src/lib/schemas/client.ts` — Zod validation schemas for clients and contacts
-- `src/lib/actions/clients.ts` — Server Actions (getClients, getClientById, createClient, updateClient, addContact, updateContact, convertPotentialClientToClient)
-- `src/components/clients/` — UI components:
-  - `client-type-badge.tsx`
-  - `clients-table.tsx`
-  - `clients-filter.tsx`
-  - `create-client-dialog.tsx`
-  - `client-detail.tsx`
-  - `contacts-list.tsx`
-  - `add-contact-dialog.tsx`
-- `src/app/(authenticated)/clients/page.tsx` — clients directory page
-- `src/app/(authenticated)/clients/[id]/page.tsx` — client profile page
-- `src/lib/schemas/__tests__/client.test.ts` — unit tests for client schemas
-- `src/lib/actions/__tests__/clients.test.ts` — unit tests for client actions
-- `messages/ar.json`, `messages/en.json` — clients & contacts translations
+- `src/lib/schemas/follow-up.ts` — Zod validation schemas for follow-ups (type, due_date, priority, status)
+- `src/lib/actions/follow-ups.ts` — Server Actions (getFollowUps, completeFollowUp, createFollowUp, rescheduleFollowUp)
+- `src/components/follow-ups/` — UI components:
+  - `follow-up-card.tsx`
+  - `follow-ups-list.tsx`
+  - `create-follow-up-dialog.tsx`
+  - `complete-follow-up-dialog.tsx`
+  - `follow-ups-filter.tsx`
+- `src/app/(authenticated)/follow-ups/page.tsx` — follow-ups management dashboard
+- `src/lib/schemas/__tests__/follow-up.test.ts` — unit tests for follow-up schemas
+- `src/lib/actions/__tests__/follow-ups.test.ts` — unit tests for follow-up actions
+- `messages/ar.json`, `messages/en.json` — follow-ups translations
 
 ## Acceptance Criteria
-- Support both `COMPANY` and `INDIVIDUAL` client types
-- Concurrency-safe business ID generation (`CLIENT-XXXXX`)
-- Duplicate detection on phone, email, and company name
-- Manage multiple contacts per client with primary contact selection and direct call/WhatsApp buttons
-- Conversion flow from Potential Client (`CONVERTED`) into Client record with activity logging
-- Responsive desktop table and mobile-optimized card layout
+- List follow-ups partitioned into: Overdue (🚨 متأخرة), Today (📅 اليوم), and Upcoming (🔜 القادمة)
+- Support follow-up types: CALL (اتصال), MEETING (اجتماع), WHATSAPP (واتساب), EMAIL (إيميل), VISIT (زيارة)
+- Direct action buttons (call phone, launch WhatsApp with prefilled client contact)
+- Complete follow-up modal capturing result notes and optionally scheduling the next follow-up in one click
+- Log corresponding activity into `activities` table automatically
 - Clean TypeScript strict mode, 0 ESLint warnings, all Vitest tests passing, production build passing
 
 ## Commands After Completion

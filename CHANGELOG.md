@@ -2,6 +2,45 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2026-10-05
+
+### Added
+- **Clients & Contacts Module**:
+  - Validation schemas (`src/lib/schemas/client.ts`) supporting `COMPANY` and `INDIVIDUAL` types
+  - Concurrency-safe business ID generation (`CLIENT-XXXXX`)
+  - Server Actions (`src/lib/actions/clients.ts`):
+    - `getClients`: search, client-type filtering, sales owner, pagination
+    - `getClientById`: full profile with contacts and deals
+    - `createClient`: validation, duplicate detection (phone/email/name), activity logging
+    - `updateClient`: profile updates and logging
+    - `addContact` & `updateContact`: manage multiple contacts per client with primary contact flag
+    - `convertPotentialClientToClient`: seamless conversion from research stage to active client + optional initial deal
+  - UI Components (`src/components/clients/`):
+    - `ClientTypeBadge`, `ClientsFilter`, `ClientsTable`, `CreateClientDialog`, `ContactsList`, `AddContactDialog`, `ClientDetail`, `ClientsClient`
+  - Routes:
+    - `/clients`: full directory with quick call/WhatsApp buttons
+    - `/clients/[id]`: client hub with overview, contacts list, and deals tab
+- **Deals & Pipeline Kanban Module**:
+  - Validation schemas (`src/lib/schemas/deal.ts`) for deals, stage updates, and lost deal tracking
+  - Server Actions (`src/lib/actions/deals.ts`):
+    - `getDeals`: paginated search and filters
+    - `getPipelineDeals`: Kanban-ready aggregation grouped by stages
+    - `getDealById`: detail view with client, services, activities
+    - `createDeal`: deal creation with services linkage
+    - `updateDeal`: full deal details editing
+    - `updateDealStage`: stage transitions, won celebration, lost reason tracking
+  - UI Components (`src/components/deals/` & `src/components/pipeline/`):
+    - `DealStageBadge`, `DealsFilter`, `DealsTable`, `CreateDealDialog`, `DealDetail`, `DealsClient`
+    - `DealCard`: pipeline card with stage advance button and direct actions
+    - `PipelineBoard`: horizontal drag/action board with responsive scrolling
+    - `LostDealDialog`: modal capturing lost reason, competitor notes, and resurface dates
+  - Routes:
+    - `/deals`: tabular view of all deals
+    - `/deals/[id]`: deal detail page with client links and stage progress
+    - `/pipeline`: interactive Kanban board
+- **Testing**:
+  - 40 passing tests across 8 test suites (including client & deal schemas and actions)
+
 ## [0.2.0] - 2026-10-05
 
 ### Added
