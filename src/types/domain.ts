@@ -329,3 +329,14 @@ export interface AuditLog {
   ip_address: string | null;
   created_at: string;
 }
+
+// ─── Lead Source ───────────────────────────────────────────────
+export interface LeadSource {
+  id: string;
+  name_ar: string;
+  name_en: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at?: string;
+}
+

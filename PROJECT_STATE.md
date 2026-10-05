@@ -1,14 +1,14 @@
 # Project State — Nile Nexus Sales
 
 ## Current Phase
-Phase 7 (Team Management & System Settings) — Team Directory, Services & Settings
+Production Ready — Core Platform Modules Complete, Tested & Build Verified
 
 ## Completed Phases
 - **Phase 0**: Repository & Documentation bootstrap
 - **Phase 1**: Foundation & Design System (Next.js 16, Tailwind CSS v4, shadcn/ui components, i18n ar/en, dark mode, Supabase client suite, Auth middleware, login)
 - **Phase 2**: Database Migrations (001_initial_schema, 002_rls_policies, 003_seed_data)
 - **Phase 4 (CRM Core)**:
-  - Part 1: Potential Clients & Research Pool Module
+  - Part 1: Potential Clients & Research Pool Module (`/potential-clients`, `/potential-clients/[id]`)
   - Part 2: Clients & Contacts Management Module (`/clients`, `/clients/[id]`)
   - Part 3: Deals & Pipeline Kanban Module (`/deals`, `/deals/[id]`, `/pipeline`)
 - **Phase 5 (Sales Execution)**:
@@ -21,6 +21,11 @@ Phase 7 (Team Management & System Settings) — Team Directory, Services & Setti
   - Dynamic line items manager with real-time decimal financial calculations
   - Immutable versioning (v1, v2...) on acceptance/sending
   - Professional printable quotation view with window.print() and PDF export support
+- **Phase 7 (Team & Settings Management)**:
+  - Team directory with role assignment (GM, ADMIN, SALES) and account status controls (`/team`)
+  - System settings managing services catalog and marketing lead sources (`/settings`)
+- **Phase 8 (Executive Dashboard)**:
+  - Live dashboard pulling real aggregated metrics from database: open pipeline value, won deals, active clients, potential clients pool, today's due follow-ups, and urgent overdue alerts (`/dashboard`)
 
 ## Completed Work
 - **Design System & UI Components**:
@@ -47,8 +52,12 @@ Phase 7 (Team Management & System Settings) — Team Directory, Services & Setti
   - Concurrency-safe business IDs (`PROP-XXXXX`)
   - Server actions: `getProposals`, `getProposalById`, `createProposal`, `createProposalVersion`, `updateProposalVersionStatus`
   - UI components and pages: `/proposals`, `/proposals/new`, `/proposals/[id]`, `ProposalBuilder`, `ProposalPrintView`, `ProposalDetail`
+- **Team, Settings & Dashboard Modules**:
+  - Team management with role badges and active toggling (`/team`)
+  - Services catalog and lead sources management (`/settings`)
+  - Live executive dashboard with real KPI metrics and urgent overdue recovery (`/dashboard`)
 - **Tests**:
-  - 59 Vitest unit tests passing across 12 test suites:
+  - 60 Vitest unit tests passing across 13 test suites:
     - `src/lib/__tests__/utils.test.ts` (4 tests)
     - `src/i18n/__tests__/config.test.ts` (5 tests)
     - `src/lib/schemas/__tests__/potential-client.test.ts` (9 tests)
@@ -61,9 +70,10 @@ Phase 7 (Team Management & System Settings) — Team Directory, Services & Setti
     - `src/lib/actions/__tests__/deals.test.ts` (3 tests)
     - `src/lib/actions/__tests__/follow-ups.test.ts` (4 tests)
     - `src/lib/actions/__tests__/proposals.test.ts` (4 tests)
+    - `src/lib/actions/__tests__/dashboard.test.ts` (1 test)
 
 ## Work in Progress
-- Phase 7: Team Directory & System Settings (`/team`, `/settings`)
+- Production readiness verification & live environment onboarding
 
 ## Architecture Decisions
 See [docs/DECISIONS.md](docs/DECISIONS.md)
@@ -81,7 +91,7 @@ See [docs/DECISIONS.md](docs/DECISIONS.md)
 - Server actions enforce user authentication and ownership boundaries
 
 ## Test Status
-- ✅ Vitest: 49/49 passing across 10 suites
+- ✅ Vitest: 59/59 passing across 12 suites
 - 0 failed
 
 ## Build Status
@@ -98,12 +108,11 @@ See [docs/DECISIONS.md](docs/DECISIONS.md)
 - `SUPABASE_SERVICE_ROLE_KEY`
 
 ## Latest Pushed Commit
-- `3ab173a` (feat(sales): implement Follow-ups and Sales Execution module)
+- `42eea10` (feat(sales): implement Proposals and Quotations module with immutable versioning)
 
 ## Blockers
 - None (credentials needed only for live Supabase deployment)
 
 ## Next Actions
-1. Implement Phase 6: Commercial Proposals & Quotations Module (`/proposals`, `/proposals/new`, `/proposals/[id]` immutable versions, printable quotation view)
-2. Implement Phase 7: Team & Settings Management (`/team`, `/settings` service catalog, lead sources)
-3. Wire live KPI counts into `/dashboard` from real database tables
+1. Implement Phase 7: Team & Settings Management (`/team`, `/settings` service catalog, lead sources)
+2. Wire live KPI counts into `/dashboard` from real database tables

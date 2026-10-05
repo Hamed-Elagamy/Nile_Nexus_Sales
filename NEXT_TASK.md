@@ -1,35 +1,24 @@
 # Next Task
 
 ## Goal
-Implement Team Management (`/team`), Company & Services Settings (`/settings`), and wire live KPI metrics into the Executive Dashboard (`/dashboard`) with Vitest test coverage.
+Production Deployment & Live Supabase Environment Connection:
+Connect live Supabase project credentials in `.env.local`, apply database migrations (`supabase/migrations/001_initial_schema.sql`, `002_rls_policies.sql`, `003_seed_data.sql`), create the initial GM/Admin user account, and launch into production on Vercel.
 
 ## Relevant Files
-- `src/lib/schemas/team.ts` & `src/lib/schemas/settings.ts` — validation schemas for team roles, services, and company settings
-- `src/lib/actions/team.ts` — Server Actions (getTeamMembers, updateMemberRole, toggleMemberStatus)
-- `src/lib/actions/settings.ts` — Server Actions (getServices, createService, updateService, getLeadSources, createLeadSource)
-- `src/lib/actions/dashboard.ts` — Server Action (getDashboardMetrics: pipeline totals, win rate, follow-up alerts, recent activities)
-- `src/components/team/` — team directory and role assignment dialog
-- `src/components/settings/` — service catalog manager and company settings
-- `src/app/(authenticated)/team/page.tsx` — team members management
-- `src/app/(authenticated)/settings/page.tsx` — company and catalog configuration
-- `src/app/(authenticated)/dashboard/page.tsx` — live executive dashboard
-- `src/lib/actions/__tests__/dashboard.test.ts` — unit tests for dashboard metrics aggregation
+- `.env.local` — live environment credentials
+- `supabase/migrations/001_initial_schema.sql` — PostgreSQL database schema
+- `supabase/migrations/002_rls_policies.sql` — Row Level Security policies
+- `supabase/migrations/003_seed_data.sql` — initial pipelines and catalog data
+- `docs/DEPLOYMENT.md` — full deployment and production checklist
 
 ## Acceptance Criteria
-- Team management with role separation (`GM`, `ADMIN`, `SALES`) and activity indicators
-- Services catalog management (names in Arabic/English, reference price, active toggle)
-- Live dashboard displaying real calculated KPIs:
-  - Potential Clients in research pool
-  - Active Clients count
-  - Open Deals & total pipeline value in EGP
-  - Today's pending follow-ups & overdue alert counter
-  - Real-time recent activities feed
-- Clean TypeScript strict mode, 0 ESLint warnings, all Vitest tests passing, production build passing
+- Set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY`
+- Database initialized with all 30+ tables and RLS security policies
+- Initial Admin/GM profile created in Supabase Auth
+- Application deployed on Vercel with automatic CI/CD from `main` branch
+- Zero build errors, zero TypeScript errors, 100% Vitest test pass rate
 
-## Commands After Completion
+## Commands To Run Application Locally
 ```bash
-npm run typecheck
-npm run lint
-npm run test
-npm run build
+npm run dev
 ```

@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2026-10-05
+
+### Added
+- **Live Executive Dashboard**:
+  - Server Action (`src/lib/actions/dashboard.ts`):
+    - `getDashboardMetrics`: live aggregation of potential clients count, active clients, open pipeline value (EGP), closed won deals value, today's follow-ups, urgent overdue counter, recent activities, and recent deals
+  - UI (`/dashboard`):
+    - Live KPI cards with direct navigation links
+    - Urgent overdue alert banner with instant recovery button
+    - Recent deals feed with live stage badges and values
+    - Real-time recent commercial activity stream
+    - Quick action bar for creating potential clients, deals, and proposals
+- **Team Directory & Role Management**:
+  - Validation schemas (`src/lib/schemas/team.ts`) for user roles (`GM`, `ADMIN`, `SALES`) and account status toggles
+  - Server Actions (`src/lib/actions/team.ts`):
+    - `getTeamMembers`: directory with active indicators and deal stats
+    - `updateMemberRole`: GM/Admin controlled role assignment
+    - `toggleMemberStatus`: user account activation and deactivation
+  - UI (`/team`):
+    - `TeamMemberCard` with role-specific badges, contact links, and inline role modification
+    - `TeamList` with instant search and role filter tabs
+- **System & Services Settings**:
+  - Validation schemas (`src/lib/schemas/settings.ts`) for services and lead sources
+  - Server Actions (`src/lib/actions/settings.ts`):
+    - `getServices`, `createService`, `updateService`
+    - `getLeadSources`, `createLeadSource`
+  - UI (`/settings`):
+    - `ServicesCatalog`: catalog table with internal reference prices, currency, active toggling, and service creation modal
+    - `LeadSourcesManager`: marketing channel cards and source creation modal
+- **Testing**:
+  - 60 passing tests across 13 test suites (dashboard aggregation tests included)
+
 ## [0.5.0] - 2026-10-05
 
 ### Added
