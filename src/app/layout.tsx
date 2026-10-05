@@ -5,6 +5,10 @@ import { Toaster } from "sonner";
 import { localeDirection, type Locale } from "@/i18n/config";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import "./globals.css";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: "Nile Nexus Sales",
@@ -25,7 +29,7 @@ export default async function RootLayout({
       : "'Inter', 'Cairo', sans-serif";
 
   return (
-    <html lang={locale} dir={dir} suppressHydrationWarning>
+    <html lang={locale} dir={dir} suppressHydrationWarning className={cn("font-sans", geist.variable)}>
       <body style={{ fontFamily }} className="antialiased min-h-screen">
         <ThemeProvider defaultTheme="light">
           <NextIntlClientProvider messages={messages}>

@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2026-10-05
+
+### Added
+- **shadcn/ui Component Library**:
+  - Initialized with `@base-ui/react` primitives and Tailwind CSS v4
+  - Components installed: `Button`, `Input`, `Card`, `Dialog`, `Select`, `Badge`, `Textarea`, `Table`, `Skeleton`, `DropdownMenu`
+  - Fully integrated with Nile Nexus design tokens and dark mode
+- **Potential Clients & Research Pool Module**:
+  - Zod validation schemas (`src/lib/schemas/potential-client.ts`) with opportunity indicators and phone normalization
+  - Server Actions (`src/lib/actions/potential-clients.ts`):
+    - `getPotentialClients`: paginated list with search, status filtering, and relations
+    - `getPotentialClientById`: full client profile with opportunity indicators and research owner
+    - `createPotentialClient`: duplicate check, concurrency-safe business ID (`generate_business_id`), activity logging
+    - `updatePotentialClient`: field updates and opportunities synchronization
+    - `updatePotentialClientStatus`: status workflow (`NEW` -> `RESEARCHING` -> `RESEARCHED` -> `CONVERTED` -> `ARCHIVED`)
+    - `checkDuplicatePotentialClient`: duplicate detection across potential clients and confirmed clients
+  - UI Components (`src/components/potential-clients/`):
+    - `PotentialClientStatusBadge`: color-coded badges for all research lifecycle stages
+    - `OpportunityBadges`: visual chips for identified client needs
+    - `CreatePotentialClientDialog`: modal with real-time duplicate warning and opportunity selector
+    - `PotentialClientsFilter`: search bar with debouncing and status filter buttons
+    - `PotentialClientsTable`: responsive table view for desktop and card layout for mobile
+    - `PotentialClientDetail`: research console with editable notes, opportunity toggles, status workflow buttons, and conversion modal
+    - `PotentialClientsClient`: interactive client container
+  - Pages:
+    - `/potential-clients`: search and directory view
+    - `/potential-clients/[id]`: detailed research console
+  - Translations:
+    - Expanded `messages/ar.json` and `messages/en.json` with field names, opportunity indicators, and Egyptian colloquial microcopy
+  - Vitest Unit Tests:
+    - `src/lib/schemas/__tests__/potential-client.test.ts` (9 tests)
+    - `src/lib/actions/__tests__/potential-clients.test.ts` (5 tests)
+    - Total test suite now at 23 passing tests
+
 ## [0.1.0] - 2026-10-03
 
 ### Added

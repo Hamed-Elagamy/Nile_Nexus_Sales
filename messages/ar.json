@@ -86,6 +86,31 @@
   "potentialClients": {
     "title": "العملاء المحتملين",
     "addNew": "عميل محتمل جديد",
+    "businessId": "كود العميل",
+    "name": "اسم العميل المحتمل",
+    "area": "المنطقة",
+    "phone": "رقم التليفون",
+    "website": "الموقع الإلكتروني",
+    "instagram": "إنستجرام",
+    "facebook": "فيسبوك",
+    "source": "المصدر",
+    "researchOwner": "المسؤول عن البحث",
+    "notes": "ملاحظات البحث",
+    "opportunities": "الفرص المحتملة",
+    "allStatuses": "كل الحالات",
+    "filterByStatus": "تصفية بالحالة",
+    "searchPlaceholder": "ابحث بالاسم، التليفون، أو الكود...",
+    "emptyTitle": "مفيش عملاء محتملين هنا 👀",
+    "emptySubtitle": "سجّل عميل جديد وابدأ ابحث عن احتياجاته وفرصه 🚀",
+    "createdSuccess": "عاش 👏 العميل المحتمل اتسجل بنجاح!",
+    "updatedSuccess": "تمام، البيانات اتحدثت بنجاح!",
+    "statusUpdated": "عاش 👏 حالة البحث اتحدثت!",
+    "duplicateWarning": "العميل ده موجود عندنا بالفعل تقريبًا 👀",
+    "duplicateFoundMessage": "في عميل مسجل بنفس التليفون أو الاسم 👀",
+    "researchMore": "يلا نعرف عنه أكتر 🕵️‍♂️",
+    "convert": "حوّل لعميل 🚀",
+    "convertConfirm": "متأكد إنك عايز تحوّل العميل المحتمل ده لعميل رسمي؟",
+    "convertSuccess": "تم التحويل بنجاح! 🎉",
     "status": {
       "NEW": "لسه",
       "RESEARCHING": "شغال عليه 🔍",
@@ -93,11 +118,22 @@
       "CONVERTED": "اتحوّل 🚀",
       "ARCHIVED": "مؤرشف"
     },
-    "convert": "حوّل لعميل 🚀",
-    "convertConfirm": "متأكد إنك عايز تحوّل العميل المحتمل ده لعميل؟",
-    "convertSuccess": "تم التحويل بنجاح! 🎉",
-    "duplicateWarning": "العميل ده موجود عندنا بالفعل تقريبًا 👀",
-    "researchMore": "يلا نعرف عنه أكتر 🕵️‍♂️"
+    "statusActions": {
+      "startResearch": "شغال عليه 🔍",
+      "finishResearch": "البحث خلص 🔥",
+      "resetToNew": "رجوع لـ لسه",
+      "archive": "أرشفة"
+    },
+    "indicators": {
+      "WEBSITE": "موقع إلكتروني 🌐",
+      "ECOMMERCE": "متجر إلكتروني 🛒",
+      "SOCIAL_MEDIA": "سوشيال ميديا 📱",
+      "BRANDING": "هوية وتصميم 🎨",
+      "ERP_SYSTEM": "نظام ERP ⚙️",
+      "MARKETING": "تسويق رقمي 📢",
+      "MOBILE_APP": "تطبيق موبايل 📲",
+      "OTHER": "حاجة تانية 💡"
+    }
   },
   "clients": {
     "title": "العملاء",

@@ -86,6 +86,31 @@
   "potentialClients": {
     "title": "Potential Clients",
     "addNew": "New Potential Client",
+    "businessId": "Business ID",
+    "name": "Potential Client Name",
+    "area": "Area / Location",
+    "phone": "Phone Number",
+    "website": "Website",
+    "instagram": "Instagram",
+    "facebook": "Facebook",
+    "source": "Lead Source",
+    "researchOwner": "Research Owner",
+    "notes": "Research Notes",
+    "opportunities": "Potential Opportunities",
+    "allStatuses": "All Statuses",
+    "filterByStatus": "Filter by Status",
+    "searchPlaceholder": "Search by name, phone, or ID...",
+    "emptyTitle": "No potential clients found 👀",
+    "emptySubtitle": "Add a new potential client to research their requirements and opportunities 🚀",
+    "createdSuccess": "Potential client registered successfully! 👏",
+    "updatedSuccess": "Details updated successfully!",
+    "statusUpdated": "Research status updated! 🔥",
+    "duplicateWarning": "This client might already exist 👀",
+    "duplicateFoundMessage": "A record with the same phone or name already exists 👀",
+    "researchMore": "Learn more about them 🕵️‍♂️",
+    "convert": "Convert to Client 🚀",
+    "convertConfirm": "Are you sure you want to convert this potential client to an official client?",
+    "convertSuccess": "Converted successfully! 🎉",
     "status": {
       "NEW": "New",
       "RESEARCHING": "Researching 🔍",
@@ -93,11 +118,22 @@
       "CONVERTED": "Converted 🚀",
       "ARCHIVED": "Archived"
     },
-    "convert": "Convert to Client 🚀",
-    "convertConfirm": "Are you sure you want to convert this potential client?",
-    "convertSuccess": "Successfully converted! 🎉",
-    "duplicateWarning": "This client might already exist 👀",
-    "researchMore": "Let's find out more 🕵️‍♂️"
+    "statusActions": {
+      "startResearch": "Start Research 🔍",
+      "finishResearch": "Research Done 🔥",
+      "resetToNew": "Back to New",
+      "archive": "Archive"
+    },
+    "indicators": {
+      "WEBSITE": "Website 🌐",
+      "ECOMMERCE": "E-commerce 🛒",
+      "SOCIAL_MEDIA": "Social Media 📱",
+      "BRANDING": "Branding & Design 🎨",
+      "ERP_SYSTEM": "ERP System ⚙️",
+      "MARKETING": "Digital Marketing 📢",
+      "MOBILE_APP": "Mobile App 📲",
+      "OTHER": "Other 💡"
+    }
   },
   "clients": {
     "title": "Clients",

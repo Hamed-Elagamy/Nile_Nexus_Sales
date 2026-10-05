@@ -1,26 +1,33 @@
 # Next Task
 
 ## Goal
-Initialize shadcn/ui component library, then build the CRM Core: Potential Clients list/create/view pages with Server Actions, Zod validation, and the research workflow status transitions. Connect to Supabase via the existing server client, with proper ownership-aware patterns matching the RLS policies in migration 002.
+Implement Client Management (`COMPANY` and `INDIVIDUAL` client types) with multiple Contacts per client, duplicate detection, search/filtering, detail page with contacts & deals tabs, Server Actions with ownership-aware RLS, and Vitest coverage.
 
 ## Relevant Files
-- `src/app/(authenticated)/potential-clients/page.tsx` — list page
-- `src/app/(authenticated)/potential-clients/[id]/page.tsx` — detail page
-- `src/components/potential-clients/` — UI components
-- `src/lib/actions/potential-clients.ts` — Server Actions
-- `src/lib/schemas/potential-client.ts` — Zod schemas
-- `messages/ar.json`, `messages/en.json` — translations
+- `src/lib/schemas/client.ts` — Zod validation schemas for clients and contacts
+- `src/lib/actions/clients.ts` — Server Actions (getClients, getClientById, createClient, updateClient, addContact, updateContact, convertPotentialClientToClient)
+- `src/components/clients/` — UI components:
+  - `client-type-badge.tsx`
+  - `clients-table.tsx`
+  - `clients-filter.tsx`
+  - `create-client-dialog.tsx`
+  - `client-detail.tsx`
+  - `contacts-list.tsx`
+  - `add-contact-dialog.tsx`
+- `src/app/(authenticated)/clients/page.tsx` — clients directory page
+- `src/app/(authenticated)/clients/[id]/page.tsx` — client profile page
+- `src/lib/schemas/__tests__/client.test.ts` — unit tests for client schemas
+- `src/lib/actions/__tests__/clients.test.ts` — unit tests for client actions
+- `messages/ar.json`, `messages/en.json` — clients & contacts translations
 
 ## Acceptance Criteria
-- shadcn/ui components (Button, Input, Card, Dialog, Select, Badge, Textarea, Table, Skeleton) available
-- Potential Client list page with search, filter by status, and pagination
-- Create Potential Client form with validation
-- View/edit Potential Client detail page
-- Status transitions: NEW → RESEARCHING → RESEARCHED
-- Opportunity indicators support
-- All Server Actions use Supabase server client
-- TypeScript strict, lint clean, build passes
-- At least 2 new test files covering schemas and actions
+- Support both `COMPANY` and `INDIVIDUAL` client types
+- Concurrency-safe business ID generation (`CLIENT-XXXXX`)
+- Duplicate detection on phone, email, and company name
+- Manage multiple contacts per client with primary contact selection and direct call/WhatsApp buttons
+- Conversion flow from Potential Client (`CONVERTED`) into Client record with activity logging
+- Responsive desktop table and mobile-optimized card layout
+- Clean TypeScript strict mode, 0 ESLint warnings, all Vitest tests passing, production build passing
 
 ## Commands After Completion
 ```bash
