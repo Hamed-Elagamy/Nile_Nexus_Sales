@@ -123,7 +123,7 @@ See [docs/DECISIONS.md](docs/DECISIONS.md)
 - `SUPABASE_SERVICE_ROLE_KEY` (optional in demo mode, required for live DB)
 
 ## Latest Pushed Commit
-- `d4fb807` (feat(platform): implement Team, Settings, and live Executive Dashboard metrics)
+- `09017d1` (feat(platform): enable standalone interactive demo mode and complete all app routes)
 
 ## Blockers
 - None. Application is immediately functional out of the box in standalone demo mode and seamlessly connects to live Supabase once credentials are provided in `.env.local`.
