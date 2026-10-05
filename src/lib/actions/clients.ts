@@ -2,6 +2,15 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import {
+  demoClients,
+  demoContacts,
+  demoDeals,
+  demoPotentialClients,
+  demoProfiles,
+  demoLeadSources,
+} from "@/lib/demo-data";
 import {
   createClientSchema,
   updateClientSchema,
@@ -59,6 +68,58 @@ export async function getClients(
 ): Promise<ActionResult<PaginatedClientsResult>> {
   try {
     const parsed = filterClientsSchema.parse(filters);
+
+    if (!isSupabaseConfigured()) {
+      let filtered = [...demoClients].filter((c) => c.archived_at === null);
+
+      if (parsed.type) {
+        filtered = filtered.filter((c) => c.type === parsed.type);
+      }
+
+      if (parsed.account_owner_id) {
+        filtered = filtered.filter((c) => c.account_owner_id === parsed.account_owner_id);
+      }
+
+      if (parsed.query && parsed.query.trim()) {
+        const q = parsed.query.trim().toLowerCase();
+        filtered = filtered.filter(
+          (c) =>
+            c.name.toLowerCase().includes(q) ||
+            (c.phone && c.phone.includes(q)) ||
+            (c.email && c.email.toLowerCase().includes(q)) ||
+            c.business_id.toLowerCase().includes(q)
+        );
+      }
+
+      const total = filtered.length;
+      const totalPages = Math.ceil(total / parsed.pageSize) || 1;
+      const from = (parsed.page - 1) * parsed.pageSize;
+      const sliced = filtered.slice(from, from + parsed.pageSize);
+
+      const items: ClientWithRelations[] = sliced.map((c) => {
+        const owner = demoProfiles.find((p) => p.id === c.account_owner_id);
+        const source = demoLeadSources.find((s) => s.id === c.source);
+        const contacts = demoContacts.filter((cnt) => cnt.client_id === c.id);
+        return {
+          ...c,
+          account_owner: owner ? { id: owner.id, full_name: owner.full_name, email: owner.email } : null,
+          source: source ? { id: source.id, name_ar: source.name_ar, name_en: source.name_en } : null,
+          contacts,
+        };
+      });
+
+      return {
+        success: true,
+        data: {
+          items,
+          total,
+          page: parsed.page,
+          pageSize: parsed.pageSize,
+          totalPages,
+        },
+      };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     let query = supabase
@@ -126,6 +187,27 @@ export async function getClientById(
   id: string
 ): Promise<ActionResult<ClientWithRelations>> {
   try {
+    if (!isSupabaseConfigured()) {
+      const client = demoClients.find((c) => c.id === id);
+      if (!client) return { success: false, error: "Client not found" };
+
+      const owner = demoProfiles.find((p) => p.id === client.account_owner_id);
+      const source = demoLeadSources.find((s) => s.id === client.source);
+      const contacts = demoContacts.filter((cnt) => cnt.client_id === client.id);
+      const deals = demoDeals.filter((d) => d.client_id === client.id);
+
+      return {
+        success: true,
+        data: {
+          ...client,
+          account_owner: owner ? { id: owner.id, full_name: owner.full_name, email: owner.email } : null,
+          source: source ? { id: source.id, name_ar: source.name_ar, name_en: source.name_en } : null,
+          contacts,
+          deals,
+        },
+      };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const { data, error } = await supabase
@@ -153,13 +235,62 @@ export async function getClientById(
 }
 
 /**
- * Create a new Client record with concurrency-safe business ID and optional primary contact
+ * Create a new Client record
  */
 export async function createClient(
   input: CreateClientInput
 ): Promise<ActionResult<ClientWithRelations>> {
   try {
     const validated = createClientSchema.parse(input);
+
+    if (!isSupabaseConfigured()) {
+      const newId = `c-${Date.now().toString().slice(-4)}`;
+      const businessId = `CLIENT-00${200 + demoClients.length + 1}`;
+      const owner = demoProfiles.find((p) => p.id === validated.account_owner_id) || demoProfiles[2];
+
+      const newClient: Client = {
+        id: newId,
+        business_id: businessId,
+        name: validated.name,
+        type: validated.type,
+        area: validated.area || null,
+        industry: validated.industry || null,
+        website: validated.website || null,
+        phone: validated.phone || null,
+        email: validated.email || null,
+        address: validated.address || null,
+        source: validated.source_id || "src-01",
+        account_owner_id: owner.id,
+        notes: validated.notes || null,
+        archived_at: null,
+        created_by: owner.id,
+        updated_by: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      demoClients.unshift(newClient);
+
+      if (validated.primary_contact) {
+        demoContacts.push({
+          id: `cnt-${Date.now().toString().slice(-4)}`,
+          client_id: newId,
+          name: validated.primary_contact.name,
+          job_title: validated.primary_contact.job_title || null,
+          phone: validated.primary_contact.phone || null,
+          whatsapp: validated.primary_contact.whatsapp || null,
+          email: validated.primary_contact.email || null,
+          is_primary: true,
+          notes: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+      }
+
+      revalidatePath("/clients");
+      return { success: true, data: newClient as unknown as ClientWithRelations };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const {
@@ -210,7 +341,6 @@ export async function createClient(
       return { success: false, error: insertError?.message || "Failed to create client" };
     }
 
-    // Insert primary contact if provided
     if (validated.primary_contact) {
       const pc = validated.primary_contact;
       await supabase.from("contacts").insert({
@@ -225,7 +355,6 @@ export async function createClient(
       });
     }
 
-    // Log Activity
     await supabase.from("activities").insert({
       type: "SYSTEM",
       actor_id: user.id,
@@ -254,6 +383,27 @@ export async function updateClient(
 ): Promise<ActionResult<Client>> {
   try {
     const validated = updateClientSchema.parse(input);
+
+    if (!isSupabaseConfigured()) {
+      const client = demoClients.find((c) => c.id === id);
+      if (!client) return { success: false, error: "Client not found" };
+
+      if (validated.name !== undefined) client.name = validated.name;
+      if (validated.type !== undefined) client.type = validated.type;
+      if (validated.area !== undefined) client.area = validated.area;
+      if (validated.industry !== undefined) client.industry = validated.industry;
+      if (validated.website !== undefined) client.website = validated.website;
+      if (validated.phone !== undefined) client.phone = validated.phone;
+      if (validated.email !== undefined) client.email = validated.email;
+      if (validated.address !== undefined) client.address = validated.address;
+      if (validated.notes !== undefined) client.notes = validated.notes;
+      client.updated_at = new Date().toISOString();
+
+      revalidatePath("/clients");
+      revalidatePath(`/clients/${id}`);
+      return { success: true, data: client };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const {
@@ -315,10 +465,36 @@ export async function updateClient(
 export async function addContact(input: ContactInput): Promise<ActionResult<Contact>> {
   try {
     const validated = contactSchema.parse(input);
+
+    if (!isSupabaseConfigured()) {
+      if (validated.is_primary) {
+        demoContacts.forEach((c) => {
+          if (c.client_id === validated.client_id) c.is_primary = false;
+        });
+      }
+
+      const newContact: Contact = {
+        id: `cnt-${Date.now().toString().slice(-4)}`,
+        client_id: validated.client_id,
+        name: validated.name,
+        job_title: validated.job_title || null,
+        phone: validated.phone || null,
+        whatsapp: validated.whatsapp || null,
+        email: validated.email || null,
+        is_primary: validated.is_primary,
+        notes: validated.notes || null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      demoContacts.push(newContact);
+      revalidatePath(`/clients/${validated.client_id}`);
+      return { success: true, data: newContact };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     if (validated.is_primary) {
-      // Unset previous primary contact
       await supabase
         .from("contacts")
         .update({ is_primary: false })
@@ -367,6 +543,74 @@ export async function convertPotentialClientToClient(
   } = {}
 ): Promise<ActionResult<{ client: Client; deal?: Deal }>> {
   try {
+    if (!isSupabaseConfigured()) {
+      const pc = demoPotentialClients.find((p) => p.id === potentialClientId);
+      if (!pc) return { success: false, error: "Potential client not found" };
+
+      const newClientId = `c-${Date.now().toString().slice(-4)}`;
+      const newBusinessId = `CLIENT-00${200 + demoClients.length + 1}`;
+
+      const newClient: Client = {
+        id: newClientId,
+        business_id: newBusinessId,
+        name: pc.name,
+        type: options.clientType || "COMPANY",
+        area: pc.area || null,
+        industry: null,
+        website: pc.website || null,
+        phone: pc.phone || null,
+        email: null,
+        address: null,
+        source: pc.source,
+        account_owner_id: pc.research_owner_id,
+        notes: pc.notes || null,
+        archived_at: null,
+        created_by: pc.created_by,
+        updated_by: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      demoClients.unshift(newClient);
+      pc.status = "CONVERTED";
+      pc.converted_client_id = newClientId;
+
+      let createdDeal: Deal | undefined;
+      if (options.createDeal && options.dealTitle) {
+        createdDeal = {
+          id: `d-${Date.now().toString().slice(-4)}`,
+          business_id: `DEAL-00${300 + demoDeals.length + 1}`,
+          title: options.dealTitle,
+          client_id: newClientId,
+          sales_owner_id: pc.research_owner_id,
+          stage: "NEW",
+          estimated_value: options.dealEstimatedValue ? String(options.dealEstimatedValue) : "100000.00",
+          currency: options.dealCurrency || "EGP",
+          final_value: null,
+          lost_reason: null,
+          lost_notes: null,
+          resurface_date: null,
+          won_date: null,
+          notes: "تم إنشاء الصفقة تلقائياً عند تحويل العميل المحتمل.",
+          archived_at: null,
+          created_by: pc.created_by,
+          updated_by: null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        demoDeals.unshift(createdDeal);
+      }
+
+      revalidatePath("/potential-clients");
+      revalidatePath("/clients");
+      revalidatePath("/pipeline");
+
+      return {
+        success: true,
+        data: { client: newClient, deal: createdDeal },
+      };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const {
@@ -377,7 +621,6 @@ export async function convertPotentialClientToClient(
       return { success: false, error: "Authentication required" };
     }
 
-    // 1. Fetch potential client
     const { data: pc, error: pcErr } = await supabase
       .from("potential_clients")
       .select("*")
@@ -388,7 +631,6 @@ export async function convertPotentialClientToClient(
       return { success: false, error: "Potential client not found" };
     }
 
-    // 2. Generate client business ID
     let clientBusinessId = `CLIENT-${Date.now().toString().slice(-5)}`;
     try {
       const { data: rpcId } = await supabase.rpc("generate_business_id", {
@@ -399,7 +641,6 @@ export async function convertPotentialClientToClient(
       // fallback
     }
 
-    // 3. Create client record
     const { data: client, error: clientErr } = await supabase
       .from("clients")
       .insert({
@@ -422,7 +663,6 @@ export async function convertPotentialClientToClient(
       return { success: false, error: clientErr?.message || "Failed to create client" };
     }
 
-    // 4. Update potential client to CONVERTED
     await supabase
       .from("potential_clients")
       .update({
@@ -431,7 +671,6 @@ export async function convertPotentialClientToClient(
       })
       .eq("id", potentialClientId);
 
-    // 5. Create primary contact if phone was present
     if (pc.phone) {
       await supabase.from("contacts").insert({
         client_id: client.id,
@@ -442,7 +681,6 @@ export async function convertPotentialClientToClient(
       });
     }
 
-    // 6. Optional: Create initial Deal
     let createdDeal: Deal | undefined;
     if (options.createDeal) {
       let dealBusinessId = `DEAL-${Date.now().toString().slice(-5)}`;
@@ -459,9 +697,9 @@ export async function convertPotentialClientToClient(
         .from("deals")
         .insert({
           business_id: dealBusinessId,
-          title: options.dealTitle || `صفقة - ${client.name}`,
+          title: options.dealTitle || `صفقة جديدة مع ${client.name}`,
           client_id: client.id,
-          sales_owner_id: user.id,
+          sales_owner_id: client.account_owner_id || user.id,
           stage: "NEW",
           estimated_value: options.dealEstimatedValue || null,
           currency: options.dealCurrency || "EGP",
@@ -473,32 +711,30 @@ export async function convertPotentialClientToClient(
       if (deal) createdDeal = deal as unknown as Deal;
     }
 
-    // 7. Log activities
-    await supabase.from("activities").insert([
-      {
-        type: "SYSTEM",
-        actor_id: user.id,
-        summary: `تحويل العميل المحتمل ${pc.name} إلى عميل رسمي (${client.business_id}) 🚀`,
-        metadata: { potential_client_id: potentialClientId, client_id: client.id },
-      },
-      {
-        type: "SYSTEM",
-        actor_id: user.id,
+    await supabase.from("activities").insert({
+      type: "SYSTEM",
+      actor_id: user.id,
+      client_id: client.id,
+      summary: `تحويل العميل المحتمل ${pc.name} إلى عميل مؤكد`,
+      metadata: {
+        potential_client_id: pc.id,
         client_id: client.id,
-        summary: `تم إنشاء العميل بالتحويل من حوض البحث 🚀`,
+        deal_id: createdDeal?.id,
       },
-    ]);
+    });
 
     revalidatePath("/potential-clients");
-    revalidatePath(`/potential-clients/${potentialClientId}`);
     revalidatePath("/clients");
-    if (options.createDeal) revalidatePath("/deals");
+    revalidatePath("/pipeline");
 
     return {
       success: true,
-      data: { client: client as unknown as Client, deal: createdDeal },
+      data: {
+        client: client as unknown as Client,
+        deal: createdDeal,
+      },
     };
   } catch (err: unknown) {
-    return { success: false, error: getErrorMessage(err, "Conversion failed") };
+    return { success: false, error: getErrorMessage(err, "Failed to convert potential client") };
   }
 }

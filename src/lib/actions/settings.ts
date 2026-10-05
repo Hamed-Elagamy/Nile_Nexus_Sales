@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { demoLeadSources, demoServices } from "@/lib/demo-data";
 import {
   createServiceSchema,
   updateServiceSchema,
@@ -29,6 +31,13 @@ function getErrorMessage(err: unknown, fallback: string): string {
  */
 export async function getServices(): Promise<ActionResult<Service[]>> {
   try {
+    if (!isSupabaseConfigured()) {
+      return {
+        success: true,
+        data: [...demoServices],
+      };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const { data, error } = await supabase
@@ -57,7 +66,35 @@ export async function createService(
 ): Promise<ActionResult<Service>> {
   try {
     const validated = createServiceSchema.parse(input);
+
+    if (!isSupabaseConfigured()) {
+      const newService: Service = {
+        id: `srv-${Date.now().toString().slice(-4)}`,
+        name_ar: validated.name_ar,
+        name_en: validated.name_en,
+        description_ar: validated.description_ar || null,
+        description_en: validated.description_en || null,
+        internal_reference_price: validated.internal_reference_price != null ? String(validated.internal_reference_price) : null,
+        currency: validated.currency || "EGP",
+        is_active: true,
+        sort_order: demoServices.length + 1,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      demoServices.push(newService);
+      revalidatePath("/settings");
+      return { success: true, data: newService };
+    }
+
     const supabase = await createSupabaseServerClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Authentication required" };
+    }
 
     const { data, error } = await supabase
       .from("services")
@@ -66,69 +103,74 @@ export async function createService(
         name_en: validated.name_en,
         description_ar: validated.description_ar || null,
         description_en: validated.description_en || null,
-        internal_reference_price: validated.internal_reference_price
-          ? validated.internal_reference_price.toString()
-          : null,
+        internal_reference_price: validated.internal_reference_price,
         currency: validated.currency || "EGP",
-        sort_order: validated.sort_order,
+        is_active: true,
       })
       .select()
       .single();
-
-    if (error || !data) {
-      return { success: false, error: error?.message || "Failed to create service" };
-    }
-
-    revalidatePath("/settings");
-
-    return {
-      success: true,
-      data: data as unknown as Service,
-    };
-  } catch (err: unknown) {
-    return { success: false, error: getErrorMessage(err, "Failed to create service") };
-  }
-}
-
-/**
- * Update an existing service
- */
-export async function updateService(
-  id: string,
-  input: UpdateServiceInput
-): Promise<ActionResult> {
-  try {
-    const validated = updateServiceSchema.parse(input);
-    const supabase = await createSupabaseServerClient();
-
-    const updatePayload: Record<string, unknown> = {
-      updated_at: new Date().toISOString(),
-    };
-
-    if (validated.name_ar !== undefined) updatePayload.name_ar = validated.name_ar;
-    if (validated.name_en !== undefined) updatePayload.name_en = validated.name_en;
-    if (validated.description_ar !== undefined) updatePayload.description_ar = validated.description_ar;
-    if (validated.description_en !== undefined) updatePayload.description_en = validated.description_en;
-    if (validated.internal_reference_price !== undefined) {
-      updatePayload.internal_reference_price = validated.internal_reference_price
-        ? validated.internal_reference_price.toString()
-        : null;
-    }
-    if (validated.currency !== undefined) updatePayload.currency = validated.currency;
-    if (validated.is_active !== undefined) updatePayload.is_active = validated.is_active;
-
-    const { error } = await supabase
-      .from("services")
-      .update(updatePayload)
-      .eq("id", id);
 
     if (error) {
       return { success: false, error: error.message };
     }
 
     revalidatePath("/settings");
+    return { success: true, data: data as unknown as Service };
+  } catch (err: unknown) {
+    return { success: false, error: getErrorMessage(err, "Failed to create service") };
+  }
+}
 
-    return { success: true };
+/**
+ * Update service details
+ */
+export async function updateService(
+  id: string,
+  input: UpdateServiceInput
+): Promise<ActionResult<Service>> {
+  try {
+    const validated = updateServiceSchema.parse(input);
+
+    if (!isSupabaseConfigured()) {
+      const srv = demoServices.find((s) => s.id === id);
+      if (srv) {
+        if (validated.name_ar) srv.name_ar = validated.name_ar;
+        if (validated.name_en) srv.name_en = validated.name_en;
+        if (validated.internal_reference_price != null)
+          srv.internal_reference_price = String(validated.internal_reference_price);
+        if (validated.is_active !== undefined) srv.is_active = validated.is_active;
+        srv.updated_at = new Date().toISOString();
+      }
+      revalidatePath("/settings");
+      return { success: true, data: srv };
+    }
+
+    const supabase = await createSupabaseServerClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Authentication required" };
+    }
+
+    const { data, error } = await supabase
+      .from("services")
+      .update({
+        ...validated,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath("/settings");
+    return { success: true, data: data as unknown as Service };
   } catch (err: unknown) {
     return { success: false, error: getErrorMessage(err, "Failed to update service") };
   }
@@ -139,12 +181,19 @@ export async function updateService(
  */
 export async function getLeadSources(): Promise<ActionResult<LeadSource[]>> {
   try {
+    if (!isSupabaseConfigured()) {
+      return {
+        success: true,
+        data: [...demoLeadSources] as unknown as LeadSource[],
+      };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const { data, error } = await supabase
       .from("lead_sources")
       .select("*")
-      .order("created_at", { ascending: true });
+      .order("sort_order", { ascending: true });
 
     if (error) {
       return { success: false, error: error.message };
@@ -167,27 +216,46 @@ export async function createLeadSource(
 ): Promise<ActionResult<LeadSource>> {
   try {
     const validated = createLeadSourceSchema.parse(input);
+
+    if (!isSupabaseConfigured()) {
+      const newSource = {
+        id: `src-${Date.now().toString().slice(-4)}`,
+        name_ar: validated.name_ar,
+        name_en: validated.name_en,
+        is_active: true,
+        sort_order: demoLeadSources.length + 1,
+      };
+      demoLeadSources.push(newSource);
+      revalidatePath("/settings");
+      return { success: true, data: newSource as unknown as LeadSource };
+    }
+
     const supabase = await createSupabaseServerClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Authentication required" };
+    }
 
     const { data, error } = await supabase
       .from("lead_sources")
       .insert({
         name_ar: validated.name_ar,
         name_en: validated.name_en,
+        is_active: true,
       })
       .select()
       .single();
 
-    if (error || !data) {
-      return { success: false, error: error?.message || "Failed to create lead source" };
+    if (error) {
+      return { success: false, error: error.message };
     }
 
     revalidatePath("/settings");
-
-    return {
-      success: true,
-      data: data as unknown as LeadSource,
-    };
+    return { success: true, data: data as unknown as LeadSource };
   } catch (err: unknown) {
     return { success: false, error: getErrorMessage(err, "Failed to create lead source") };
   }

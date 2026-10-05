@@ -2,6 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import {
+  demoClients,
+  demoDeals,
+  demoFollowUps,
+  demoProfiles,
+} from "@/lib/demo-data";
 import {
   createFollowUpSchema,
   completeFollowUpSchema,
@@ -11,7 +18,6 @@ import {
   type CompleteFollowUpInput,
   type RescheduleFollowUpInput,
   type FilterFollowUpsInput,
-  type FollowUpStatus,
 } from "@/lib/schemas/follow-up";
 import type { FollowUp, Client, Deal } from "@/types/domain";
 
@@ -60,13 +66,83 @@ export async function getFollowUps(
 ): Promise<ActionResult<FollowUpsDashboardResult>> {
   try {
     const parsed = filterFollowUpsSchema.parse(filters);
+
+    if (!isSupabaseConfigured()) {
+      const todayCount = demoFollowUps.filter((f) => f.status === "PENDING" && f.id !== "flw-003" && f.id !== "flw-004").length;
+      const overdueCount = demoFollowUps.filter((f) => f.id === "flw-003").length;
+      const upcomingCount = demoFollowUps.filter((f) => f.id === "flw-004").length;
+      const completedCount = demoFollowUps.filter((f) => f.status === "COMPLETED").length;
+      const allCount = demoFollowUps.length;
+
+      let filtered = [...demoFollowUps];
+      switch (parsed.tab) {
+        case "TODAY":
+          filtered = filtered.filter((f) => f.status === "PENDING" && f.id !== "flw-003" && f.id !== "flw-004");
+          break;
+        case "OVERDUE":
+          filtered = filtered.filter((f) => f.id === "flw-003");
+          break;
+        case "UPCOMING":
+          filtered = filtered.filter((f) => f.id === "flw-004");
+          break;
+        case "COMPLETED":
+          filtered = filtered.filter((f) => f.status === "COMPLETED");
+          break;
+      }
+
+      const items: FollowUpWithRelations[] = filtered.map((f) => {
+        const client = demoClients.find((c) => c.id === f.client_id);
+        const deal = demoDeals.find((d) => d.id === f.deal_id);
+        const resp = demoProfiles.find((p) => p.id === f.responsible_id);
+        return {
+          ...f,
+          client: client
+            ? {
+                id: client.id,
+                name: client.name,
+                business_id: client.business_id,
+                phone: client.phone,
+                type: client.type,
+              }
+            : null,
+          deal: deal
+            ? {
+                id: deal.id,
+                title: deal.title,
+                business_id: deal.business_id,
+                estimated_value: deal.estimated_value,
+                stage: deal.stage,
+              }
+            : null,
+          responsible: resp ? { id: resp.id, full_name: resp.full_name, email: resp.email } : null,
+        };
+      });
+
+      return {
+        success: true,
+        data: {
+          items,
+          counts: {
+            today: todayCount,
+            overdue: overdueCount,
+            upcoming: upcomingCount,
+            completed: completedCount,
+            all: allCount,
+          },
+          total: items.length,
+          page: parsed.page || 1,
+          pageSize: parsed.pageSize || 20,
+          totalPages: 1,
+        },
+      };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const now = new Date();
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
     const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999).toISOString();
 
-    // Query for tab counts in parallel
     const [todayCountRes, overdueCountRes, upcomingCountRes, completedCountRes, allCountRes] =
       await Promise.all([
         supabase
@@ -102,7 +178,6 @@ export async function getFollowUps(
       all: allCountRes.count || 0,
     };
 
-    // Build the query for the selected tab
     let query = supabase
       .from("follow_ups")
       .select(
@@ -159,25 +234,31 @@ export async function getFollowUps(
         break;
     }
 
-    const from = (parsed.page - 1) * parsed.pageSize;
-    const to = from + parsed.pageSize - 1;
-    const { data, count, error } = await query.range(from, to);
+    const page = parsed.page || 1;
+    const pageSize = parsed.pageSize || 20;
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+
+    query = query.range(from, to);
+
+    const { data, count, error } = await query;
 
     if (error) {
       return { success: false, error: error.message };
     }
 
+    const items = (data || []) as unknown as FollowUpWithRelations[];
     const total = count || 0;
-    const totalPages = Math.ceil(total / parsed.pageSize) || 1;
+    const totalPages = Math.ceil(total / pageSize) || 1;
 
     return {
       success: true,
       data: {
-        items: (data || []) as unknown as FollowUpWithRelations[],
+        items,
         counts,
         total,
-        page: parsed.page,
-        pageSize: parsed.pageSize,
+        page,
+        pageSize,
         totalPages,
       },
     };
@@ -187,13 +268,35 @@ export async function getFollowUps(
 }
 
 /**
- * Create a new Follow-up
+ * Schedule a new follow-up
  */
 export async function createFollowUp(
   input: CreateFollowUpInput
-): Promise<ActionResult<FollowUpWithRelations>> {
+): Promise<ActionResult<FollowUp>> {
   try {
     const validated = createFollowUpSchema.parse(input);
+
+    if (!isSupabaseConfigured()) {
+      const newFlw: FollowUp = {
+        id: `flw-${Date.now().toString().slice(-4)}`,
+        client_id: validated.client_id,
+        deal_id: validated.deal_id || null,
+        responsible_id: validated.responsible_id || demoProfiles[2].id,
+        due_at: validated.due_at,
+        action: validated.action,
+        notes: validated.notes || null,
+        status: "PENDING",
+        completion_result: null,
+        completed_at: null,
+        created_by: demoProfiles[2].id,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      demoFollowUps.unshift(newFlw);
+      revalidatePath("/follow-ups");
+      return { success: true, data: newFlw };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const {
@@ -215,30 +318,22 @@ export async function createFollowUp(
         due_at: validated.due_at,
         action: validated.action,
         notes: validated.notes || null,
-        status: "PENDING" as FollowUpStatus,
+        status: "PENDING",
         created_by: user.id,
       })
-      .select(
-        `
-        *,
-        client:clients!client_id(id, name, business_id, phone, type),
-        deal:deals!deal_id(id, title, business_id, estimated_value, stage),
-        responsible:profiles!responsible_id(id, full_name, email)
-      `
-      )
+      .select()
       .single();
 
     if (insertError || !inserted) {
       return { success: false, error: insertError?.message || "Failed to create follow-up" };
     }
 
-    // Activity log
     await supabase.from("activities").insert({
-      type: validated.action === "CALL" ? "CALL" : validated.action === "MEETING" ? "MEETING" : "NOTE",
+      type: "FOLLOW_UP",
       actor_id: user.id,
       client_id: validated.client_id,
       deal_id: validated.deal_id || null,
-      summary: `جدولة متابعة (${validated.action}) للموعد ${new Date(validated.due_at).toLocaleDateString("ar-EG")}`,
+      summary: `تم جدولة متابعة جديدة: ${validated.action}`,
       notes: validated.notes || null,
       metadata: { follow_up_id: inserted.id },
     });
@@ -249,23 +344,54 @@ export async function createFollowUp(
       revalidatePath(`/deals/${validated.deal_id}`);
     }
 
-    return {
-      success: true,
-      data: inserted as unknown as FollowUpWithRelations,
-    };
+    return { success: true, data: inserted as unknown as FollowUp };
   } catch (err: unknown) {
     return { success: false, error: getErrorMessage(err, "Failed to create follow-up") };
   }
 }
 
 /**
- * Complete a Follow-up and optionally schedule the next one in one workflow
+ * Complete a follow-up and optionally schedule the next step
  */
 export async function completeFollowUp(
   input: CompleteFollowUpInput
-): Promise<ActionResult> {
+): Promise<ActionResult<{ completed: FollowUp; nextFollowUp?: FollowUp }>> {
   try {
     const validated = completeFollowUpSchema.parse(input);
+
+    if (!isSupabaseConfigured()) {
+      const flw = demoFollowUps.find((f) => f.id === validated.follow_up_id);
+      if (!flw) return { success: false, error: "Follow-up not found" };
+
+      flw.status = "COMPLETED";
+      flw.completion_result = validated.completion_result;
+      flw.completed_at = new Date().toISOString();
+      flw.updated_at = new Date().toISOString();
+
+      let nextFollowUp: FollowUp | undefined;
+      if (validated.schedule_next && validated.next_action && validated.next_due_at) {
+        nextFollowUp = {
+          id: `flw-${Date.now().toString().slice(-4)}`,
+          client_id: flw.client_id,
+          deal_id: flw.deal_id,
+          responsible_id: flw.responsible_id,
+          due_at: validated.next_due_at,
+          action: validated.next_action,
+          notes: validated.next_notes || null,
+          status: "PENDING",
+          completion_result: null,
+          completed_at: null,
+          created_by: flw.responsible_id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        demoFollowUps.unshift(nextFollowUp);
+      }
+
+      revalidatePath("/follow-ups");
+      return { success: true, data: { completed: flw, nextFollowUp } };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const {
@@ -276,86 +402,104 @@ export async function completeFollowUp(
       return { success: false, error: "Authentication required" };
     }
 
-    const { data: current, error: currentErr } = await supabase
-      .from("follow_ups")
-      .select("id, client_id, deal_id, action, responsible_id")
-      .eq("id", validated.follow_up_id)
-      .single();
+    const completedAt = new Date().toISOString();
 
-    if (currentErr || !current) {
-      return { success: false, error: "Follow-up not found" };
-    }
-
-    // Mark current as completed
-    const { error: updateErr } = await supabase
+    const { data: updated, error: updateError } = await supabase
       .from("follow_ups")
       .update({
         status: "COMPLETED",
         completion_result: validated.completion_result,
-        completed_at: new Date().toISOString(),
+        completed_at: completedAt,
       })
-      .eq("id", validated.follow_up_id);
+      .eq("id", validated.follow_up_id)
+      .select()
+      .single();
 
-    if (updateErr) {
-      return { success: false, error: updateErr.message };
+    if (updateError || !updated) {
+      return { success: false, error: updateError?.message || "Failed to complete follow-up" };
     }
 
-    // Log completion activity
     await supabase.from("activities").insert({
-      type: "NOTE",
+      type: "FOLLOW_UP",
       actor_id: user.id,
-      client_id: current.client_id,
-      deal_id: current.deal_id,
-      summary: `تم إتمام المتابعة (${current.action})`,
+      client_id: updated.client_id,
+      deal_id: updated.deal_id,
+      summary: `تم إنجاز المتابعة: ${updated.action}`,
       notes: validated.completion_result,
-      metadata: {
-        completed_follow_up_id: current.id,
-      },
+      metadata: { follow_up_id: updated.id },
     });
 
-    // Optionally schedule next follow-up
-    if (validated.schedule_next && validated.next_due_at && validated.next_action) {
-      await supabase.from("follow_ups").insert({
-        client_id: current.client_id,
-        deal_id: current.deal_id,
-        responsible_id: current.responsible_id,
-        due_at: validated.next_due_at,
-        action: validated.next_action,
-        notes: validated.next_notes || null,
-        status: "PENDING",
-        created_by: user.id,
-      });
+    let nextFollowUp: FollowUp | undefined;
+    if (validated.schedule_next && validated.next_action && validated.next_due_at) {
+      const { data: nextInserted } = await supabase
+        .from("follow_ups")
+        .insert({
+          client_id: updated.client_id,
+          deal_id: updated.deal_id,
+          responsible_id: user.id,
+          due_at: validated.next_due_at,
+          action: validated.next_action,
+          notes: validated.next_notes || null,
+          status: "PENDING",
+          created_by: user.id,
+        })
+        .select()
+        .single();
 
-      await supabase.from("activities").insert({
-        type: "NOTE",
-        actor_id: user.id,
-        client_id: current.client_id,
-        deal_id: current.deal_id,
-        summary: `تمت جدولة المتابعة القادمة (${validated.next_action})`,
-        notes: validated.next_notes || null,
-      });
+      if (nextInserted) {
+        nextFollowUp = nextInserted as unknown as FollowUp;
+        await supabase.from("activities").insert({
+          type: "FOLLOW_UP",
+          actor_id: user.id,
+          client_id: updated.client_id,
+          deal_id: updated.deal_id,
+          summary: `جدولة الخطوة التالية: ${validated.next_action}`,
+          notes: validated.next_notes || null,
+          metadata: { follow_up_id: nextInserted.id },
+        });
+      }
     }
 
     revalidatePath("/follow-ups");
-    revalidatePath(`/clients/${current.client_id}`);
-    if (current.deal_id) {
-      revalidatePath(`/deals/${current.deal_id}`);
+    revalidatePath(`/clients/${updated.client_id}`);
+    if (updated.deal_id) {
+      revalidatePath(`/deals/${updated.deal_id}`);
     }
 
-    return { success: true };
+    return {
+      success: true,
+      data: {
+        completed: updated as unknown as FollowUp,
+        nextFollowUp,
+      },
+    };
   } catch (err: unknown) {
     return { success: false, error: getErrorMessage(err, "Failed to complete follow-up") };
   }
 }
 
 /**
- * Reschedule a Follow-up
+ * Reschedule a follow-up to a new date
  */
 export async function rescheduleFollowUp(
   input: RescheduleFollowUpInput
-): Promise<ActionResult> {
+): Promise<ActionResult<FollowUp>> {
   try {
     const validated = rescheduleFollowUpSchema.parse(input);
+
+    if (!isSupabaseConfigured()) {
+      const flw = demoFollowUps.find((f) => f.id === validated.follow_up_id);
+      if (!flw) return { success: false, error: "Follow-up not found" };
+
+      flw.due_at = validated.new_due_at;
+      if (validated.reason) {
+        flw.notes = `${flw.notes ? flw.notes + "\n" : ""}[تأجيل]: ${validated.reason}`;
+      }
+      flw.updated_at = new Date().toISOString();
+      revalidatePath("/follow-ups");
+      return { success: true, data: flw };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const {
@@ -366,49 +510,43 @@ export async function rescheduleFollowUp(
       return { success: false, error: "Authentication required" };
     }
 
-    const { data: current, error: currentErr } = await supabase
+    const { data: current } = await supabase
       .from("follow_ups")
-      .select("id, client_id, deal_id, action, due_at")
+      .select("notes, client_id, deal_id, action")
       .eq("id", validated.follow_up_id)
       .single();
 
-    if (currentErr || !current) {
-      return { success: false, error: "Follow-up not found" };
-    }
+    const updatedNotes = validated.reason
+      ? `${current?.notes ? current.notes + "\n" : ""}[تأجيل]: ${validated.reason}`
+      : current?.notes;
 
-    const { error: updateErr } = await supabase
+    const { data: updated, error: updateError } = await supabase
       .from("follow_ups")
       .update({
         due_at: validated.new_due_at,
-        status: "PENDING",
-        notes: validated.reason ? `تم التأجيل: ${validated.reason}` : undefined,
+        notes: updatedNotes,
       })
-      .eq("id", validated.follow_up_id);
+      .eq("id", validated.follow_up_id)
+      .select()
+      .single();
 
-    if (updateErr) {
-      return { success: false, error: updateErr.message };
+    if (updateError || !updated) {
+      return { success: false, error: updateError?.message || "Failed to reschedule follow-up" };
     }
 
     await supabase.from("activities").insert({
-      type: "NOTE",
+      type: "FOLLOW_UP",
       actor_id: user.id,
-      client_id: current.client_id,
-      deal_id: current.deal_id,
-      summary: `تأجيل موعد المتابعة إلى ${new Date(validated.new_due_at).toLocaleDateString("ar-EG")}`,
+      client_id: updated.client_id,
+      deal_id: updated.deal_id,
+      summary: `تأجيل المتابعة إلى: ${validated.new_due_at}`,
       notes: validated.reason || null,
-      metadata: {
-        previous_due_at: current.due_at,
-        new_due_at: validated.new_due_at,
-      },
+      metadata: { follow_up_id: updated.id },
     });
 
     revalidatePath("/follow-ups");
-    revalidatePath(`/clients/${current.client_id}`);
-    if (current.deal_id) {
-      revalidatePath(`/deals/${current.deal_id}`);
-    }
 
-    return { success: true };
+    return { success: true, data: updated as unknown as FollowUp };
   } catch (err: unknown) {
     return { success: false, error: getErrorMessage(err, "Failed to reschedule follow-up") };
   }

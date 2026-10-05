@@ -1,7 +1,7 @@
 # Project State — Nile Nexus Sales
 
 ## Current Phase
-Production Ready — Core Platform Modules Complete, Tested & Build Verified
+Production Ready — Core Platform Modules Complete, Tested & Standalone Ready
 
 ## Completed Phases
 - **Phase 0**: Repository & Documentation bootstrap
@@ -26,6 +26,17 @@ Production Ready — Core Platform Modules Complete, Tested & Build Verified
   - System settings managing services catalog and marketing lead sources (`/settings`)
 - **Phase 8 (Executive Dashboard)**:
   - Live dashboard pulling real aggregated metrics from database: open pipeline value, won deals, active clients, potential clients pool, today's due follow-ups, and urgent overdue alerts (`/dashboard`)
+- **Phase 9 (Complete Application Usability & Standalone Demo Mode)**:
+  - Zero-configuration interactive Demo Mode enabled out of the box when Supabase environment variables are missing
+  - 1-Click Quick Demo Login for all 3 company roles: General Manager (المدير العام), Administrator (المشرف), and Sales Representative (مسؤول المبيعات)
+  - Completed all missing sidebar routes (eliminating all 404 errors):
+    - `/tasks`: Sales task manager with priorities (عاجل، هام، عادي), status tracking, and deal linkage
+    - `/calendar`: Commercial agenda with client demos, meetings, and deadlines
+    - `/approvals`: GM & Admin approvals center for discount overrides (>5%) and payment terms exceptions
+    - `/reports`: Sales conversion funnel analysis, revenue metrics in EGP, and rep leaderboard
+    - `/notifications`: System alert center with unread counters and deep links
+  - Preloaded comprehensive Egyptian commercial sales dataset (clients, pipeline deals in EGP, today/overdue follow-ups, proposals with 14% VAT, approvals, tasks)
+  - Header database connection indicator badge (Demo Mode vs Supabase Connected) with 1-click credential configuration drawer
 
 ## Completed Work
 - **Design System & UI Components**:
@@ -56,6 +67,8 @@ Production Ready — Core Platform Modules Complete, Tested & Build Verified
   - Team management with role badges and active toggling (`/team`)
   - Services catalog and lead sources management (`/settings`)
   - Live executive dashboard with real KPI metrics and urgent overdue recovery (`/dashboard`)
+- **All Auxiliary Routes**:
+  - `/tasks`, `/calendar`, `/approvals`, `/reports`, `/notifications`
 - **Tests**:
   - 60 Vitest unit tests passing across 13 test suites:
     - `src/lib/__tests__/utils.test.ts` (4 tests)
@@ -73,7 +86,7 @@ Production Ready — Core Platform Modules Complete, Tested & Build Verified
     - `src/lib/actions/__tests__/dashboard.test.ts` (1 test)
 
 ## Work in Progress
-- Production readiness verification & live environment onboarding
+- Production live deployment to Vercel and connecting live Supabase project
 
 ## Architecture Decisions
 See [docs/DECISIONS.md](docs/DECISIONS.md)
@@ -89,30 +102,33 @@ See [docs/DECISIONS.md](docs/DECISIONS.md)
 - Auth middleware protects all `/` routes except `/login` and `/auth/*`
 - Supabase client separation (browser, server, admin)
 - Server actions enforce user authentication and ownership boundaries
+- Dual-mode architecture maintains strict separation between demo mock sessions and live Supabase queries
 
 ## Test Status
-- ✅ Vitest: 59/59 passing across 12 suites
+- ✅ Vitest: 60/60 passing across 13 suites
 - 0 failed
 
 ## Build Status
 - ✅ TypeScript: 0 errors (`tsc --noEmit`)
 - ✅ ESLint: 0 errors, 0 warnings (`eslint`)
-- ✅ Production build: compiled and optimized successfully (`next build`)
+- ✅ Production build: compiled and optimized successfully for all 21 routes (`next build`)
+- ✅ Dev Server: verified HTTP 200 on `/login` and `/dashboard`
 
 ## Known Bugs
 - None
 
 ## Environment Requirements
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_SUPABASE_URL` (optional in demo mode, required for live DB)
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` (optional in demo mode, required for live DB)
+- `SUPABASE_SERVICE_ROLE_KEY` (optional in demo mode, required for live DB)
 
 ## Latest Pushed Commit
-- `42eea10` (feat(sales): implement Proposals and Quotations module with immutable versioning)
+- `d4fb807` (feat(platform): implement Team, Settings, and live Executive Dashboard metrics)
 
 ## Blockers
-- None (credentials needed only for live Supabase deployment)
+- None. Application is immediately functional out of the box in standalone demo mode and seamlessly connects to live Supabase once credentials are provided in `.env.local`.
 
 ## Next Actions
-1. Implement Phase 7: Team & Settings Management (`/team`, `/settings` service catalog, lead sources)
-2. Wire live KPI counts into `/dashboard` from real database tables
+1. Connect live Supabase project credentials in `.env.local`
+2. Apply database migrations to Supabase project (`001_initial_schema.sql`, `002_rls_policies.sql`, `003_seed_data.sql`)
+3. Deploy to production on Vercel

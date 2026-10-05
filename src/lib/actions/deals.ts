@@ -2,6 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import {
+  demoClients,
+  demoDeals,
+  demoProfiles,
+} from "@/lib/demo-data";
 import {
   createDealSchema,
   updateDealSchema,
@@ -13,7 +19,7 @@ import {
   type FilterDealsInput,
   type DealStage,
 } from "@/lib/schemas/deal";
-import type { Deal, Client, Activity } from "@/types/domain";
+import type { Deal, Client } from "@/types/domain";
 
 export type ActionResult<T = unknown> = {
   success: boolean;
@@ -65,6 +71,66 @@ export async function getDeals(
 ): Promise<ActionResult<PaginatedDealsResult>> {
   try {
     const parsed = filterDealsSchema.parse(filters);
+
+    if (!isSupabaseConfigured()) {
+      let filtered = [...demoDeals].filter((d) => d.archived_at === null);
+
+      if (parsed.stage) {
+        filtered = filtered.filter((d) => d.stage === parsed.stage);
+      }
+
+      if (parsed.client_id) {
+        filtered = filtered.filter((d) => d.client_id === parsed.client_id);
+      }
+
+      if (parsed.sales_owner_id) {
+        filtered = filtered.filter((d) => d.sales_owner_id === parsed.sales_owner_id);
+      }
+
+      if (parsed.query && parsed.query.trim()) {
+        const q = parsed.query.trim().toLowerCase();
+        filtered = filtered.filter(
+          (d) =>
+            d.title.toLowerCase().includes(q) ||
+            d.business_id.toLowerCase().includes(q)
+        );
+      }
+
+      const total = filtered.length;
+      const totalPages = Math.ceil(total / parsed.pageSize) || 1;
+      const from = (parsed.page - 1) * parsed.pageSize;
+      const sliced = filtered.slice(from, from + parsed.pageSize);
+
+      const items: DealWithRelations[] = sliced.map((d) => {
+        const client = demoClients.find((c) => c.id === d.client_id);
+        const owner = demoProfiles.find((p) => p.id === d.sales_owner_id);
+        return {
+          ...d,
+          client: client
+            ? {
+                id: client.id,
+                name: client.name,
+                business_id: client.business_id,
+                phone: client.phone,
+                type: client.type,
+              }
+            : null,
+          sales_owner: owner ? { id: owner.id, full_name: owner.full_name, email: owner.email } : null,
+        };
+      });
+
+      return {
+        success: true,
+        data: {
+          items,
+          total,
+          page: parsed.page,
+          pageSize: parsed.pageSize,
+          totalPages,
+        },
+      };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     let query = supabase
@@ -132,7 +198,52 @@ export async function getDeals(
 export async function getPipelineDeals(): Promise<
   ActionResult<Record<DealStage, PipelineStageSummary>>
 > {
+  const allStages: DealStage[] = [
+    "NEW",
+    "CONTACTED",
+    "INTERESTED",
+    "PROPOSAL_SENT",
+    "NEGOTIATION",
+    "WON",
+    "LOST",
+    "LATER",
+  ];
+
   try {
+    if (!isSupabaseConfigured()) {
+      const result = {} as Record<DealStage, PipelineStageSummary>;
+      for (const stage of allStages) {
+        result[stage] = { stage, deals: [], totalValue: 0, count: 0 };
+      }
+
+      for (const d of demoDeals) {
+        if (d.archived_at) continue;
+        const client = demoClients.find((c) => c.id === d.client_id);
+        const owner = demoProfiles.find((p) => p.id === d.sales_owner_id);
+        const dealWithRel: DealWithRelations = {
+          ...d,
+          client: client
+            ? {
+                id: client.id,
+                name: client.name,
+                business_id: client.business_id,
+                phone: client.phone,
+                type: client.type,
+              }
+            : null,
+          sales_owner: owner ? { id: owner.id, full_name: owner.full_name, email: owner.email } : null,
+        };
+
+        if (result[d.stage]) {
+          result[d.stage].deals.push(dealWithRel);
+          result[d.stage].count += 1;
+          result[d.stage].totalValue += Number(d.final_value || d.estimated_value) || 0;
+        }
+      }
+
+      return { success: true, data: result };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const { data, error } = await supabase
@@ -151,48 +262,57 @@ export async function getPipelineDeals(): Promise<
       return { success: false, error: error.message };
     }
 
-    const deals = (data || []) as unknown as DealWithRelations[];
-
-    const stages: DealStage[] = [
-      "NEW",
-      "CONTACTED",
-      "INTERESTED",
-      "PROPOSAL_SENT",
-      "NEGOTIATION",
-      "WON",
-      "LOST",
-      "LATER",
-    ];
-
     const result = {} as Record<DealStage, PipelineStageSummary>;
+    for (const stage of allStages) {
+      result[stage] = { stage, deals: [], totalValue: 0, count: 0 };
+    }
 
-    for (const stage of stages) {
-      const stageDeals = deals.filter((d) => d.stage === stage);
-      const totalValue = stageDeals.reduce(
-        (sum, d) => sum + (Number(d.estimated_value) || 0),
-        0
-      );
-      result[stage] = {
-        stage,
-        deals: stageDeals,
-        totalValue,
-        count: stageDeals.length,
-      };
+    for (const deal of (data || []) as unknown as DealWithRelations[]) {
+      const stage = deal.stage;
+      if (result[stage]) {
+        result[stage].deals.push(deal);
+        result[stage].count += 1;
+        result[stage].totalValue +=
+          Number(deal.final_value || deal.estimated_value) || 0;
+      }
     }
 
     return { success: true, data: result };
   } catch (err: unknown) {
-    return { success: false, error: getErrorMessage(err, "Failed to load pipeline") };
+    return { success: false, error: getErrorMessage(err, "Failed to load pipeline deals") };
   }
 }
 
 /**
- * Get single deal by ID with activities and client info
+ * Get deal by ID with client details and relations
  */
-export async function getDealById(
-  id: string
-): Promise<ActionResult<DealWithRelations & { activities?: Activity[] }>> {
+export async function getDealById(id: string): Promise<ActionResult<DealWithRelations>> {
   try {
+    if (!isSupabaseConfigured()) {
+      const deal = demoDeals.find((d) => d.id === id);
+      if (!deal) return { success: false, error: "Deal not found" };
+
+      const client = demoClients.find((c) => c.id === deal.client_id);
+      const owner = demoProfiles.find((p) => p.id === deal.sales_owner_id);
+
+      return {
+        success: true,
+        data: {
+          ...deal,
+          client: client
+            ? {
+                id: client.id,
+                name: client.name,
+                business_id: client.business_id,
+                phone: client.phone,
+                type: client.type,
+              }
+            : null,
+          sales_owner: owner ? { id: owner.id, full_name: owner.full_name, email: owner.email } : null,
+        },
+      };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const { data, error } = await supabase
@@ -200,8 +320,9 @@ export async function getDealById(
       .select(
         `
         *,
-        client:clients!client_id(id, name, business_id, phone, email, type, area),
-        sales_owner:profiles!sales_owner_id(id, full_name, email)
+        client:clients!client_id(id, name, business_id, phone, type, email, industry),
+        sales_owner:profiles!sales_owner_id(id, full_name, email),
+        deal_services(id, service_id, service:services(name_ar, name_en))
       `
       )
       .eq("id", id)
@@ -211,34 +332,53 @@ export async function getDealById(
       return { success: false, error: error?.message || "Deal not found" };
     }
 
-    // Fetch activities for this deal
-    const { data: activities } = await supabase
-      .from("activities")
-      .select("*")
-      .eq("deal_id", id)
-      .order("created_at", { ascending: false })
-      .limit(20);
-
-    return {
-      success: true,
-      data: {
-        ...(data as unknown as DealWithRelations),
-        activities: (activities || []) as Activity[],
-      },
-    };
+    return { success: true, data: data as unknown as DealWithRelations };
   } catch (err: unknown) {
-    return { success: false, error: getErrorMessage(err, "Failed to fetch deal") };
+    return { success: false, error: getErrorMessage(err, "Failed to load deal") };
   }
 }
 
 /**
- * Create a new Deal record
+ * Create a new deal
  */
-export async function createDeal(
-  input: CreateDealInput
-): Promise<ActionResult<DealWithRelations>> {
+export async function createDeal(input: CreateDealInput): Promise<ActionResult<Deal>> {
   try {
     const validated = createDealSchema.parse(input);
+
+    if (!isSupabaseConfigured()) {
+      const newDealId = `d-${Date.now().toString().slice(-4)}`;
+      const businessId = `DEAL-00${300 + demoDeals.length + 1}`;
+      const owner = demoProfiles.find((p) => p.id === validated.sales_owner_id) || demoProfiles[2];
+
+      const newDeal: Deal = {
+        id: newDealId,
+        business_id: businessId,
+        title: validated.title,
+        client_id: validated.client_id,
+        sales_owner_id: owner.id,
+        stage: validated.stage || "NEW",
+        estimated_value: validated.estimated_value ? String(validated.estimated_value) : null,
+        currency: validated.currency || "EGP",
+        final_value: null,
+        lost_reason: null,
+        lost_notes: null,
+        resurface_date: null,
+        won_date: null,
+        notes: validated.notes || null,
+        archived_at: null,
+        created_by: owner.id,
+        updated_by: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      demoDeals.unshift(newDeal);
+      revalidatePath("/deals");
+      revalidatePath("/pipeline");
+
+      return { success: true, data: newDeal };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const {
@@ -268,7 +408,7 @@ export async function createDeal(
         title: validated.title,
         client_id: validated.client_id,
         sales_owner_id: salesOwnerId,
-        stage: validated.stage,
+        stage: validated.stage || "NEW",
         estimated_value: validated.estimated_value || null,
         currency: validated.currency || "EGP",
         notes: validated.notes || null,
@@ -281,46 +421,60 @@ export async function createDeal(
       return { success: false, error: insertError?.message || "Failed to create deal" };
     }
 
-    // Link services if any
     if (validated.service_ids && validated.service_ids.length > 0) {
-      const serviceRows = validated.service_ids.map((service_id) => ({
+      const serviceRows = validated.service_ids.map((serviceId: string) => ({
         deal_id: inserted.id,
-        service_id,
+        service_id: serviceId,
       }));
       await supabase.from("deal_services").insert(serviceRows);
     }
 
-    // Log Activity
     await supabase.from("activities").insert({
       type: "SYSTEM",
       actor_id: user.id,
       client_id: validated.client_id,
       deal_id: inserted.id,
-      summary: `إنشاء صفقة جديدة: ${inserted.title} (${inserted.business_id})`,
+      summary: `تسجيل صفقة جديدة: ${inserted.title} (${inserted.business_id})`,
       metadata: { deal_id: inserted.id },
     });
 
     revalidatePath("/deals");
     revalidatePath("/pipeline");
-    revalidatePath(`/clients/${validated.client_id}`);
 
-    return {
-      success: true,
-      data: inserted as unknown as DealWithRelations,
-    };
+    return { success: true, data: inserted as unknown as Deal };
   } catch (err: unknown) {
     return { success: false, error: getErrorMessage(err, "Failed to create deal") };
   }
 }
 
 /**
- * Update Deal stage (e.g. dragging across Pipeline Kanban)
+ * Update deal details
  */
-export async function updateDealStage(
-  input: UpdateDealStageInput
-): Promise<ActionResult> {
+export async function updateDeal(
+  id: string,
+  input: UpdateDealInput
+): Promise<ActionResult<Deal>> {
   try {
-    const validated = updateDealStageSchema.parse(input);
+    const validated = updateDealSchema.parse(input);
+
+    if (!isSupabaseConfigured()) {
+      const deal = demoDeals.find((d) => d.id === id);
+      if (!deal) return { success: false, error: "Deal not found" };
+
+      if (validated.title !== undefined) deal.title = validated.title;
+      if (validated.stage !== undefined) deal.stage = validated.stage;
+      if (validated.estimated_value !== undefined)
+        deal.estimated_value = validated.estimated_value ? String(validated.estimated_value) : null;
+      if (validated.notes !== undefined) deal.notes = validated.notes;
+      deal.updated_at = new Date().toISOString();
+
+      revalidatePath("/deals");
+      revalidatePath(`/deals/${id}`);
+      revalidatePath("/pipeline");
+
+      return { success: true, data: deal };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     const {
@@ -331,14 +485,78 @@ export async function updateDealStage(
       return { success: false, error: "Authentication required" };
     }
 
-    const { data: current, error: currentErr } = await supabase
+    const updatePayload: Record<string, unknown> = {
+      updated_by: user.id,
+    };
+
+    if (validated.title !== undefined) updatePayload.title = validated.title;
+    if (validated.stage !== undefined) updatePayload.stage = validated.stage;
+    if (validated.estimated_value !== undefined)
+      updatePayload.estimated_value = validated.estimated_value;
+    if (validated.currency !== undefined) updatePayload.currency = validated.currency;
+    if (validated.sales_owner_id !== undefined)
+      updatePayload.sales_owner_id = validated.sales_owner_id;
+    if (validated.notes !== undefined) updatePayload.notes = validated.notes;
+
+    const { data: updated, error } = await supabase
       .from("deals")
-      .select("id, title, stage, client_id, business_id")
-      .eq("id", validated.deal_id)
+      .update(updatePayload)
+      .eq("id", id)
+      .select()
       .single();
 
-    if (currentErr || !current) {
-      return { success: false, error: "Deal not found" };
+    if (error || !updated) {
+      return { success: false, error: error?.message || "Failed to update deal" };
+    }
+
+    revalidatePath("/deals");
+    revalidatePath(`/deals/${id}`);
+    revalidatePath("/pipeline");
+
+    return { success: true, data: updated as unknown as Deal };
+  } catch (err: unknown) {
+    return { success: false, error: getErrorMessage(err, "Failed to update deal") };
+  }
+}
+
+/**
+ * Move deal through stages
+ */
+export async function updateDealStage(
+  input: UpdateDealStageInput
+): Promise<ActionResult> {
+  try {
+    const validated = updateDealStageSchema.parse(input);
+
+    if (!isSupabaseConfigured()) {
+      const deal = demoDeals.find((d) => d.id === validated.deal_id);
+      if (!deal) return { success: false, error: "Deal not found" };
+
+      deal.stage = validated.stage;
+      if (validated.stage === "WON") {
+        deal.won_date = new Date().toISOString();
+        if (validated.final_value != null) deal.final_value = String(validated.final_value);
+      } else if (validated.stage === "LOST") {
+        deal.lost_reason = validated.lost_reason_id || null;
+        deal.lost_notes = validated.lost_notes || null;
+      }
+      deal.updated_at = new Date().toISOString();
+
+      revalidatePath("/deals");
+      revalidatePath("/pipeline");
+      revalidatePath(`/deals/${validated.deal_id}`);
+
+      return { success: true };
+    }
+
+    const supabase = await createSupabaseServerClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Authentication required" };
     }
 
     const updatePayload: Record<string, unknown> = {
@@ -347,38 +565,26 @@ export async function updateDealStage(
     };
 
     if (validated.stage === "WON") {
-      updatePayload.won_date = new Date().toISOString().split("T")[0];
-      if (validated.final_value) updatePayload.final_value = validated.final_value;
+      updatePayload.won_date = new Date().toISOString();
+      if (validated.final_value !== undefined) {
+        updatePayload.final_value = validated.final_value;
+      }
+    } else if (validated.stage === "LOST") {
+      updatePayload.lost_reason_id = validated.lost_reason_id || null;
+      updatePayload.lost_notes = validated.lost_notes || null;
+      if (validated.resurface_date) {
+        updatePayload.resurface_date = validated.resurface_date;
+      }
     }
 
-    if (validated.stage === "LOST") {
-      if (validated.lost_reason_id) updatePayload.lost_reason_id = validated.lost_reason_id;
-      if (validated.lost_notes) updatePayload.lost_notes = validated.lost_notes;
-      if (validated.resurface_date) updatePayload.resurface_date = validated.resurface_date;
-    }
-
-    const { error: updateErr } = await supabase
+    const { error } = await supabase
       .from("deals")
       .update(updatePayload)
       .eq("id", validated.deal_id);
 
-    if (updateErr) {
-      return { success: false, error: updateErr.message };
+    if (error) {
+      return { success: false, error: error.message };
     }
-
-    // Log Activity
-    await supabase.from("activities").insert({
-      type: "STAGE_CHANGE",
-      actor_id: user.id,
-      client_id: current.client_id,
-      deal_id: current.id,
-      summary: `تغيير مرحلة الصفقة ${current.title} من ${current.stage} إلى ${validated.stage}`,
-      notes: validated.notes || validated.lost_notes || null,
-      metadata: {
-        previous_stage: current.stage,
-        new_stage: validated.stage,
-      },
-    });
 
     revalidatePath("/deals");
     revalidatePath("/pipeline");
@@ -386,97 +592,6 @@ export async function updateDealStage(
 
     return { success: true };
   } catch (err: unknown) {
-    return { success: false, error: getErrorMessage(err, "Failed to update deal stage") };
+    return { success: false, error: getErrorMessage(err, "Failed to change deal stage") };
   }
 }
-
-/**
- * Update Deal details
- */
-export async function updateDeal(
-  dealId: string,
-  input: UpdateDealInput
-): Promise<ActionResult<DealWithRelations>> {
-  try {
-    const validated = updateDealSchema.parse(input);
-    const supabase = await createSupabaseServerClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return { success: false, error: "Authentication required" };
-    }
-
-    const { data: current, error: currentErr } = await supabase
-      .from("deals")
-      .select("id, title, client_id, business_id")
-      .eq("id", dealId)
-      .single();
-
-    if (currentErr || !current) {
-      return { success: false, error: "Deal not found" };
-    }
-
-    const updatePayload: Record<string, unknown> = {
-      updated_by: user.id,
-    };
-
-    if (validated.title !== undefined) updatePayload.title = validated.title;
-    if (validated.sales_owner_id !== undefined) updatePayload.sales_owner_id = validated.sales_owner_id;
-    if (validated.stage !== undefined) updatePayload.stage = validated.stage;
-    if (validated.estimated_value !== undefined) updatePayload.estimated_value = validated.estimated_value;
-    if (validated.final_value !== undefined) updatePayload.final_value = validated.final_value;
-    if (validated.currency !== undefined) updatePayload.currency = validated.currency;
-    if (validated.notes !== undefined) updatePayload.notes = validated.notes;
-    if (validated.won_date !== undefined) updatePayload.won_date = validated.won_date;
-    if (validated.lost_reason_id !== undefined) updatePayload.lost_reason_id = validated.lost_reason_id;
-    if (validated.lost_notes !== undefined) updatePayload.lost_notes = validated.lost_notes;
-    if (validated.resurface_date !== undefined) updatePayload.resurface_date = validated.resurface_date;
-
-    const { data: updated, error: updateErr } = await supabase
-      .from("deals")
-      .update(updatePayload)
-      .eq("id", dealId)
-      .select()
-      .single();
-
-    if (updateErr || !updated) {
-      return { success: false, error: updateErr?.message || "Failed to update deal" };
-    }
-
-    // Sync services if provided
-    if (validated.service_ids) {
-      await supabase.from("deal_services").delete().eq("deal_id", dealId);
-      if (validated.service_ids.length > 0) {
-        const rows = validated.service_ids.map((service_id) => ({
-          deal_id: dealId,
-          service_id,
-        }));
-        await supabase.from("deal_services").insert(rows);
-      }
-    }
-
-    await supabase.from("activities").insert({
-      type: "SYSTEM",
-      actor_id: user.id,
-      client_id: current.client_id,
-      deal_id: dealId,
-      summary: `تحديث بيانات الصفقة: ${current.title}`,
-      metadata: { deal_id: dealId },
-    });
-
-    revalidatePath("/deals");
-    revalidatePath("/pipeline");
-    revalidatePath(`/deals/${dealId}`);
-
-    return {
-      success: true,
-      data: updated as unknown as DealWithRelations,
-    };
-  } catch (err: unknown) {
-    return { success: false, error: getErrorMessage(err, "Failed to update deal") };
-  }
-}
-

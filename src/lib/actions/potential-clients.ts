@@ -2,6 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
+import {
+  demoPotentialClients,
+  demoClients,
+  demoProfiles,
+  demoLeadSources,
+} from "@/lib/demo-data";
 import {
   createPotentialClientSchema,
   updatePotentialClientSchema,
@@ -66,9 +73,8 @@ export async function checkDuplicatePotentialClient(params: {
   isDuplicate: boolean;
   matches: Array<{ id: string; name: string; business_id: string; type: "potential_client" | "client" }>;
 }> {
-  const supabase = await createClient();
   const normalizedPhone = normalizePhoneNumber(params.phone);
-  const nameQuery = params.name?.trim();
+  const nameQuery = params.name?.trim().toLowerCase();
 
   const matches: Array<{
     id: string;
@@ -77,8 +83,42 @@ export async function checkDuplicatePotentialClient(params: {
     type: "potential_client" | "client";
   }> = [];
 
+  if (!isSupabaseConfigured()) {
+    if (normalizedPhone) {
+      for (const pc of demoPotentialClients) {
+        if (normalizePhoneNumber(pc.phone) === normalizedPhone) {
+          matches.push({ id: pc.id, name: pc.name, business_id: pc.business_id, type: "potential_client" });
+        }
+      }
+      for (const c of demoClients) {
+        if (normalizePhoneNumber(c.phone) === normalizedPhone) {
+          matches.push({ id: c.id, name: c.name, business_id: c.business_id, type: "client" });
+        }
+      }
+    }
+
+    if (nameQuery && nameQuery.length >= 3) {
+      for (const pc of demoPotentialClients) {
+        if (pc.name.toLowerCase().includes(nameQuery) && !matches.some((m) => m.id === pc.id)) {
+          matches.push({ id: pc.id, name: pc.name, business_id: pc.business_id, type: "potential_client" });
+        }
+      }
+      for (const c of demoClients) {
+        if (c.name.toLowerCase().includes(nameQuery) && !matches.some((m) => m.id === c.id)) {
+          matches.push({ id: c.id, name: c.name, business_id: c.business_id, type: "client" });
+        }
+      }
+    }
+
+    return {
+      isDuplicate: matches.length > 0,
+      matches,
+    };
+  }
+
+  const supabase = await createClient();
+
   if (normalizedPhone) {
-    // Check potential clients
     const { data: pcPhone } = await supabase
       .from("potential_clients")
       .select("id, name, business_id")
@@ -91,7 +131,6 @@ export async function checkDuplicatePotentialClient(params: {
       }
     }
 
-    // Check confirmed clients
     const { data: cPhone } = await supabase
       .from("clients")
       .select("id, name, business_id")
@@ -135,6 +174,56 @@ export async function getPotentialClients(
 ): Promise<ActionResult<PaginatedResult<PotentialClientWithRelations>>> {
   try {
     const parsedFilters = filterPotentialClientSchema.parse(filters);
+
+    if (!isSupabaseConfigured()) {
+      let filtered = [...demoPotentialClients].filter((p) => p.archived_at === null);
+
+      if (parsedFilters.status) {
+        filtered = filtered.filter((p) => p.status === parsedFilters.status);
+      }
+
+      if (parsedFilters.research_owner_id) {
+        filtered = filtered.filter((p) => p.research_owner_id === parsedFilters.research_owner_id);
+      }
+
+      if (parsedFilters.query && parsedFilters.query.trim()) {
+        const q = parsedFilters.query.trim().toLowerCase();
+        filtered = filtered.filter(
+          (p) =>
+            p.name.toLowerCase().includes(q) ||
+            (p.phone && p.phone.includes(q)) ||
+            p.business_id.toLowerCase().includes(q)
+        );
+      }
+
+      const total = filtered.length;
+      const totalPages = Math.ceil(total / parsedFilters.pageSize) || 1;
+      const from = (parsedFilters.page - 1) * parsedFilters.pageSize;
+      const sliced = filtered.slice(from, from + parsedFilters.pageSize);
+
+      const items: PotentialClientWithRelations[] = sliced.map((pc) => {
+        const owner = demoProfiles.find((pr) => pr.id === pc.research_owner_id);
+        const source = demoLeadSources.find((ls) => ls.id === pc.source);
+        return {
+          ...pc,
+          opportunities: ["WEBSITE", "ERP_SYSTEM"] as OpportunityIndicator[],
+          research_owner: owner ? { id: owner.id, full_name: owner.full_name, email: owner.email } : null,
+          source: source ? { id: source.id, name_ar: source.name_ar, name_en: source.name_en } : null,
+        };
+      });
+
+      return {
+        success: true,
+        data: {
+          items,
+          total,
+          page: parsedFilters.page,
+          pageSize: parsedFilters.pageSize,
+          totalPages,
+        },
+      };
+    }
+
     const supabase = await createClient();
 
     let query = supabase
@@ -205,6 +294,24 @@ export async function getPotentialClientById(
   id: string
 ): Promise<ActionResult<PotentialClientWithRelations>> {
   try {
+    if (!isSupabaseConfigured()) {
+      const pc = demoPotentialClients.find((p) => p.id === id);
+      if (!pc) {
+        return { success: false, error: "Potential client not found" };
+      }
+      const owner = demoProfiles.find((pr) => pr.id === pc.research_owner_id);
+      const source = demoLeadSources.find((ls) => ls.id === pc.source);
+      return {
+        success: true,
+        data: {
+          ...pc,
+          opportunities: ["WEBSITE", "ERP_SYSTEM"] as OpportunityIndicator[],
+          research_owner: owner ? { id: owner.id, full_name: owner.full_name, email: owner.email } : null,
+          source: source ? { id: source.id, name_ar: source.name_ar, name_en: source.name_en } : null,
+        },
+      };
+    }
+
     const supabase = await createClient();
 
     const { data, error } = await supabase
@@ -237,13 +344,59 @@ export async function getPotentialClientById(
 }
 
 /**
- * Create a new potential client record with concurrency-safe business ID
+ * Create a new potential client record
  */
 export async function createPotentialClient(
   input: CreatePotentialClientInput
 ): Promise<ActionResult<PotentialClientWithRelations>> {
   try {
     const validated = createPotentialClientSchema.parse(input);
+
+    if (!isSupabaseConfigured()) {
+      const duplicate = await checkDuplicatePotentialClient({
+        phone: validated.phone,
+        name: validated.name,
+      });
+
+      const newId = `pc-${Date.now().toString().slice(-4)}`;
+      const businessId = `POT-00${100 + demoPotentialClients.length + 1}`;
+      const owner = demoProfiles.find((p) => p.id === validated.research_owner_id) || demoProfiles[2];
+
+      const newPC: PotentialClient = {
+        id: newId,
+        business_id: businessId,
+        name: validated.name,
+        area: validated.area || null,
+        phone: validated.phone || null,
+        website: validated.website || null,
+        instagram: validated.instagram || null,
+        facebook: validated.facebook || null,
+        source: validated.source_id || "src-01",
+        research_owner_id: owner.id,
+        status: "NEW",
+        notes: validated.notes || null,
+        converted_client_id: null,
+        archived_at: null,
+        created_by: owner.id,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      demoPotentialClients.unshift(newPC);
+      revalidatePath("/potential-clients");
+
+      return {
+        success: true,
+        data: {
+          ...newPC,
+          source: { id: "src-01", name_ar: "إعلانات لينكد إن", name_en: "LinkedIn Ads" },
+          opportunities: validated.opportunities || [],
+          research_owner: { id: owner.id, full_name: owner.full_name, email: owner.email },
+        },
+        warning: duplicate.isDuplicate ? "العميل ده موجود عندنا بالفعل تقريبًا 👀" : undefined,
+      };
+    }
+
     const supabase = await createClient();
 
     const {
@@ -254,7 +407,6 @@ export async function createPotentialClient(
       return { success: false, error: "Authentication required" };
     }
 
-    // Duplicate check warning
     const duplicate = await checkDuplicatePotentialClient({
       phone: validated.phone,
       name: validated.name,
@@ -269,7 +421,7 @@ export async function createPotentialClient(
         businessId = rpcId;
       }
     } catch {
-      // fallback to generated business ID
+      // fallback
     }
 
     const phoneNormalized = normalizePhoneNumber(validated.phone);
@@ -299,7 +451,6 @@ export async function createPotentialClient(
       return { success: false, error: insertError?.message || "Failed to create potential client" };
     }
 
-    // Insert opportunity indicators if any
     if (validated.opportunities && validated.opportunities.length > 0) {
       const oppRows = validated.opportunities.map((indicator) => ({
         potential_client_id: inserted.id,
@@ -308,7 +459,6 @@ export async function createPotentialClient(
       await supabase.from("potential_client_opportunities").insert(oppRows);
     }
 
-    // Create system activity
     await supabase.from("activities").insert({
       type: "SYSTEM",
       actor_id: user.id,
@@ -325,9 +475,7 @@ export async function createPotentialClient(
         ...inserted,
         opportunities: validated.opportunities || [],
       },
-      warning: duplicate.isDuplicate
-        ? "العميل ده موجود عندنا بالفعل تقريبًا 👀"
-        : undefined,
+      warning: duplicate.isDuplicate ? "العميل ده موجود عندنا بالفعل تقريبًا 👀" : undefined,
     };
   } catch (err: unknown) {
     return { success: false, error: getErrorMessage(err, "Failed to create potential client") };
@@ -335,7 +483,7 @@ export async function createPotentialClient(
 }
 
 /**
- * Update potential client details and opportunity indicators
+ * Update potential client details
  */
 export async function updatePotentialClient(
   id: string,
@@ -343,6 +491,32 @@ export async function updatePotentialClient(
 ): Promise<ActionResult<PotentialClientWithRelations>> {
   try {
     const validated = updatePotentialClientSchema.parse(input);
+
+    if (!isSupabaseConfigured()) {
+      const pc = demoPotentialClients.find((p) => p.id === id);
+      if (!pc) return { success: false, error: "Potential client not found" };
+
+      if (validated.name !== undefined) pc.name = validated.name;
+      if (validated.area !== undefined) pc.area = validated.area;
+      if (validated.phone !== undefined) pc.phone = validated.phone;
+      if (validated.website !== undefined) pc.website = validated.website;
+      if (validated.notes !== undefined) pc.notes = validated.notes;
+      if (validated.status !== undefined) pc.status = validated.status;
+      pc.updated_at = new Date().toISOString();
+
+      revalidatePath("/potential-clients");
+      revalidatePath(`/potential-clients/${id}`);
+
+      return {
+        success: true,
+        data: {
+          ...pc,
+          source: { id: "src-01", name_ar: "إعلانات لينكد إن", name_en: "LinkedIn Ads" },
+          opportunities: validated.opportunities || [],
+        },
+      };
+    }
+
     const supabase = await createClient();
 
     const {
@@ -379,7 +553,6 @@ export async function updatePotentialClient(
       return { success: false, error: updateError?.message || "Failed to update potential client" };
     }
 
-    // Sync opportunities if passed
     if (validated.opportunities !== undefined) {
       await supabase.from("potential_client_opportunities").delete().eq("potential_client_id", id);
       if (validated.opportunities.length > 0) {
@@ -407,7 +580,7 @@ export async function updatePotentialClient(
 }
 
 /**
- * Update research status (NEW -> RESEARCHING -> RESEARCHED -> ARCHIVED)
+ * Update research status
  */
 export async function updatePotentialClientStatus(
   id: string,
@@ -416,6 +589,18 @@ export async function updatePotentialClientStatus(
 ): Promise<ActionResult> {
   try {
     const validated = updateStatusSchema.parse({ status, notes });
+
+    if (!isSupabaseConfigured()) {
+      const pc = demoPotentialClients.find((p) => p.id === id);
+      if (!pc) return { success: false, error: "Potential client not found" };
+      pc.status = validated.status;
+      if (validated.notes) pc.notes = validated.notes;
+      pc.updated_at = new Date().toISOString();
+      revalidatePath("/potential-clients");
+      revalidatePath(`/potential-clients/${id}`);
+      return { success: true };
+    }
+
     const supabase = await createClient();
 
     const {
@@ -448,7 +633,6 @@ export async function updatePotentialClientStatus(
       return { success: false, error: updateErr.message };
     }
 
-    // Record activity
     await supabase.from("activities").insert({
       type: "STAGE_CHANGE",
       actor_id: user.id,
@@ -467,5 +651,43 @@ export async function updatePotentialClientStatus(
     return { success: true };
   } catch (err: unknown) {
     return { success: false, error: getErrorMessage(err, "Failed to update status") };
+  }
+}
+
+/**
+ * Soft delete (archive) potential client
+ */
+export async function archivePotentialClient(id: string): Promise<ActionResult> {
+  try {
+    if (!isSupabaseConfigured()) {
+      const pc = demoPotentialClients.find((p) => p.id === id);
+      if (pc) pc.archived_at = new Date().toISOString();
+      revalidatePath("/potential-clients");
+      return { success: true };
+    }
+
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Authentication required" };
+    }
+
+    const { error } = await supabase
+      .from("potential_clients")
+      .update({ archived_at: new Date().toISOString() })
+      .eq("id", id);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath("/potential-clients");
+    return { success: true };
+  } catch (err: unknown) {
+    return { success: false, error: getErrorMessage(err, "Failed to archive potential client") };
   }
 }

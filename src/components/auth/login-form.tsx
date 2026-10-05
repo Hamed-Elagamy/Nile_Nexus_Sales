@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { useRouter } from "next/navigation";
-import { Loader2, LogIn, Mail, Lock } from "lucide-react";
+import { Loader2, LogIn, Mail, Lock, Shield, UserCheck, Briefcase, Database } from "lucide-react";
 
 export function LoginForm() {
   const t = useTranslations("auth");
@@ -13,11 +14,35 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showConfigHelp, setShowConfigHelp] = useState(false);
+
+  const isConfigured = typeof window !== "undefined" ? isSupabaseConfigured() : false;
+
+  const handleDemoLogin = (role: "gm" | "admin" | "sales") => {
+    // Set demo cookies
+    document.cookie = `nile_demo_role=${role}; path=/; max-age=86400`;
+    document.cookie = `nile_demo_signed_out=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+    router.push("/dashboard");
+    router.refresh();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    if (!isConfigured) {
+      // In demo mode, accept demo emails or any input
+      if (email.includes("admin")) {
+        handleDemoLogin("admin");
+      } else if (email.includes("sales")) {
+        handleDemoLogin("sales");
+      } else {
+        handleDemoLogin("gm");
+      }
+      setLoading(false);
+      return;
+    }
 
     const supabase = createClient();
 
@@ -37,90 +62,154 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="text-center space-y-2">
-        <h2 className="text-xl font-semibold text-[var(--foreground)]">
-          {t("loginTitle")}
-        </h2>
-        <p className="text-sm text-[var(--muted-foreground)]">
-          {t("loginSubtitle")}
-        </p>
-      </div>
-
-      {error && (
-        <div className="bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm p-3 rounded-lg border border-red-200 dark:border-red-800">
-          {error}
+    <div className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="text-center space-y-2">
+          <h2 className="text-xl font-semibold text-[var(--foreground)]">
+            {t("loginTitle")}
+          </h2>
+          <p className="text-sm text-[var(--muted-foreground)]">
+            {t("loginSubtitle")}
+          </p>
         </div>
-      )}
 
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <label
-            htmlFor="email"
-            className="text-sm font-medium text-[var(--foreground)]"
-          >
-            {t("email")}
-          </label>
-          <div className="relative">
-            <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]" />
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              className="w-full ps-10 pe-4 py-2.5 rounded-lg border border-[var(--input)] bg-[var(--background)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] transition-colors"
-              placeholder="name@company.com"
-              dir="ltr"
-            />
+        {error && (
+          <div className="bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm p-3 rounded-lg border border-red-200 dark:border-red-800">
+            {error}
           </div>
-        </div>
+        )}
 
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
+        <div className="space-y-4">
+          <div className="space-y-2">
             <label
-              htmlFor="password"
+              htmlFor="email"
               className="text-sm font-medium text-[var(--foreground)]"
             >
-              {t("password")}
+              {t("email")}
             </label>
-            <a
-              href="/auth/reset-password"
-              className="text-xs text-[var(--primary)] hover:underline"
-            >
-              {t("forgotPassword")}
-            </a>
+            <div className="relative">
+              <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]" />
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                className="w-full ps-10 pe-4 py-2.5 rounded-lg border border-[var(--input)] bg-[var(--background)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] transition-colors"
+                placeholder="name@company.com"
+                dir="ltr"
+              />
+            </div>
           </div>
-          <div className="relative">
-            <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]" />
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-              className="w-full ps-10 pe-4 py-2.5 rounded-lg border border-[var(--input)] bg-[var(--background)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] transition-colors"
-              placeholder="••••••••"
-              dir="ltr"
-            />
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="password"
+                className="text-sm font-medium text-[var(--foreground)]"
+              >
+                {t("password")}
+              </label>
+              <a
+                href="/auth/reset-password"
+                className="text-xs text-[var(--primary)] hover:underline"
+              >
+                {t("forgotPassword")}
+              </a>
+            </div>
+            <div className="relative">
+              <Lock className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]" />
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                className="w-full ps-10 pe-4 py-2.5 rounded-lg border border-[var(--input)] bg-[var(--background)] text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] transition-colors"
+                placeholder="••••••••"
+                dir="ltr"
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <LogIn className="h-4 w-4" />
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-[var(--primary)] text-[var(--primary-foreground)] font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <LogIn className="h-4 w-4" />
+          )}
+          {t("loginButton")}
+        </button>
+      </form>
+
+      {/* 1-Click Quick Demo Login */}
+      <div className="pt-4 border-t border-[var(--border)]">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider">
+            الدخول السريع للتجربة (Demo Mode)
+          </p>
+          <span className="text-[10px] bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-medium">
+            متاح فوراً
+          </span>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2">
+          <button
+            type="button"
+            onClick={() => handleDemoLogin("gm")}
+            className="flex flex-col items-center justify-center p-2.5 rounded-lg border border-[var(--border)] bg-[var(--muted)]/50 hover:bg-[var(--accent)] hover:border-[var(--primary)]/50 transition-all text-center group"
+          >
+            <Shield className="h-4 w-4 text-amber-500 mb-1 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-medium text-[var(--foreground)]">المدير العام</span>
+            <span className="text-[10px] text-[var(--muted-foreground)]">GM</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleDemoLogin("admin")}
+            className="flex flex-col items-center justify-center p-2.5 rounded-lg border border-[var(--border)] bg-[var(--muted)]/50 hover:bg-[var(--accent)] hover:border-[var(--primary)]/50 transition-all text-center group"
+          >
+            <UserCheck className="h-4 w-4 text-blue-500 mb-1 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-medium text-[var(--foreground)]">المشرف</span>
+            <span className="text-[10px] text-[var(--muted-foreground)]">Admin</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleDemoLogin("sales")}
+            className="flex flex-col items-center justify-center p-2.5 rounded-lg border border-[var(--border)] bg-[var(--muted)]/50 hover:bg-[var(--accent)] hover:border-[var(--primary)]/50 transition-all text-center group"
+          >
+            <Briefcase className="h-4 w-4 text-emerald-500 mb-1 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-medium text-[var(--foreground)]">المبيعات</span>
+            <span className="text-[10px] text-[var(--muted-foreground)]">Sales</span>
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setShowConfigHelp(!showConfigHelp)}
+          className="mt-3 w-full flex items-center justify-center gap-1.5 text-xs text-[var(--muted-foreground)] hover:text-[var(--primary)] transition-colors py-1"
+        >
+          <Database className="h-3 w-3" />
+          <span>كيفية ربط قاعدة بيانات Supabase الحية؟</span>
+        </button>
+
+        {showConfigHelp && (
+          <div className="mt-2 p-3 rounded-lg bg-[var(--muted)]/60 border border-[var(--border)] text-xs space-y-1.5 text-[var(--muted-foreground)] leading-relaxed text-start">
+            <p className="font-medium text-[var(--foreground)]">3 خطوات بسيطة لتشغيل النسخة الحية:</p>
+            <p>1. أنشئ مشروعاً مجانياً على <a href="https://supabase.com" target="_blank" rel="noreferrer" className="text-[var(--primary)] underline">Supabase</a></p>
+            <p>2. أضف المفاتيح إلى ملف <code className="bg-background px-1 py-0.5 rounded border">.env.local</code></p>
+            <p>3. شغّل ملفات الـ SQL الموجودة في <code className="bg-background px-1 py-0.5 rounded border">supabase/migrations/</code> بالترتيب في SQL Editor</p>
+          </div>
         )}
-        {t("loginButton")}
-      </button>
-    </form>
+      </div>
+    </div>
   );
 }

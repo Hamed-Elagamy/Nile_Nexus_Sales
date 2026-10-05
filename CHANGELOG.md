@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.0] - 2026-10-05
+
+### Added
+- **Zero-Config Standalone Demo Mode**:
+  - Offline/demo fallback architecture allowing the application to run smoothly and interactively without needing live Supabase credentials
+  - 1-Click Quick Demo Login on `/login` supporting GM (المدير العام), Admin (المشرف), and Sales (مسؤول المبيعات) with instant role switching
+  - Database status indicator badge in the main application header (Demo Mode vs Supabase Connected) with drawer for connecting live credentials
+- **Completed All Auxiliary Routes (Zero 404 Navigation)**:
+  - `/tasks`: Sales task manager with urgency filtering (عاجل، هام، عادي), status tracking, and deal linkage
+  - `/calendar`: Commercial agenda for meetings, demos, calls, and deadlines
+  - `/approvals`: Management approvals center for discounts >5% and payment terms exceptions
+  - `/reports`: Conversion funnel analysis, EGP revenue indicators, and representative leaderboard
+  - `/notifications`: Real-time notification and system alert center
+- **Rich Egyptian Commercial Dataset**:
+  - Realistic companies, pipeline deals with values in EGP, today/overdue follow-up actions, commercial quotations with 14% VAT, approvals, and tasks
+- **Dual-Mode Server Actions**:
+  - Transparent dual-mode execution for `dashboard.ts`, `team.ts`, `settings.ts`, `potential-clients.ts`, `clients.ts`, `deals.ts`, `follow-ups.ts`, and `proposals.ts`
+  - Strict preservation of the Supabase data path when credentials exist, with full test-mock support
+- **Quality Assurance & Verification**:
+  - 100% test pass rate (60/60 Vitest tests)
+  - 0 TypeScript errors (`tsc --noEmit`)
+  - 0 ESLint errors and warnings
+  - Production build successfully compiling all 21 routes with Next.js Turbopack
+
 ## [0.6.0] - 2026-10-05
 
 ### Added

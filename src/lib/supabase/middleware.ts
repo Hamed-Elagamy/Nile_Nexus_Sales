@@ -1,14 +1,39 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isSupabaseConfigured } from "./config";
 
 /**
  * Supabase middleware to refresh auth tokens and protect routes.
- * Called on every request by Next.js middleware.
+ * Gracefully provides standalone Demo Mode when Supabase credentials are not configured.
  */
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
+
+  const publicPaths = ["/login", "/auth/callback", "/auth/reset-password"];
+  const isPublicPath = publicPaths.some((path) =>
+    request.nextUrl.pathname.startsWith(path)
+  );
+
+  // If Supabase is not configured, operate in Demo Mode
+  if (!isSupabaseConfigured()) {
+    const isSignedOut = request.cookies.get("nile_demo_signed_out")?.value === "true";
+
+    if (isSignedOut && !isPublicPath) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      return NextResponse.redirect(url);
+    }
+
+    if (!isSignedOut && request.nextUrl.pathname === "/login") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard";
+      return NextResponse.redirect(url);
+    }
+
+    return supabaseResponse;
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -37,12 +62,6 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  // Public routes that don't require authentication
-  const publicPaths = ["/login", "/auth/callback", "/auth/reset-password"];
-  const isPublicPath = publicPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
 
   // Redirect unauthenticated users to login
   if (!user && !isPublicPath) {
