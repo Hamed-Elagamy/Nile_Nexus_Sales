@@ -1,7 +1,7 @@
 # Project State — Nile Nexus Sales
 
 ## Current Phase
-Phase 6 (Commercial Proposals & Quotations) — Proposals, Line Items & Immutable Versions
+Phase 7 (Team Management & System Settings) — Team Directory, Services & Settings
 
 ## Completed Phases
 - **Phase 0**: Repository & Documentation bootstrap
@@ -16,6 +16,11 @@ Phase 6 (Commercial Proposals & Quotations) — Proposals, Line Items & Immutabl
   - Quick action to complete follow-up and schedule next step in one transaction
   - Direct call and WhatsApp launcher
   - Activity logging on all follow-up events
+- **Phase 6 (Commercial Proposals & Quotations)**:
+  - Commercial Proposals directory and creation wizard (`/proposals`, `/proposals/new`)
+  - Dynamic line items manager with real-time decimal financial calculations
+  - Immutable versioning (v1, v2...) on acceptance/sending
+  - Professional printable quotation view with window.print() and PDF export support
 
 ## Completed Work
 - **Design System & UI Components**:
@@ -37,21 +42,28 @@ Phase 6 (Commercial Proposals & Quotations) — Proposals, Line Items & Immutabl
   - Schemas for follow-up actions, completion results, next steps, rescheduling
   - Server actions: `getFollowUps`, `createFollowUp`, `completeFollowUp`, `rescheduleFollowUp`
   - UI components and page: `/follow-ups`, badges, quick complete modal, reschedule modal, tab filters
+- **Commercial Proposals & Quotations Module**:
+  - Schemas for proposals, line items, version cloning, and status transitions
+  - Concurrency-safe business IDs (`PROP-XXXXX`)
+  - Server actions: `getProposals`, `getProposalById`, `createProposal`, `createProposalVersion`, `updateProposalVersionStatus`
+  - UI components and pages: `/proposals`, `/proposals/new`, `/proposals/[id]`, `ProposalBuilder`, `ProposalPrintView`, `ProposalDetail`
 - **Tests**:
-  - 49 Vitest unit tests passing across 10 test suites:
+  - 59 Vitest unit tests passing across 12 test suites:
     - `src/lib/__tests__/utils.test.ts` (4 tests)
     - `src/i18n/__tests__/config.test.ts` (5 tests)
     - `src/lib/schemas/__tests__/potential-client.test.ts` (9 tests)
     - `src/lib/schemas/__tests__/client.test.ts` (6 tests)
     - `src/lib/schemas/__tests__/deal.test.ts` (4 tests)
     - `src/lib/schemas/__tests__/follow-up.test.ts` (5 tests)
+    - `src/lib/schemas/__tests__/proposal.test.ts` (6 tests)
     - `src/lib/actions/__tests__/potential-clients.test.ts` (5 tests)
     - `src/lib/actions/__tests__/clients.test.ts` (4 tests)
     - `src/lib/actions/__tests__/deals.test.ts` (3 tests)
     - `src/lib/actions/__tests__/follow-ups.test.ts` (4 tests)
+    - `src/lib/actions/__tests__/proposals.test.ts` (4 tests)
 
 ## Work in Progress
-- Phase 6: Commercial Proposals & Quotations (`/proposals`, `/proposals/new`, `/proposals/[id]`)
+- Phase 7: Team Directory & System Settings (`/team`, `/settings`)
 
 ## Architecture Decisions
 See [docs/DECISIONS.md](docs/DECISIONS.md)
@@ -69,7 +81,7 @@ See [docs/DECISIONS.md](docs/DECISIONS.md)
 - Server actions enforce user authentication and ownership boundaries
 
 ## Test Status
-- ✅ Vitest: 40/40 passing across 8 suites
+- ✅ Vitest: 49/49 passing across 10 suites
 - 0 failed
 
 ## Build Status
@@ -86,13 +98,12 @@ See [docs/DECISIONS.md](docs/DECISIONS.md)
 - `SUPABASE_SERVICE_ROLE_KEY`
 
 ## Latest Pushed Commit
-- `d5a5c0c` (feat(crm): implement Clients, Contacts, Deals, and Pipeline Kanban modules)
+- `3ab173a` (feat(sales): implement Follow-ups and Sales Execution module)
 
 ## Blockers
 - None (credentials needed only for live Supabase deployment)
 
 ## Next Actions
-1. Implement Phase 5: Follow-ups & Sales Activities Module (`/follow-ups` dashboard, overdue alerts, completion modal, instant next follow-up scheduler)
-2. Implement Phase 6: Proposals & Quotations Module (`/proposals` immutable versions, line item calculations, printable offer sheet)
-3. Implement Phase 7: Team & Settings Management (`/team`, `/settings` service catalog, lead sources)
-4. Wire live KPI counts into `/dashboard` from real database tables
+1. Implement Phase 6: Commercial Proposals & Quotations Module (`/proposals`, `/proposals/new`, `/proposals/[id]` immutable versions, printable quotation view)
+2. Implement Phase 7: Team & Settings Management (`/team`, `/settings` service catalog, lead sources)
+3. Wire live KPI counts into `/dashboard` from real database tables

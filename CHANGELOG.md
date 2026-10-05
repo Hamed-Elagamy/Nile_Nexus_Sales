@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2026-10-05
+
+### Added
+- **Commercial Proposals & Quotations Module**:
+  - Validation schemas (`src/lib/schemas/proposal.ts`) for line items, financial totals, version cloning, and status transitions
+  - Concurrency-safe business ID generation (`PROP-XXXXX`)
+  - Server Actions (`src/lib/actions/proposals.ts`):
+    - `getProposals`: paginated list with search and status filtering
+    - `getProposalById`: full detail view with all versions, line items, and audit history
+    - `createProposal`: creation wizard creating initial Version 1, line items, and activity logging
+    - `createProposalVersion`: version cloning (v2, v3...) allowing changes requested after sending
+    - `updateProposalVersionStatus`: lifecycle transitions with immutability enforcement once accepted/sent
+  - UI Components (`src/components/proposals/`):
+    - `ProposalStatusBadge`: color-coded lifecycle badges
+    - `ProposalBuilder`: dynamic line items manager with real-time subtotal, discount, VAT, and grand total calculations
+    - `ProposalPrintView`: printable quotation layout for Egyptian commercial clients with window.print() / PDF support
+    - `ProposalDetail`: full console with version tabs, lifecycle buttons, and printable view modal
+    - `ProposalsTable`: table of proposals with status, currency, and link to details
+    - `ProposalsFilter`: search and status filter tabs
+    - `CreateProposalWizard`: wizard for new proposals with client and deal selector
+    - `ProposalsClient`: client container
+  - Routes:
+    - `/proposals`: proposals directory
+    - `/proposals/new`: proposal creation wizard
+    - `/proposals/[id]`: proposal version details and printing console
+  - Testing:
+    - 59 passing tests across 12 test suites (proposals schemas and actions included)
+
 ## [0.4.0] - 2026-10-05
 
 ### Added
