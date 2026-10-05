@@ -1,7 +1,7 @@
 # Project State — Nile Nexus Sales
 
 ## Current Phase
-Phase 5 (Sales Execution) — Follow-ups, Activity Logging & Reminders
+Phase 6 (Commercial Proposals & Quotations) — Proposals, Line Items & Immutable Versions
 
 ## Completed Phases
 - **Phase 0**: Repository & Documentation bootstrap
@@ -11,6 +11,11 @@ Phase 5 (Sales Execution) — Follow-ups, Activity Logging & Reminders
   - Part 1: Potential Clients & Research Pool Module
   - Part 2: Clients & Contacts Management Module (`/clients`, `/clients/[id]`)
   - Part 3: Deals & Pipeline Kanban Module (`/deals`, `/deals/[id]`, `/pipeline`)
+- **Phase 5 (Sales Execution)**:
+  - Follow-ups Daily Workspace (`/follow-ups` Today, Overdue, Upcoming, Completed)
+  - Quick action to complete follow-up and schedule next step in one transaction
+  - Direct call and WhatsApp launcher
+  - Activity logging on all follow-up events
 
 ## Completed Work
 - **Design System & UI Components**:
@@ -28,19 +33,25 @@ Phase 5 (Sales Execution) — Follow-ups, Activity Logging & Reminders
   - Server actions: `getDeals`, `getPipelineDeals`, `getDealById`, `createDeal`, `updateDeal`, `updateDealStage`
   - Pipeline Kanban board with horizontal scrolling and stage advance controls
   - UI components and pages: `/deals`, `/deals/[id]`, `/pipeline`
+- **Follow-ups & Sales Execution Module**:
+  - Schemas for follow-up actions, completion results, next steps, rescheduling
+  - Server actions: `getFollowUps`, `createFollowUp`, `completeFollowUp`, `rescheduleFollowUp`
+  - UI components and page: `/follow-ups`, badges, quick complete modal, reschedule modal, tab filters
 - **Tests**:
-  - 40 Vitest unit tests passing across 8 test suites:
+  - 49 Vitest unit tests passing across 10 test suites:
     - `src/lib/__tests__/utils.test.ts` (4 tests)
     - `src/i18n/__tests__/config.test.ts` (5 tests)
     - `src/lib/schemas/__tests__/potential-client.test.ts` (9 tests)
     - `src/lib/schemas/__tests__/client.test.ts` (6 tests)
     - `src/lib/schemas/__tests__/deal.test.ts` (4 tests)
+    - `src/lib/schemas/__tests__/follow-up.test.ts` (5 tests)
     - `src/lib/actions/__tests__/potential-clients.test.ts` (5 tests)
     - `src/lib/actions/__tests__/clients.test.ts` (4 tests)
     - `src/lib/actions/__tests__/deals.test.ts` (3 tests)
+    - `src/lib/actions/__tests__/follow-ups.test.ts` (4 tests)
 
 ## Work in Progress
-- Phase 5: Sales Execution (Follow-ups, Activities & Reminders)
+- Phase 6: Commercial Proposals & Quotations (`/proposals`, `/proposals/new`, `/proposals/[id]`)
 
 ## Architecture Decisions
 See [docs/DECISIONS.md](docs/DECISIONS.md)
@@ -74,13 +85,14 @@ See [docs/DECISIONS.md](docs/DECISIONS.md)
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 
+## Latest Pushed Commit
+- `d5a5c0c` (feat(crm): implement Clients, Contacts, Deals, and Pipeline Kanban modules)
+
 ## Blockers
 - None (credentials needed only for live Supabase deployment)
 
 ## Next Actions
-1. Implement Client Management (`/clients` list & `/clients/[id]` profile) supporting both `COMPANY` and `INDIVIDUAL` types
-2. Implement multiple Contacts per client with `is_primary` flag and WhatsApp/Phone actions
-3. Implement Deal creation linked to clients (`Client != Deal`)
-4. Implement conversion action from Potential Client to Client + optional initial Deal
-5. Implement Pipeline Kanban and List views with stage transition workflows
-6. Implement Follow-ups module with overdue calculations and completion workflows
+1. Implement Phase 5: Follow-ups & Sales Activities Module (`/follow-ups` dashboard, overdue alerts, completion modal, instant next follow-up scheduler)
+2. Implement Phase 6: Proposals & Quotations Module (`/proposals` immutable versions, line item calculations, printable offer sheet)
+3. Implement Phase 7: Team & Settings Management (`/team`, `/settings` service catalog, lead sources)
+4. Wire live KPI counts into `/dashboard` from real database tables

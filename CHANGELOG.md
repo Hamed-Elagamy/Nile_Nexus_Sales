@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-10-05
+
+### Added
+- **Sales Execution Module (Follow-ups & Activity Logging)**:
+  - Validation schemas (`src/lib/schemas/follow-up.ts`) for follow-up actions, completion results, next-step scheduling, and rescheduling
+  - Server Actions (`src/lib/actions/follow-ups.ts`):
+    - `getFollowUps`: multi-tab dashboard (TODAY, OVERDUE, UPCOMING, COMPLETED, ALL) with parallel count aggregation
+    - `createFollowUp`: new follow-up scheduling with activity logging
+    - `completeFollowUp`: quick completion modal with outcome notes and one-click next-step scheduling
+    - `rescheduleFollowUp`: date postponement with reason tracking
+  - UI Components (`src/components/follow-ups/`):
+    - `FollowUpActionBadge`: color-coded badges for CALL, MEETING, WHATSAPP, EMAIL, VISIT
+    - `FollowUpCard`: card with urgent overdue highlighting, direct phone call / WhatsApp launcher, and quick completion buttons
+    - `FollowUpsFilter`: tab navigation with live counters and action type filtering
+    - `CompleteFollowUpDialog`: modal to record outcome notes and immediately schedule the subsequent follow-up
+    - `RescheduleFollowUpDialog`: date postponement modal
+    - `CreateFollowUpDialog`: modal to schedule new follow-ups with client selector
+    - `FollowUpsClient`: interactive client container with empty-state feedback per tab
+  - Routes:
+    - `/follow-ups`: daily sales execution dashboard
+  - Testing:
+    - 49 passing tests across 10 test suites (schemas and actions for follow-ups included)
+
 ## [0.3.0] - 2026-10-05
 
 ### Added

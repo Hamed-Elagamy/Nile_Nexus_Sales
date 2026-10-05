@@ -1,28 +1,31 @@
 # Next Task
 
 ## Goal
-Implement Sales Execution Module (Follow-ups, Activity Logging & Reminders) with daily due list, overdue counter, quick complete modal with next step scheduling, activity feed integration, and Vitest test coverage.
+Implement Commercial Proposals & Quotations Module (`/proposals`, `/proposals/new`, `/proposals/[id]`) with dynamic line items calculation, discount handling, immutable versioning upon sending/acceptance, status lifecycle, printable quotation view, and Vitest test coverage.
 
 ## Relevant Files
-- `src/lib/schemas/follow-up.ts` — Zod validation schemas for follow-ups (type, due_date, priority, status)
-- `src/lib/actions/follow-ups.ts` — Server Actions (getFollowUps, completeFollowUp, createFollowUp, rescheduleFollowUp)
-- `src/components/follow-ups/` — UI components:
-  - `follow-up-card.tsx`
-  - `follow-ups-list.tsx`
-  - `create-follow-up-dialog.tsx`
-  - `complete-follow-up-dialog.tsx`
-  - `follow-ups-filter.tsx`
-- `src/app/(authenticated)/follow-ups/page.tsx` — follow-ups management dashboard
-- `src/lib/schemas/__tests__/follow-up.test.ts` — unit tests for follow-up schemas
-- `src/lib/actions/__tests__/follow-ups.test.ts` — unit tests for follow-up actions
-- `messages/ar.json`, `messages/en.json` — follow-ups translations
+- `src/lib/schemas/proposal.ts` — Zod validation schemas for proposals, line items, and versions
+- `src/lib/actions/proposals.ts` — Server Actions (getProposals, getProposalById, createProposal, createProposalVersion, updateProposalVersionStatus)
+- `src/components/proposals/` — UI components:
+  - `proposal-status-badge.tsx`
+  - `proposals-table.tsx`
+  - `proposals-filter.tsx`
+  - `proposal-builder.tsx`
+  - `proposal-detail.tsx`
+  - `proposal-print-view.tsx`
+- `src/app/(authenticated)/proposals/page.tsx` — proposals directory
+- `src/app/(authenticated)/proposals/new/page.tsx` — new proposal wizard
+- `src/app/(authenticated)/proposals/[id]/page.tsx` — proposal detail and versions console
+- `src/lib/schemas/__tests__/proposal.test.ts` — unit tests for proposal schemas
+- `src/lib/actions/__tests__/proposals.test.ts` — unit tests for proposal actions
+- `messages/ar.json`, `messages/en.json` — proposal translations
 
 ## Acceptance Criteria
-- List follow-ups partitioned into: Overdue (🚨 متأخرة), Today (📅 اليوم), and Upcoming (🔜 القادمة)
-- Support follow-up types: CALL (اتصال), MEETING (اجتماع), WHATSAPP (واتساب), EMAIL (إيميل), VISIT (زيارة)
-- Direct action buttons (call phone, launch WhatsApp with prefilled client contact)
-- Complete follow-up modal capturing result notes and optionally scheduling the next follow-up in one click
-- Log corresponding activity into `activities` table automatically
+- Concurrency-safe business ID generation (`PROP-XXXXX`)
+- Line items calculation: quantity * unit_price, subtotal, discount, tax, grand total
+- Support immutable versioning (v1, v2...) — once a version is `SENT` or `ACCEPTED`, it is locked and edits spawn a new version
+- Printable / shareable quotation sheet suitable for Egyptian clients (Arabic RTL, VAT breakdown, payment terms)
+- Finance boundary respected: proposals are commercial offers, not invoices
 - Clean TypeScript strict mode, 0 ESLint warnings, all Vitest tests passing, production build passing
 
 ## Commands After Completion
