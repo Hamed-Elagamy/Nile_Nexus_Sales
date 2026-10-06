@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import {
   isSupabaseConfigured,
+  getSupabaseAnonKey,
   FALLBACK_SUPABASE_URL,
   FALLBACK_SUPABASE_ANON_KEY,
   DEMO_USERS,
@@ -57,7 +58,7 @@ export async function createClient() {
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    getSupabaseAnonKey(),
     {
       cookies: {
         getAll() {
