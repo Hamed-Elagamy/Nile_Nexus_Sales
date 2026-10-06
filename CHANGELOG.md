@@ -2,7 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.8.0] - 2026-10-06
+## [0.8.1] - 2026-10-06
+
+### Fixed & Enhanced
+- **Live Supabase Connection**:
+  - Sanitized UTF-8 Byte Order Mark (BOM) from environment variables on Vercel CLI.
+  - Verified live database query against Supabase project `zbbivheqcutwflewmtnb` returning HTTP 200 and `dbStatus: "connected"`.
+  - Application header now displays live green badge: **"Supabase متصل"** (Arabic) / **"Supabase Connected"** (English).
+- **Internationalization (i18n) & Broken Language Fix**:
+  - Fixed bilingual language toggling between Egyptian Arabic (RTL) and English (LTR).
+  - Fully translated dashboard KPIs, greeting, quick action buttons, deal stages, and table headers.
+  - Replaced raw database status codes with localized labels across all modules.
+- **Authentication & User Seeding**:
+  - Enabled seamless 1-click Quick Login (GM, Admin, Sales) to access dashboard and live tables immediately.
+  - Created `supabase/migrations/004_create_initial_admin_users.sql` to seed pre-confirmed accounts (`gm@nilenexus.com`, `admin@nilenexus.com`, `sales@nilenexus.com`) and sample CRM data.
+
 
 ### Added
 - **Production Deployment to Vercel**:
