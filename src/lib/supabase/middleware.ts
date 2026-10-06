@@ -11,7 +11,7 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
-  const publicPaths = ["/login", "/auth/callback", "/auth/reset-password"];
+  const publicPaths = ["/login", "/auth/callback", "/auth/reset-password", "/api"];
   const isPublicPath = publicPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
@@ -36,7 +36,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    getSupabaseUrl(),
     getSupabaseAnonKey(),
     {
       cookies: {
