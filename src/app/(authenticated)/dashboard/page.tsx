@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import {
   Users,
   Search,
@@ -22,6 +23,8 @@ export const metadata = {
 };
 
 export default async function DashboardPage() {
+  const t = await getTranslations("dashboard");
+  const tCommon = await getTranslations("common");
 
   const metricsRes = await getDashboardMetrics();
   const metrics = metricsRes.success && metricsRes.data ? metricsRes.data : null;
@@ -32,10 +35,10 @@ export default async function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border/60">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <span>مرحباً بك يا بطل 🚀</span>
+            <span>{t("greeting")}</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            لوحة القيادة والمتابعة اللحظية لعمليات المبيعات والصفقات التجارية
+            {t("subtitle")}
           </p>
         </div>
 
@@ -46,7 +49,7 @@ export default async function DashboardPage() {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-semibold hover:bg-muted transition-colors"
           >
             <Search className="h-3.5 w-3.5 text-primary" />
-            <span>بحث عملاء</span>
+            <span>{t("searchClients")}</span>
           </Link>
 
           <Link
@@ -54,7 +57,7 @@ export default async function DashboardPage() {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-semibold hover:bg-muted transition-colors"
           >
             <Plus className="h-3.5 w-3.5 text-primary" />
-            <span>صفقة جديدة</span>
+            <span>{t("newDeal")}</span>
           </Link>
 
           <Link
@@ -62,7 +65,7 @@ export default async function DashboardPage() {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:opacity-95 transition-opacity"
           >
             <FileText className="h-3.5 w-3.5" />
-            <span>عرض أسعار</span>
+            <span>{t("newProposal")}</span>
           </Link>
         </div>
       </div>
@@ -76,10 +79,10 @@ export default async function DashboardPage() {
             </div>
             <div>
               <h4 className="text-sm font-bold text-rose-700 dark:text-rose-300">
-                تنبيه عاجل: لديك {metrics.overdueFollowUpsCount} متابعات متأخرة!
+                {t("overdueAlertTitle", { count: metrics.overdueFollowUpsCount })}
               </h4>
               <p className="text-xs text-rose-600/80 dark:text-rose-400/80">
-                العملاء ينتظرون تواصلك، قم بإنهاء المتابعات المتأخرة فوراً للحفاظ على فرص النجاح.
+                {t("overdueAlertDesc")}
               </p>
             </div>
           </div>
@@ -88,7 +91,7 @@ export default async function DashboardPage() {
             href="/follow-ups"
             className="px-3 py-1.5 rounded-lg bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 transition-colors whitespace-nowrap"
           >
-            مراجعة المتابعات المتأخرة
+            {t("reviewOverdue")}
           </Link>
         </div>
       )}
@@ -99,7 +102,7 @@ export default async function DashboardPage() {
         <Link href="/pipeline" className="group">
           <Card className="p-5 bg-card border-border hover:border-primary/50 transition-all shadow-sm space-y-2 h-full">
             <div className="flex items-center justify-between text-muted-foreground text-xs">
-              <span className="font-semibold">قيمة البايبلاين المفتوح</span>
+              <span className="font-semibold">{t("openPipeline")}</span>
               <div className="p-2 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform">
                 <Briefcase className="h-4 w-4" />
               </div>
@@ -109,7 +112,7 @@ export default async function DashboardPage() {
               <span className="text-xs font-sans font-medium text-muted-foreground">EGP</span>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              إجمالي {metrics?.openDealsCount || 0} صفقات جارية في مراحل التفاوض
+              {t("openDealsDesc", { count: metrics?.openDealsCount || 0 })}
             </p>
           </Card>
         </Link>
@@ -118,7 +121,7 @@ export default async function DashboardPage() {
         <Link href="/deals" className="group">
           <Card className="p-5 bg-card border-border hover:border-emerald-500/50 transition-all shadow-sm space-y-2 h-full">
             <div className="flex items-center justify-between text-muted-foreground text-xs">
-              <span className="font-semibold">الصفقات الرابحة (Won)</span>
+              <span className="font-semibold">{t("wonDeals")}</span>
               <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
                 <Trophy className="h-4 w-4" />
               </div>
@@ -128,7 +131,7 @@ export default async function DashboardPage() {
               <span className="text-xs font-sans font-medium text-muted-foreground">EGP</span>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              تم إغلاق {metrics?.wonDealsCount || 0} صفقات بنجاح 🏆
+              {t("wonDealsDesc", { count: metrics?.wonDealsCount || 0 })}
             </p>
           </Card>
         </Link>
@@ -137,7 +140,7 @@ export default async function DashboardPage() {
         <Link href="/follow-ups" className="group">
           <Card className="p-5 bg-card border-border hover:border-amber-500/50 transition-all shadow-sm space-y-2 h-full">
             <div className="flex items-center justify-between text-muted-foreground text-xs">
-              <span className="font-semibold">متابعات اليوم المجدولة</span>
+              <span className="font-semibold">{t("todayFollowUps")}</span>
               <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform">
                 <PhoneCall className="h-4 w-4" />
               </div>
@@ -146,7 +149,7 @@ export default async function DashboardPage() {
               {metrics?.todayFollowUpsCount || 0}
             </div>
             <p className="text-[11px] text-muted-foreground">
-              اتصالات واجتماعات مستهدفة لليوم
+              {t("todayFollowUpsDesc")}
             </p>
           </Card>
         </Link>
@@ -155,7 +158,7 @@ export default async function DashboardPage() {
         <Link href="/clients" className="group">
           <Card className="p-5 bg-card border-border hover:border-purple-500/50 transition-all shadow-sm space-y-2 h-full">
             <div className="flex items-center justify-between text-muted-foreground text-xs">
-              <span className="font-semibold">العملاء المؤكدين</span>
+              <span className="font-semibold">{t("activeClients")}</span>
               <div className="p-2 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 group-hover:scale-105 transition-transform">
                 <Users className="h-4 w-4" />
               </div>
@@ -164,7 +167,7 @@ export default async function DashboardPage() {
               {metrics?.activeClientsCount || 0}
             </div>
             <p className="text-[11px] text-muted-foreground">
-              بالإضافة إلى {metrics?.potentialClientsCount || 0} عميل في بنك البحث
+              {t("activeClientsDesc", { count: metrics?.potentialClientsCount || 0 })}
             </p>
           </Card>
         </Link>
@@ -177,19 +180,19 @@ export default async function DashboardPage() {
           <CardHeader className="p-4 border-b border-border/60 bg-muted/30 flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
               <Briefcase className="h-4 w-4 text-primary" />
-              <span>أحدث الصفقات التجارية</span>
+              <span>{t("recentDeals")}</span>
             </CardTitle>
             <Link
               href="/deals"
               className="text-xs text-primary hover:underline font-medium"
             >
-              عرض الكل
+              {tCommon("viewAll")}
             </Link>
           </CardHeader>
           <CardContent className="p-0">
             {!metrics?.recentDeals || metrics.recentDeals.length === 0 ? (
               <div className="p-8 text-center text-xs text-muted-foreground">
-                لا توجد صفقات حالياً. ابدأ بإنشاء صفقة جديدة الآن.
+                {t("noRecentDeals")}
               </div>
             ) : (
               <div className="divide-y divide-border/60">
@@ -211,7 +214,7 @@ export default async function DashboardPage() {
                       )}
                     </div>
 
-                    <div className="text-left space-y-1 shrink-0">
+                    <div className="text-end space-y-1 shrink-0">
                       <DealStageBadge stage={deal.stage} />
                       <p className="text-xs font-mono font-bold text-foreground">
                         {Number(deal.estimated_value || 0).toLocaleString()} {deal.currency}
@@ -229,24 +232,24 @@ export default async function DashboardPage() {
           <CardHeader className="p-4 border-b border-border/60 bg-muted/30 flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
               <ActivityIcon className="h-4 w-4 text-primary" />
-              <span>سجل الأنشطة والمتابعات الحية</span>
+              <span>{t("liveActivities")}</span>
             </CardTitle>
             <Link
               href="/follow-ups"
               className="text-xs text-primary hover:underline font-medium"
             >
-              المتابعات
+              {tCommon("viewAll")}
             </Link>
           </CardHeader>
           <CardContent className="p-0">
             {!metrics?.recentActivities || metrics.recentActivities.length === 0 ? (
               <div className="p-8 text-center text-xs text-muted-foreground">
-                لا توجد أنشطة مسجلة حتى الآن.
+                {t("noActivities")}
               </div>
             ) : (
               <div className="divide-y divide-border/60">
                 {metrics.recentActivities.map((act) => {
-                  const dateStr = new Date(act.created_at).toLocaleDateString("ar-EG", {
+                  const dateStr = new Date(act.created_at).toLocaleDateString(undefined, {
                     month: "short",
                     day: "numeric",
                     hour: "2-digit",
@@ -271,7 +274,7 @@ export default async function DashboardPage() {
                       )}
 
                       <div className="flex items-center gap-2 text-[10px] text-muted-foreground pt-0.5">
-                        {act.actor && <span>بواسطة: {act.actor.full_name}</span>}
+                        {act.actor && <span>{t("by", { name: act.actor.full_name })}</span>}
                         {act.client && (
                           <Link
                             href={`/clients/${act.client.id}`}

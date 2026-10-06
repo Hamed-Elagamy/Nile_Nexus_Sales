@@ -92,7 +92,6 @@ export function AppHeader({ user }: AppHeaderProps) {
               onClick={handleSignOut}
               className="p-2 rounded-lg hover:bg-[var(--muted)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
               aria-label={t("auth.logout")}
-              title="تسجيل الخروج"
             >
               <LogOut className="h-4 w-4" />
             </button>
@@ -103,13 +102,21 @@ export function AppHeader({ user }: AppHeaderProps) {
       {showDbInfo && (
         <div className="px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20 text-xs text-amber-800 dark:text-amber-200 flex items-center justify-between">
           <p>
-            💡 <strong>النظام يعمل الآن في وضع المعاينة بكامل المميزات:</strong> لتوصيل قاعدة بيانات Supabase الحية، أضف المفاتيح إلى ملف <code>.env.local</code> وشغّل ملفات الهجرة في <code>supabase/migrations/</code>.
+            {t("common.save") === "حفظ" ? (
+              <>
+                💡 <strong>النظام يعمل الآن في وضع المعاينة بكامل المميزات:</strong> لتوصيل قاعدة بيانات Supabase الحية، شغّل ملف الهجرة <code>supabase/migrations/all_in_one_deploy.sql</code> في لوحة تحكم Supabase.
+              </>
+            ) : (
+              <>
+                💡 <strong>System running in full-featured Demo Preview Mode:</strong> To connect your live Supabase database, run the migration <code>supabase/migrations/all_in_one_deploy.sql</code> in your Supabase dashboard.
+              </>
+            )}
           </p>
           <button
             onClick={() => setShowDbInfo(false)}
-            className="text-xs font-bold underline ms-2 hover:opacity-80"
+            className="text-xs font-bold underline ms-2 hover:opacity-80 cursor-pointer"
           >
-            إغلاق
+            {t("common.close")}
           </button>
         </div>
       )}

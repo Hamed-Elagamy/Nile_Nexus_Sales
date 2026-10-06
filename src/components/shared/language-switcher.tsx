@@ -21,16 +21,16 @@ export function LanguageSwitcher() {
   };
 
   return (
-    <div className="flex items-center rounded-lg border border-[var(--border)] bg-[var(--muted)]/60 p-0.5 text-xs font-medium">
+    <div className="flex items-center rounded-lg border border-border bg-card shadow-xs p-0.5 text-xs font-medium">
       <button
         type="button"
         onClick={() => changeLocale("ar")}
         disabled={isPending}
         className={cn(
-          "px-2.5 py-1 rounded-md transition-all cursor-pointer",
+          "px-2.5 py-1 rounded-md transition-all cursor-pointer font-semibold",
           locale === "ar"
-            ? "bg-[var(--background)] text-[var(--foreground)] font-bold shadow-xs"
-            : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+            ? "bg-primary text-primary-foreground shadow-xs"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
         )}
       >
         عربي
@@ -40,10 +40,10 @@ export function LanguageSwitcher() {
         onClick={() => changeLocale("en")}
         disabled={isPending}
         className={cn(
-          "px-2.5 py-1 rounded-md transition-all cursor-pointer",
+          "px-2.5 py-1 rounded-md transition-all cursor-pointer font-semibold",
           locale === "en"
-            ? "bg-[var(--background)] text-[var(--foreground)] font-bold shadow-xs"
-            : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+            ? "bg-primary text-primary-foreground shadow-xs"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
         )}
       >
         English
