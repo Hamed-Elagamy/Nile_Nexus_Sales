@@ -34,7 +34,7 @@ export function ClientsFilter({
         <div className="relative flex-1">
           <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="ابحث باسم العميل، التليفون، الإيميل، أو الكود..."
+            placeholder={t("searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="ps-9 pe-8 h-10 bg-card rounded-lg"
@@ -71,7 +71,7 @@ export function ClientsFilter({
               : "bg-card text-muted-foreground hover:text-foreground hover:bg-muted border-border"
           }`}
         >
-          كل العملاء
+          {t("allClients")}
         </button>
 
         <button

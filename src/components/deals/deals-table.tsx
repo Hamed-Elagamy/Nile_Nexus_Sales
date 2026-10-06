@@ -31,6 +31,7 @@ interface DealsTableProps {
 }
 
 export function DealsTable({ deals, loading = false }: DealsTableProps) {
+  const tDeals = useTranslations("deals");
   const tCommon = useTranslations("common");
 
   if (loading) {
@@ -53,9 +54,9 @@ export function DealsTable({ deals, loading = false }: DealsTableProps) {
     return (
       <Card className="p-10 text-center flex flex-col items-center justify-center space-y-3 border-dashed">
         <div className="p-3 bg-muted rounded-full text-2xl">💼</div>
-        <h3 className="font-semibold text-lg text-foreground">لا توجد صفقات بعد</h3>
+        <h3 className="font-semibold text-lg text-foreground">{tDeals("emptyTitle")}</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
-          ابدأ بإنشاء صفقة جديدة من زر &quot;صفقة جديدة&quot; أو من داخل ملف العميل 🚀
+          {tDeals("emptySubtitle")}
         </p>
       </Card>
     );
@@ -68,12 +69,12 @@ export function DealsTable({ deals, loading = false }: DealsTableProps) {
         <Table>
           <TableHeader className="bg-muted/40">
             <TableRow>
-              <TableHead className="w-24 font-semibold">الكود</TableHead>
-              <TableHead className="font-semibold">عنوان الصفقة</TableHead>
-              <TableHead className="font-semibold">العميل</TableHead>
-              <TableHead className="w-32 font-semibold text-center">المرحلة</TableHead>
-              <TableHead className="font-semibold">القيمة التقديرية</TableHead>
-              <TableHead className="font-semibold">المسؤول</TableHead>
+              <TableHead className="w-24 font-semibold">{tDeals("table.code")}</TableHead>
+              <TableHead className="font-semibold">{tDeals("table.title")}</TableHead>
+              <TableHead className="font-semibold">{tDeals("table.client")}</TableHead>
+              <TableHead className="w-32 font-semibold text-center">{tDeals("table.stage")}</TableHead>
+              <TableHead className="font-semibold">{tDeals("table.estimatedValue")}</TableHead>
+              <TableHead className="font-semibold">{tDeals("table.owner")}</TableHead>
               <TableHead className="w-16 text-end"></TableHead>
             </TableRow>
           </TableHeader>

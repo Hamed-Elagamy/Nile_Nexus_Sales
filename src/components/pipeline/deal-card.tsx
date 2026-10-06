@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ChevronLeft, MoreVertical, Trophy, XCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,14 +37,16 @@ export function DealCard({
   onMarkWon,
   onMarkLost,
 }: DealCardProps) {
+  const t = useTranslations("pipeline");
+  const tCommon = useTranslations("common");
   const currentIndex = STAGE_ORDER.indexOf(deal.stage as DealStage);
   const nextStage = currentIndex >= 0 && currentIndex < STAGE_ORDER.length - 1
     ? STAGE_ORDER[currentIndex + 1]
     : null;
 
   const formattedValue = deal.estimated_value
-    ? `${Number(deal.estimated_value).toLocaleString("ar-EG")} ${deal.currency || "EGP"}`
-    : "غير محدد";
+    ? `${Number(deal.estimated_value).toLocaleString()} ${t("currency")}`
+    : t("unspecified");
 
   return (
     <Card className="p-3 bg-card border-border hover:border-primary/50 transition-all shadow-xs hover:shadow-sm space-y-2.5 group">
@@ -74,7 +77,7 @@ export function DealCard({
             <DropdownMenuItem
               render={
                 <Link href={`/deals/${deal.id}`} className="cursor-pointer">
-                  التفاصيل
+                  {tCommon("details")}
                 </Link>
               }
             />
@@ -84,7 +87,7 @@ export function DealCard({
                 className="cursor-pointer text-emerald-600 dark:text-emerald-400 font-medium"
               >
                 <Trophy className="h-3.5 w-3.5" />
-                <span>كسبنا الصفقة 🎉</span>
+                <span>{t("markWon")}</span>
               </DropdownMenuItem>
             )}
             {deal.stage !== "LOST" && (
@@ -93,7 +96,7 @@ export function DealCard({
                 className="cursor-pointer text-rose-600 dark:text-rose-400"
               >
                 <XCircle className="h-3.5 w-3.5" />
-                <span>خسرنا الصفقة</span>
+                <span>{t("markLost")}</span>
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>
@@ -124,9 +127,9 @@ export function DealCard({
             variant="outline"
             onClick={() => onAdvanceStage(deal.id, nextStage)}
             className="h-6 text-[10px] px-1.5 gap-1 text-primary hover:bg-primary hover:text-primary-foreground"
-            title="نقل للمرحلة التالية"
+            title={t("advanceStage")}
           >
-            <span>نقل</span>
+            <span>{t("advance")}</span>
             <ChevronLeft className="h-3 w-3 rtl:rotate-0 rotate-180" />
           </Button>
         )}

@@ -5,6 +5,7 @@ import { type DealStage } from "@/lib/schemas/deal";
 import { getClients } from "@/lib/actions/clients";
 import { PipelineBoard } from "@/components/pipeline/pipeline-board";
 import { CreateDealDialog } from "@/components/deals/create-deal-dialog";
+import { getTranslations } from "next-intl/server";
 
 export const metadata = {
   title: "البايبلاين | Nile Nexus Sales",
@@ -12,6 +13,7 @@ export const metadata = {
 };
 
 export default async function PipelinePage() {
+  const t = await getTranslations("pipeline");
   const [pipelineRes, clientsRes] = await Promise.all([
     getPipelineDeals(),
     getClients({ page: 1, pageSize: 100 }),
@@ -32,10 +34,10 @@ export default async function PipelinePage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            لوحة البايبلاين (Pipeline)
+            {t("title")}
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            متابعة الصفقات عبر مراحل البيع المختلفة خطوة بخطوة 🎯
+            {t("subtitle")}
           </p>
         </div>
 
@@ -45,7 +47,7 @@ export default async function PipelinePage() {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium hover:bg-muted transition-colors"
           >
             <TableIcon className="h-3.5 w-3.5" />
-            <span>عرض الجدول</span>
+            <span>{t("tableView")}</span>
           </Link>
 
           <CreateDealDialog clients={clientsList} />

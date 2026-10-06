@@ -89,7 +89,7 @@ export function PotentialClientsTable({
               <TableHead className="font-semibold">{t("name")}</TableHead>
               <TableHead className="font-semibold">{t("phone")}</TableHead>
               <TableHead className="font-semibold">{t("opportunities")}</TableHead>
-              <TableHead className="w-32 font-semibold text-center">{t("common.status")}</TableHead>
+              <TableHead className="w-32 font-semibold text-center">{tCommon("status")}</TableHead>
               <TableHead className="w-16 text-end"></TableHead>
             </TableRow>
           </TableHeader>
@@ -142,7 +142,7 @@ export function PotentialClientsTable({
                             <a
                               href={`tel:${client.phone}`}
                               className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
-                              title="اتصال"
+                              title={tCommon("call")}
                             >
                               <Phone className="h-3.5 w-3.5" />
                             </a>
@@ -152,7 +152,7 @@ export function PotentialClientsTable({
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="p-1 rounded hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700"
-                                title="واتساب"
+                                title={tCommon("whatsapp")}
                               >
                                 <MessageCircle className="h-3.5 w-3.5" />
                               </a>
@@ -308,7 +308,7 @@ export function PotentialClientsTable({
                       className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 text-xs flex items-center gap-1"
                     >
                       <MessageCircle className="h-3.5 w-3.5" />
-                      <span>واتساب</span>
+                      <span>{tCommon("whatsapp")}</span>
                     </a>
                   )}
                 </div>

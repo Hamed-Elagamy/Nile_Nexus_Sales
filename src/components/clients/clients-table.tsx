@@ -59,9 +59,9 @@ export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
     return (
       <Card className="p-10 text-center flex flex-col items-center justify-center space-y-3 border-dashed">
         <div className="p-3 bg-muted rounded-full text-2xl">🏢</div>
-        <h3 className="font-semibold text-lg text-foreground">لا يوجد عملاء بعد</h3>
+        <h3 className="font-semibold text-lg text-foreground">{t("emptyTitle")}</h3>
         <p className="text-sm text-muted-foreground max-w-sm">
-          ابدأ بتسجيل عميل جديد أو تحويل عميل من حوض البحث 🚀
+          {t("emptySubtitle")}
         </p>
       </Card>
     );
@@ -74,12 +74,12 @@ export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
         <Table>
           <TableHeader className="bg-muted/40">
             <TableRow>
-              <TableHead className="w-24 font-semibold">الكود</TableHead>
-              <TableHead className="font-semibold">{t("title")}</TableHead>
-              <TableHead className="w-28 font-semibold">النوع</TableHead>
-              <TableHead className="font-semibold">جهة الاتصال الأساسية</TableHead>
-              <TableHead className="font-semibold">التواصل</TableHead>
-              <TableHead className="font-semibold">المسؤول</TableHead>
+              <TableHead className="w-24 font-semibold">{t("table.code")}</TableHead>
+              <TableHead className="font-semibold">{t("table.name")}</TableHead>
+              <TableHead className="w-28 font-semibold">{t("table.type")}</TableHead>
+              <TableHead className="font-semibold">{t("table.primaryContact")}</TableHead>
+              <TableHead className="font-semibold">{t("table.contact")}</TableHead>
+              <TableHead className="font-semibold">{t("table.owner")}</TableHead>
               <TableHead className="w-16 text-end"></TableHead>
             </TableRow>
           </TableHeader>
@@ -152,7 +152,7 @@ export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
                             <a
                               href={`tel:${phone}`}
                               className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
-                              title="اتصال"
+                              title={t("quickActions.call")}
                             >
                               <Phone className="h-3.5 w-3.5" />
                             </a>
@@ -162,7 +162,7 @@ export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="p-1 rounded hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700"
-                                title="واتساب"
+                                title={t("quickActions.whatsapp")}
                               >
                                 <MessageCircle className="h-3.5 w-3.5" />
                               </a>
@@ -252,7 +252,7 @@ export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
 
               {primaryContact && (
                 <div className="text-xs p-2 rounded-lg bg-muted/40 flex items-center justify-between">
-                  <span className="text-muted-foreground">جهة الاتصال:</span>
+                  <span className="text-muted-foreground">{t("table.primaryContact")}:</span>
                   <span className="font-medium text-foreground">
                     {primaryContact.name} {primaryContact.job_title ? `(${primaryContact.job_title})` : ""}
                   </span>
@@ -278,7 +278,7 @@ export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
                       className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 text-xs flex items-center gap-1"
                     >
                       <MessageCircle className="h-3.5 w-3.5" />
-                      <span>واتساب</span>
+                      <span>{t("quickActions.whatsapp")}</span>
                     </a>
                   )}
                 </div>

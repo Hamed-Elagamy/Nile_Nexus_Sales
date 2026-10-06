@@ -32,7 +32,9 @@
     "viewAll": "View All",
     "success": "Done! 👏",
     "error": "Something went wrong",
-    "allGood": "All good 😎"
+    "allGood": "All good 😎",
+    "call": "Call",
+    "whatsapp": "WhatsApp"
   },
   "auth": {
     "login": "Login",
@@ -86,6 +88,7 @@
   "potentialClients": {
     "title": "Potential Clients",
     "addNew": "New Potential Client",
+    "subtitle": "Prospect research pool and opportunity scouting before client conversion 🕵️‍♂️",
     "businessId": "Business ID",
     "name": "Potential Client Name",
     "area": "Area / Location",
@@ -138,6 +141,20 @@
   "clients": {
     "title": "Clients",
     "addNew": "New Client",
+    "subtitle": "Directory of confirmed companies, individuals, and primary contacts 🏢",
+    "allClients": "All Clients",
+    "searchPlaceholder": "Search by client name, phone, email, or code...",
+    "emptyTitle": "No clients found yet",
+    "emptySubtitle": "Start by adding a new client or converting a lead from the research pool 🚀",
+    "table": {
+      "code": "Code",
+      "name": "Client",
+      "type": "Type",
+      "primaryContact": "Primary Contact",
+      "contact": "Contact",
+      "owner": "Owner",
+      "actions": "Actions"
+    },
     "type": {
       "COMPANY": "Company",
       "INDIVIDUAL": "Individual"
@@ -154,11 +171,26 @@
   "deals": {
     "title": "Deals",
     "addNew": "New Deal",
+    "subtitle": "Manage all commercial opportunities, deals, and pipeline stages 💼",
+    "allStages": "All Deals",
+    "searchPlaceholder": "Search by deal title, code, or client...",
+    "pipelineKanban": "Pipeline View (Kanban)",
+    "emptyTitle": "No deals found yet",
+    "emptySubtitle": "Start by creating a new deal using the 'New Deal' button or from a client profile 🚀",
+    "table": {
+      "code": "Code",
+      "title": "Deal Title",
+      "client": "Client",
+      "stage": "Stage",
+      "estimatedValue": "Estimated Value",
+      "owner": "Owner",
+      "actions": "Actions"
+    },
     "stages": {
       "NEW": "New",
-      "CONTACTED": "Contacted",
-      "INTERESTED": "Interested 👀",
-      "PROPOSAL_SENT": "Proposal Sent 📄",
+      "CONTACTED": "Contacted 📞",
+      "INTERESTED": "Interested 🔥",
+      "PROPOSAL_SENT": "Proposal Sent 📑",
       "NEGOTIATION": "Negotiation 🤝",
       "WON": "Won 🎉",
       "LOST": "Lost",
@@ -180,6 +212,21 @@
       "PROPOSAL_SENT": "Schedule a follow-up ⏰",
       "WON": "Prepare for Finance handoff 💰"
     }
+  },
+  "pipeline": {
+    "title": "Pipeline Board",
+    "subtitle": "Track deals across sales stages step by step 🎯",
+    "tableView": "Table View",
+    "totalValue": "Total Value:",
+    "emptyStage": "No deals in this stage",
+    "currency": "EGP",
+    "movedSuccess": "Deal moved to: {stage} 🚀",
+    "wonSuccess": "Congratulations! Deal closed and won! 🎉🔥🏆",
+    "advance": "Advance",
+    "advanceStage": "Advance to next stage",
+    "markWon": "Won Deal 🎉",
+    "markLost": "Lost Deal",
+    "unspecified": "Unspecified"
   },
   "followUps": {
     "title": "Follow-ups",

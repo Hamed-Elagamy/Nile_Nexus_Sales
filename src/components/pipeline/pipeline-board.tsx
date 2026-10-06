@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { DealCard } from "./deal-card";
 import { LostDealDialog } from "./lost-deal-dialog";
@@ -17,6 +18,8 @@ interface PipelineBoardProps {
 }
 
 export function PipelineBoard({ initialStages, onRefresh }: PipelineBoardProps) {
+  const t = useTranslations("pipeline");
+  const tDeals = useTranslations("deals");
   const [, startTransition] = useTransition();
   const stages = initialStages;
 
@@ -32,7 +35,7 @@ export function PipelineBoard({ initialStages, onRefresh }: PipelineBoardProps) 
       });
 
       if (res.success) {
-        toast.success(`تم نقل الصفقة إلى مرحلة: ${nextStage} 🚀`);
+        toast.success(t("movedSuccess", { stage: tDeals(`stages.${nextStage}`) }));
         onRefresh?.();
       } else {
         toast.error(res.error || "فشل نقل الصفقة");
@@ -48,7 +51,7 @@ export function PipelineBoard({ initialStages, onRefresh }: PipelineBoardProps) 
       });
 
       if (res.success) {
-        toast.success("مبروك يا وحش! الصفقة اتقفلت وكسبناها بنجاح! 🎉🔥🏆", {
+        toast.success(t("wonSuccess"), {
           duration: 5000,
         });
         onRefresh?.();
@@ -75,8 +78,8 @@ export function PipelineBoard({ initialStages, onRefresh }: PipelineBoardProps) 
           };
 
           const formattedTotal = summary.totalValue > 0
-            ? `${summary.totalValue.toLocaleString("ar-EG")} ج.م`
-            : "0 ج.م";
+            ? `${summary.totalValue.toLocaleString()} ${t("currency")}`
+            : `0 ${t("currency")}`;
 
           return (
             <div
@@ -92,7 +95,7 @@ export function PipelineBoard({ initialStages, onRefresh }: PipelineBoardProps) 
                   </span>
                 </div>
                 <div className="text-[11px] font-mono text-muted-foreground flex items-center justify-between">
-                  <span>إجمالي القيمة:</span>
+                  <span>{t("totalValue")}</span>
                   <span className="font-semibold text-foreground">{formattedTotal}</span>
                 </div>
               </div>
@@ -101,7 +104,7 @@ export function PipelineBoard({ initialStages, onRefresh }: PipelineBoardProps) 
               <div className="flex-1 overflow-y-auto space-y-2.5 pt-3 pr-0.5 scrollbar-thin">
                 {summary.deals.length === 0 ? (
                   <div className="text-center py-10 border border-dashed border-border/80 rounded-xl text-muted-foreground text-xs">
-                    مفيش صفقات في المرحلة دي
+                    {t("emptyStage")}
                   </div>
                 ) : (
                   summary.deals.map((deal) => (

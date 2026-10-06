@@ -68,7 +68,10 @@ const stageConfig: Record<
   },
 };
 
+import { useTranslations } from "next-intl";
+
 export function DealStageBadge({ stage, label, className }: DealStageBadgeProps) {
+  const tDeals = useTranslations("deals");
   const config = stageConfig[stage] || stageConfig.NEW;
 
   return (
@@ -82,7 +85,7 @@ export function DealStageBadge({ stage, label, className }: DealStageBadgeProps)
         className
       )}
     >
-      {label || config.defaultLabelAr}
+      {label || tDeals(`stages.${stage}`) || config.defaultLabelAr}
     </Badge>
   );
 }

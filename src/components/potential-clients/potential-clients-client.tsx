@@ -88,7 +88,7 @@ export function PotentialClientsClient({ initialData }: PotentialClientsClientPr
             </span>
           </div>
           <p className="text-sm text-muted-foreground mt-0.5">
-            حوض البحث وتجميع الفرص قبل تحويلها لعملاء رسميين 🕵️‍♂️
+            {t("subtitle")}
           </p>
         </div>
 

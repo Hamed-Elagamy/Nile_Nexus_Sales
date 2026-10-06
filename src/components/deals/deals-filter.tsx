@@ -22,6 +22,7 @@ export function DealsFilter({
   onStageChange,
   onReset,
 }: DealsFilterProps) {
+  const tDeals = useTranslations("deals");
   const tCommon = useTranslations("common");
   const hasActiveFilters = searchQuery.trim() !== "" || selectedStage !== "ALL";
 
@@ -31,7 +32,7 @@ export function DealsFilter({
         <div className="relative flex-1">
           <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="ابحث بعنوان الصفقة، الكود، أو العميل..."
+            placeholder={tDeals("searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="ps-9 pe-8 h-10 bg-card rounded-lg"
@@ -68,7 +69,7 @@ export function DealsFilter({
               : "bg-card text-muted-foreground hover:text-foreground hover:bg-muted border-border"
           }`}
         >
-          كل الصفقات
+          {tDeals("allStages")}
         </button>
 
         {DEAL_STAGES.map((st) => (
@@ -81,7 +82,7 @@ export function DealsFilter({
                 : "bg-card text-muted-foreground hover:text-foreground hover:bg-muted border-border"
             }`}
           >
-            {st}
+            {tDeals(`stages.${st}`)}
           </button>
         ))}
       </div>

@@ -4,32 +4,50 @@ import { useTransition } from "react";
 import { useLocale } from "next-intl";
 import { Globe } from "lucide-react";
 import { setUserLocale } from "@/i18n/locale";
-import { type Locale } from "@/i18n/config";
+import type { Locale } from "@/i18n/config";
+import { cn } from "@/lib/utils";
 
 export function LanguageSwitcher() {
   const locale = useLocale() as Locale;
   const [isPending, startTransition] = useTransition();
 
-  const toggleLocale = () => {
-    const nextLocale: Locale = locale === "ar" ? "en" : "ar";
+  const changeLocale = (targetLocale: Locale) => {
+    if (targetLocale === locale) return;
     startTransition(async () => {
-      await setUserLocale(nextLocale);
-      // Force a full page reload to apply new locale direction
+      await setUserLocale(targetLocale);
+      document.cookie = `nile-nexus-locale=${targetLocale}; path=/; max-age=31536000; SameSite=Lax`;
       window.location.reload();
     });
   };
 
   return (
-    <button
-      onClick={toggleLocale}
-      disabled={isPending}
-      className="flex items-center gap-1.5 px-3 py-2 rounded-lg hover:bg-[var(--muted)] text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors disabled:opacity-50"
-      aria-label="Switch language"
-    >
-      <Globe className="h-4 w-4" />
-      <span className="hidden sm:inline">
-        {locale === "ar" ? "EN" : "عربي"}
-      </span>
-    </button>
+    <div className="flex items-center rounded-lg border border-[var(--border)] bg-[var(--muted)]/60 p-0.5 text-xs font-medium">
+      <button
+        type="button"
+        onClick={() => changeLocale("ar")}
+        disabled={isPending}
+        className={cn(
+          "px-2.5 py-1 rounded-md transition-all cursor-pointer",
+          locale === "ar"
+            ? "bg-[var(--background)] text-[var(--foreground)] font-bold shadow-xs"
+            : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+        )}
+      >
+        عربي
+      </button>
+      <button
+        type="button"
+        onClick={() => changeLocale("en")}
+        disabled={isPending}
+        className={cn(
+          "px-2.5 py-1 rounded-md transition-all cursor-pointer",
+          locale === "en"
+            ? "bg-[var(--background)] text-[var(--foreground)] font-bold shadow-xs"
+            : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+        )}
+      >
+        English
+      </button>
+    </div>
   );
 }

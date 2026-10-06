@@ -2,6 +2,7 @@
 
 import React, { useState, useTransition, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Kanban } from "lucide-react";
 import { DealsFilter } from "./deals-filter";
@@ -19,6 +20,7 @@ interface DealsClientProps {
 }
 
 export function DealsClient({ initialData, clients = [] }: DealsClientProps) {
+  const tDeals = useTranslations("deals");
   const [isPending, startTransition] = useTransition();
 
   const [data, setData] = useState<PaginatedDealsResult>(
@@ -67,14 +69,14 @@ export function DealsClient({ initialData, clients = [] }: DealsClientProps) {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              الصفقات
+              {tDeals("title")}
             </h1>
             <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
               {data.total}
             </span>
           </div>
           <p className="text-sm text-muted-foreground mt-0.5">
-            إدارة جميع الفرص والصفقات التجارية ومتابعة مراحلها 💼
+            {tDeals("subtitle")}
           </p>
         </div>
 
@@ -84,7 +86,7 @@ export function DealsClient({ initialData, clients = [] }: DealsClientProps) {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium hover:bg-muted transition-colors"
           >
             <Kanban className="h-3.5 w-3.5" />
-            <span>عرض البايبلاين (Kanban)</span>
+            <span>{tDeals("pipelineKanban")}</span>
           </Link>
 
           <CreateDealDialog
