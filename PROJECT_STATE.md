@@ -1,7 +1,7 @@
 # Project State — Nile Nexus Sales
 
 ## Current Phase
-Production Ready — Core Platform Modules Complete, Tested & Standalone Ready
+Production Deployed — Live on Vercel & Connected to Supabase
 
 ## Completed Phases
 - **Phase 0**: Repository & Documentation bootstrap
@@ -35,8 +35,17 @@ Production Ready — Core Platform Modules Complete, Tested & Standalone Ready
     - `/approvals`: GM & Admin approvals center for discount overrides (>5%) and payment terms exceptions
     - `/reports`: Sales conversion funnel analysis, revenue metrics in EGP, and rep leaderboard
     - `/notifications`: System alert center with unread counters and deep links
-  - Preloaded comprehensive Egyptian commercial sales dataset (clients, pipeline deals in EGP, today/overdue follow-ups, proposals with 14% VAT, approvals, tasks)
-  - Header database connection indicator badge (Demo Mode vs Supabase Connected) with 1-click credential configuration drawer
+  - Preloaded comprehensive Egyptian commercial sales dataset
+  - Header database connection indicator badge (Demo Mode vs Supabase Connected)
+- **Phase 10 (Production Deployment & Vercel Integration)**:
+  - Linked and configured Vercel production project: `nile-nexus-sales`
+  - Configured live production environment variables on Vercel:
+    - `NEXT_PUBLIC_SUPABASE_URL`
+    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+  - Successfully built and deployed to Vercel Production
+  - Live production URL: `https://nile-nexus-sales.vercel.app`
+  - Verified live deployment responsiveness
 
 ## Completed Work
 - **Design System & UI Components**:
@@ -69,33 +78,18 @@ Production Ready — Core Platform Modules Complete, Tested & Standalone Ready
   - Live executive dashboard with real KPI metrics and urgent overdue recovery (`/dashboard`)
 - **All Auxiliary Routes**:
   - `/tasks`, `/calendar`, `/approvals`, `/reports`, `/notifications`
+- **Production Infrastructure**:
+  - Live Vercel Production Deployment: `https://nile-nexus-sales.vercel.app`
+  - Connected to Supabase Project: `https://zbbivheqcutwflewmtnb.supabase.co`
 - **Tests**:
-  - 60 Vitest unit tests passing across 13 test suites:
-    - `src/lib/__tests__/utils.test.ts` (4 tests)
-    - `src/i18n/__tests__/config.test.ts` (5 tests)
-    - `src/lib/schemas/__tests__/potential-client.test.ts` (9 tests)
-    - `src/lib/schemas/__tests__/client.test.ts` (6 tests)
-    - `src/lib/schemas/__tests__/deal.test.ts` (4 tests)
-    - `src/lib/schemas/__tests__/follow-up.test.ts` (5 tests)
-    - `src/lib/schemas/__tests__/proposal.test.ts` (6 tests)
-    - `src/lib/actions/__tests__/potential-clients.test.ts` (5 tests)
-    - `src/lib/actions/__tests__/clients.test.ts` (4 tests)
-    - `src/lib/actions/__tests__/deals.test.ts` (3 tests)
-    - `src/lib/actions/__tests__/follow-ups.test.ts` (4 tests)
-    - `src/lib/actions/__tests__/proposals.test.ts` (4 tests)
-    - `src/lib/actions/__tests__/dashboard.test.ts` (1 test)
-
-## Work in Progress
-- Production live deployment to Vercel and connecting live Supabase project
-
-## Architecture Decisions
-See [docs/DECISIONS.md](docs/DECISIONS.md)
+  - 60 Vitest unit tests passing across 13 test suites (100% pass rate)
 
 ## Database State
-- 3 migrations written (ready to apply on Supabase project):
+- 3 migrations written + unified deploy script:
   - `001_initial_schema.sql` — all core tables, indexes, triggers, functions
   - `002_rls_policies.sql` — comprehensive RLS for all tables
   - `003_seed_data.sql` — pipeline stages, services, permissions, settings
+  - `all_in_one_deploy.sql` — consolidated single-run deployment migration
 
 ## Security State
 - RLS policies designed for all tables
@@ -112,23 +106,19 @@ See [docs/DECISIONS.md](docs/DECISIONS.md)
 - ✅ TypeScript: 0 errors (`tsc --noEmit`)
 - ✅ ESLint: 0 errors, 0 warnings (`eslint`)
 - ✅ Production build: compiled and optimized successfully for all 21 routes (`next build`)
-- ✅ Dev Server: verified HTTP 200 on `/login` and `/dashboard`
+- ✅ Vercel Production Deployment: READY at `https://nile-nexus-sales.vercel.app`
 
 ## Known Bugs
 - None
 
 ## Environment Requirements
-- `NEXT_PUBLIC_SUPABASE_URL` (optional in demo mode, required for live DB)
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` (optional in demo mode, required for live DB)
-- `SUPABASE_SERVICE_ROLE_KEY` (optional in demo mode, required for live DB)
+- `NEXT_PUBLIC_SUPABASE_URL` (configured on Vercel)
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` (configured on Vercel)
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (configured on Vercel)
+- `SUPABASE_SERVICE_ROLE_KEY` (optional)
 
 ## Latest Pushed Commit
-- `09017d1` (feat(platform): enable standalone interactive demo mode and complete all app routes)
-
-## Blockers
-- None. Application is immediately functional out of the box in standalone demo mode and seamlessly connects to live Supabase once credentials are provided in `.env.local`.
+- `91351fb` (feat(supabase): support publishable API key format and initialize supabase config)
 
 ## Next Actions
-1. Connect live Supabase project credentials in `.env.local`
-2. Apply database migrations to Supabase project (`001_initial_schema.sql`, `002_rls_policies.sql`, `003_seed_data.sql`)
-3. Deploy to production on Vercel
+- Verify live production user workflows on `https://nile-nexus-sales.vercel.app`

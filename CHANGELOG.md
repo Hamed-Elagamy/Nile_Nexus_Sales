@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.0] - 2026-10-06
+
+### Added
+- **Production Deployment to Vercel**:
+  - Successfully linked and created production project `nile-nexus-sales` under account `hamed-elagamy`
+  - Deployed live application to Vercel Production: [https://nile-nexus-sales.vercel.app](https://nile-nexus-sales.vercel.app)
+  - Configured live production environment variables on Vercel:
+    - `NEXT_PUBLIC_SUPABASE_URL`
+    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+  - Verified live endpoint responsiveness with HTTP 200/307 redirects
+- **Supabase Integration Updates**:
+  - Added support for new Supabase publishable key format (`sb_publishable_...`) across client, server, and middleware
+  - Created consolidated single-run deployment migration `supabase/migrations/all_in_one_deploy.sql`
+  - Initialized `supabase/config.toml`
+
 ## [0.7.0] - 2026-10-05
 
 ### Added
