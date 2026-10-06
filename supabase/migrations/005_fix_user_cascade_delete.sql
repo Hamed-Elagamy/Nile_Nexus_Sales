@@ -1,115 +1,88 @@
 -- ============================================================================
--- Nile Nexus Sales — Fix User Delete & Cascade Constraints
+-- Nile Nexus Sales — Fix Foreign Keys & Enable User Deletion
 -- Run this in Supabase SQL Editor:
 -- https://supabase.com/dashboard/project/zbbivheqcutwflewmtnb/sql/new
 -- ============================================================================
 
--- 1. Reassign or Clean up demo GM user data and delete gm@nilenexus.com
+-- Step 1: Automatically find and drop all foreign keys pointing to profiles
 DO $$
 DECLARE
-  v_new_gm_id UUID;
-  v_old_gm_id UUID;
+    r RECORD;
 BEGIN
-  SELECT id INTO v_new_gm_id FROM auth.users WHERE email = 'hamedelagamy00@gmail.com';
-  SELECT id INTO v_old_gm_id FROM auth.users WHERE email = 'gm@nilenexus.com';
-
-  IF v_old_gm_id IS NOT NULL THEN
-    IF v_new_gm_id IS NOT NULL THEN
-      -- Reassign existing records to your account
-      UPDATE potential_clients SET created_by = v_new_gm_id WHERE created_by = v_old_gm_id;
-      UPDATE clients SET created_by = v_new_gm_id WHERE created_by = v_old_gm_id;
-      UPDATE deals SET created_by = v_new_gm_id WHERE created_by = v_old_gm_id;
-    ELSE
-      DELETE FROM deals WHERE created_by = v_old_gm_id;
-      DELETE FROM clients WHERE created_by = v_old_gm_id;
-      DELETE FROM potential_clients WHERE created_by = v_old_gm_id;
-    END IF;
-
-    -- Delete the demo GM profile and auth user
-    DELETE FROM profiles WHERE id = v_old_gm_id;
-    DELETE FROM auth.users WHERE id = v_old_gm_id;
-  END IF;
+    FOR r IN (
+        SELECT tc.table_schema, tc.table_name, tc.constraint_name
+        FROM information_schema.table_constraints AS tc
+        JOIN information_schema.key_column_usage AS kcu
+          ON tc.constraint_name = kcu.constraint_name
+          AND tc.table_schema = kcu.table_schema
+        JOIN information_schema.constraint_column_usage AS ccu
+          ON ccu.constraint_name = tc.constraint_name
+          AND ccu.table_schema = tc.table_schema
+        WHERE tc.constraint_type = 'FOREIGN KEY'
+          AND ccu.table_name = 'profiles'
+    ) LOOP
+        EXECUTE 'ALTER TABLE ' || quote_ident(r.table_schema) || '.' || quote_ident(r.table_name) ||
+                ' DROP CONSTRAINT ' || quote_ident(r.constraint_name);
+    END LOOP;
 END $$;
 
--- 2. Drop and Re-add Foreign Keys on tables with ON DELETE CASCADE / SET NULL
--- This ensures deleting ANY user from Supabase Dashboard UI succeeds without errors.
+-- Step 2: Re-create foreign keys with ON DELETE CASCADE or ON DELETE SET NULL
+-- This ensures deleting any user from Supabase Studio never throws "Database error loading user"
 
--- Potential Clients
-ALTER TABLE potential_clients DROP CONSTRAINT IF EXISTS potential_clients_research_owner_id_fkey;
-ALTER TABLE potential_clients ADD CONSTRAINT potential_clients_research_owner_id_fkey 
-  FOREIGN KEY (research_owner_id) REFERENCES profiles(id) ON DELETE SET NULL;
+ALTER TABLE potential_clients 
+  ADD CONSTRAINT potential_clients_research_owner_id_fkey FOREIGN KEY (research_owner_id) REFERENCES profiles(id) ON DELETE SET NULL,
+  ADD CONSTRAINT potential_clients_created_by_fkey FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE CASCADE;
 
-ALTER TABLE potential_clients DROP CONSTRAINT IF EXISTS potential_clients_created_by_fkey;
-ALTER TABLE potential_clients ADD CONSTRAINT potential_clients_created_by_fkey 
-  FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE CASCADE;
+ALTER TABLE clients 
+  ADD CONSTRAINT clients_account_owner_id_fkey FOREIGN KEY (account_owner_id) REFERENCES profiles(id) ON DELETE SET NULL,
+  ADD CONSTRAINT clients_created_by_fkey FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE CASCADE,
+  ADD CONSTRAINT clients_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES profiles(id) ON DELETE SET NULL;
 
--- Clients
-ALTER TABLE clients DROP CONSTRAINT IF EXISTS clients_account_owner_id_fkey;
-ALTER TABLE clients ADD CONSTRAINT clients_account_owner_id_fkey 
-  FOREIGN KEY (account_owner_id) REFERENCES profiles(id) ON DELETE SET NULL;
+ALTER TABLE deals 
+  ADD CONSTRAINT deals_sales_owner_id_fkey FOREIGN KEY (sales_owner_id) REFERENCES profiles(id) ON DELETE SET NULL,
+  ADD CONSTRAINT deals_created_by_fkey FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE CASCADE,
+  ADD CONSTRAINT deals_updated_by_fkey FOREIGN KEY (updated_by) REFERENCES profiles(id) ON DELETE SET NULL;
 
-ALTER TABLE clients DROP CONSTRAINT IF EXISTS clients_created_by_fkey;
-ALTER TABLE clients ADD CONSTRAINT clients_created_by_fkey 
-  FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE CASCADE;
+ALTER TABLE activities 
+  ADD CONSTRAINT activities_actor_id_fkey FOREIGN KEY (actor_id) REFERENCES profiles(id) ON DELETE CASCADE;
 
-ALTER TABLE clients DROP CONSTRAINT IF EXISTS clients_updated_by_fkey;
-ALTER TABLE clients ADD CONSTRAINT clients_updated_by_fkey 
-  FOREIGN KEY (updated_by) REFERENCES profiles(id) ON DELETE SET NULL;
+ALTER TABLE follow_ups 
+  ADD CONSTRAINT follow_ups_responsible_id_fkey FOREIGN KEY (responsible_id) REFERENCES profiles(id) ON DELETE CASCADE,
+  ADD CONSTRAINT follow_ups_created_by_fkey FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE CASCADE;
 
--- Deals
-ALTER TABLE deals DROP CONSTRAINT IF EXISTS deals_sales_owner_id_fkey;
-ALTER TABLE deals ADD CONSTRAINT deals_sales_owner_id_fkey 
-  FOREIGN KEY (sales_owner_id) REFERENCES profiles(id) ON DELETE SET NULL;
+ALTER TABLE tasks 
+  ADD CONSTRAINT tasks_assignee_id_fkey FOREIGN KEY (assignee_id) REFERENCES profiles(id) ON DELETE SET NULL,
+  ADD CONSTRAINT tasks_created_by_fkey FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE CASCADE;
 
-ALTER TABLE deals DROP CONSTRAINT IF EXISTS deals_created_by_fkey;
-ALTER TABLE deals ADD CONSTRAINT deals_created_by_fkey 
-  FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE CASCADE;
+ALTER TABLE meetings 
+  ADD CONSTRAINT meetings_created_by_fkey FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE CASCADE;
 
-ALTER TABLE deals DROP CONSTRAINT IF EXISTS deals_updated_by_fkey;
-ALTER TABLE deals ADD CONSTRAINT deals_updated_by_fkey 
-  FOREIGN KEY (updated_by) REFERENCES profiles(id) ON DELETE SET NULL;
+ALTER TABLE meeting_participants 
+  ADD CONSTRAINT meeting_participants_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES profiles(id) ON DELETE CASCADE;
 
--- Activities
-ALTER TABLE activities DROP CONSTRAINT IF EXISTS activities_actor_id_fkey;
-ALTER TABLE activities ADD CONSTRAINT activities_actor_id_fkey 
-  FOREIGN KEY (actor_id) REFERENCES profiles(id) ON DELETE CASCADE;
+ALTER TABLE proposals 
+  ADD CONSTRAINT proposals_created_by_fkey FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE CASCADE;
 
--- Follow-ups
-ALTER TABLE follow_ups DROP CONSTRAINT IF EXISTS follow_ups_responsible_id_fkey;
-ALTER TABLE follow_ups ADD CONSTRAINT follow_ups_responsible_id_fkey 
-  FOREIGN KEY (responsible_id) REFERENCES profiles(id) ON DELETE CASCADE;
+ALTER TABLE proposal_versions 
+  ADD CONSTRAINT proposal_versions_prepared_by_fkey FOREIGN KEY (prepared_by) REFERENCES profiles(id) ON DELETE CASCADE,
+  ADD CONSTRAINT proposal_versions_approved_by_fkey FOREIGN KEY (approved_by) REFERENCES profiles(id) ON DELETE SET NULL;
 
-ALTER TABLE follow_ups DROP CONSTRAINT IF EXISTS follow_ups_created_by_fkey;
-ALTER TABLE follow_ups ADD CONSTRAINT follow_ups_created_by_fkey 
-  FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE CASCADE;
+ALTER TABLE approvals 
+  ADD CONSTRAINT approvals_requester_id_fkey FOREIGN KEY (requester_id) REFERENCES profiles(id) ON DELETE CASCADE,
+  ADD CONSTRAINT approvals_approver_id_fkey FOREIGN KEY (approver_id) REFERENCES profiles(id) ON DELETE SET NULL;
 
--- Tasks
-ALTER TABLE tasks DROP CONSTRAINT IF EXISTS tasks_assignee_id_fkey;
-ALTER TABLE tasks ADD CONSTRAINT tasks_assignee_id_fkey 
-  FOREIGN KEY (assignee_id) REFERENCES profiles(id) ON DELETE SET NULL;
+ALTER TABLE files 
+  ADD CONSTRAINT files_uploaded_by_fkey FOREIGN KEY (uploaded_by) REFERENCES profiles(id) ON DELETE CASCADE;
 
-ALTER TABLE tasks DROP CONSTRAINT IF EXISTS tasks_created_by_fkey;
-ALTER TABLE tasks ADD CONSTRAINT tasks_created_by_fkey 
-  FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE CASCADE;
+ALTER TABLE targets 
+  ADD CONSTRAINT targets_user_id_fkey FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE;
 
--- Proposals
-ALTER TABLE proposals DROP CONSTRAINT IF EXISTS proposals_created_by_fkey;
-ALTER TABLE proposals ADD CONSTRAINT proposals_created_by_fkey 
-  FOREIGN KEY (created_by) REFERENCES profiles(id) ON DELETE CASCADE;
+ALTER TABLE commission_entries 
+  ADD CONSTRAINT commission_entries_user_id_fkey FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE;
 
-ALTER TABLE proposal_versions DROP CONSTRAINT IF EXISTS proposal_versions_prepared_by_fkey;
-ALTER TABLE proposal_versions ADD CONSTRAINT proposal_versions_prepared_by_fkey 
-  FOREIGN KEY (prepared_by) REFERENCES profiles(id) ON DELETE CASCADE;
+ALTER TABLE finance_handoffs 
+  ADD CONSTRAINT finance_handoffs_salesperson_id_fkey FOREIGN KEY (salesperson_id) REFERENCES profiles(id) ON DELETE CASCADE;
 
-ALTER TABLE proposal_versions DROP CONSTRAINT IF EXISTS proposal_versions_approved_by_fkey;
-ALTER TABLE proposal_versions ADD CONSTRAINT proposal_versions_approved_by_fkey 
-  FOREIGN KEY (approved_by) REFERENCES profiles(id) ON DELETE SET NULL;
-
--- Approvals
-ALTER TABLE approvals DROP CONSTRAINT IF EXISTS approvals_requester_id_fkey;
-ALTER TABLE approvals ADD CONSTRAINT approvals_requester_id_fkey 
-  FOREIGN KEY (requester_id) REFERENCES profiles(id) ON DELETE CASCADE;
-
-ALTER TABLE approvals DROP CONSTRAINT IF EXISTS approvals_approver_id_fkey;
-ALTER TABLE approvals ADD CONSTRAINT approvals_approver_id_fkey 
-  FOREIGN KEY (approver_id) REFERENCES profiles(id) ON DELETE SET NULL;
+-- Step 3: Delete the demo accounts (gm@nilenexus.com and sales@nilenexus.com) cleanly
+DELETE FROM auth.users WHERE email IN ('gm@nilenexus.com', 'sales@nilenexus.com');
+DELETE FROM profiles WHERE email IN ('gm@nilenexus.com', 'sales@nilenexus.com');
