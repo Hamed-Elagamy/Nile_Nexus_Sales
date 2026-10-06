@@ -63,15 +63,19 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const demoRole = request.cookies.get("nile_demo_role")?.value;
+  const isDemoSignedOut = request.cookies.get("nile_demo_signed_out")?.value === "true";
+  const hasDemoSession = Boolean(demoRole && !isDemoSignedOut);
+
   // Redirect unauthenticated users to login
-  if (!user && !isPublicPath) {
+  if (!user && !hasDemoSession && !isPublicPath) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from login
-  if (user && request.nextUrl.pathname === "/login") {
+  // Redirect authenticated or active demo users away from login
+  if ((user || hasDemoSession) && request.nextUrl.pathname === "/login") {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);

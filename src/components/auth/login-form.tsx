@@ -16,7 +16,7 @@ export function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [showConfigHelp, setShowConfigHelp] = useState(false);
 
-  const isConfigured = typeof window !== "undefined" ? isSupabaseConfigured() : false;
+  const isConfigured = isSupabaseConfigured();
 
   const handleDemoLogin = (role: "gm" | "admin" | "sales") => {
     // Set demo cookies

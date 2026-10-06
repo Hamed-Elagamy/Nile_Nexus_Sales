@@ -19,15 +19,19 @@ export function AppHeader({ user }: AppHeaderProps) {
   const router = useRouter();
   const [showDbInfo, setShowDbInfo] = useState(false);
 
-  const isConfigured = typeof window !== "undefined" ? isSupabaseConfigured() : false;
+  const isConfigured = isSupabaseConfigured();
 
   const handleSignOut = async () => {
     if (isConfigured) {
-      const supabase = createClient();
-      await supabase.auth.signOut();
-    } else {
-      document.cookie = "nile_demo_signed_out=true; path=/; max-age=86400";
+      try {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+      } catch {
+        // Ignore sign out errors
+      }
     }
+    document.cookie = "nile_demo_signed_out=true; path=/; max-age=86400";
+    document.cookie = "nile_demo_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
     router.push("/login");
     router.refresh();
   };

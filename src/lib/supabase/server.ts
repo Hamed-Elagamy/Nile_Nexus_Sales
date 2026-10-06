@@ -57,7 +57,7 @@ export async function createClient() {
     return baseClient;
   }
 
-  return createServerClient(
+  const client = createServerClient(
     getSupabaseUrl(),
     getSupabaseAnonKey(),
     {
@@ -79,4 +79,20 @@ export async function createClient() {
       },
     }
   );
+
+  const roleCookie = cookieStore.get("nile_demo_role")?.value;
+  const isSignedOut = cookieStore.get("nile_demo_signed_out")?.value === "true";
+
+  if (roleCookie && !isSignedOut) {
+    const origGetUser = client.auth.getUser.bind(client.auth);
+    client.auth.getUser = (async () => {
+      const { data, error } = await origGetUser();
+      if (data?.user) return { data, error };
+      const demoUser =
+        DEMO_USERS[roleCookie as keyof typeof DEMO_USERS] || DEMO_USERS.gm;
+      return { data: { user: demoUser as unknown as User }, error: null };
+    }) as typeof client.auth.getUser;
+  }
+
+  return client;
 }
