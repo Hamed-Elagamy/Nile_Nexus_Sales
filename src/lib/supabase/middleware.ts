@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { isSupabaseConfigured, getSupabaseAnonKey } from "./config";
+import { isSupabaseConfigured, getSupabaseUrl, getSupabaseAnonKey } from "./config";
 
 /**
  * Supabase middleware to refresh auth tokens and protect routes.
