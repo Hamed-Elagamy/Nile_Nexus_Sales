@@ -52,7 +52,21 @@
     "resetSuccess": "Done! Check your email 📧",
     "invalidCredentials": "Invalid email or password",
     "accountDisabled": "This account is disabled. Contact your administrator.",
-    "sessionExpired": "Session expired. Please sign in again."
+    "sessionExpired": "Session expired. Please sign in again.",
+    "signUp": "Sign Up",
+    "signUpTitle": "Create an Account",
+    "signUpSubtitle": "Register a new user to access the sales platform",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "e.g. Ahmed Elagamy",
+    "role": "Role",
+    "roleGm": "General Manager (GM)",
+    "roleAdmin": "System Administrator (Admin)",
+    "roleSales": "Sales Representative (Sales)",
+    "signUpButton": "Create Account",
+    "hasAccount": "Already have an account? Sign In",
+    "noAccount": "Don't have an account? Create one",
+    "signUpSuccess": "Account created successfully! You can now sign in.",
+    "checkEmailConfirmation": "Registration submitted! If email confirmation is required, please check your inbox or confirm the user in Supabase."
   },
   "nav": {
     "dashboard": "Dashboard",

@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Bell, LogOut, Search, Database, CheckCircle2 } from "lucide-react";
+import { Bell, LogOut, Search, CheckCircle2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
@@ -17,7 +16,6 @@ interface AppHeaderProps {
 export function AppHeader({ user }: AppHeaderProps) {
   const t = useTranslations();
   const router = useRouter();
-  const [showDbInfo, setShowDbInfo] = useState(false);
 
   const isConfigured = isSupabaseConfigured();
 
@@ -56,16 +54,8 @@ export function AppHeader({ user }: AppHeaderProps) {
 
         {/* Actions & Status */}
         <div className="flex items-center gap-2 ms-4">
-          {/* Database Mode Indicator */}
-          {!isConfigured ? (
-            <button
-              onClick={() => setShowDbInfo(!showDbInfo)}
-              className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 transition-colors"
-            >
-              <Database className="h-3.5 w-3.5" />
-              <span>{t("common.appName") ? (t("common.save") === "حفظ" ? "وضع المعاينة التجريبي (Demo)" : "Demo Preview Mode") : "Demo Mode"}</span>
-            </button>
-          ) : (
+          {/* Live Database Status Indicator */}
+          {isConfigured && (
             <span className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
               <CheckCircle2 className="h-3.5 w-3.5" />
               <span>{t("common.save") === "حفظ" ? "Supabase متصل" : "Supabase Connected"}</span>
@@ -94,7 +84,7 @@ export function AppHeader({ user }: AppHeaderProps) {
             </div>
             <button
               onClick={handleSignOut}
-              className="p-2 rounded-lg hover:bg-[var(--muted)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+              className="p-2 rounded-lg hover:bg-[var(--muted)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
               aria-label={t("auth.logout")}
             >
               <LogOut className="h-4 w-4" />
@@ -102,28 +92,6 @@ export function AppHeader({ user }: AppHeaderProps) {
           </div>
         </div>
       </div>
-
-      {showDbInfo && (
-        <div className="px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20 text-xs text-amber-800 dark:text-amber-200 flex items-center justify-between">
-          <p>
-            {t("common.save") === "حفظ" ? (
-              <>
-                💡 <strong>النظام يعمل الآن في وضع المعاينة بكامل المميزات:</strong> لتوصيل قاعدة بيانات Supabase الحية، شغّل ملف الهجرة <code>supabase/migrations/all_in_one_deploy.sql</code> في لوحة تحكم Supabase.
-              </>
-            ) : (
-              <>
-                💡 <strong>System running in full-featured Demo Preview Mode:</strong> To connect your live Supabase database, run the migration <code>supabase/migrations/all_in_one_deploy.sql</code> in your Supabase dashboard.
-              </>
-            )}
-          </p>
-          <button
-            onClick={() => setShowDbInfo(false)}
-            className="text-xs font-bold underline ms-2 hover:opacity-80 cursor-pointer"
-          >
-            {t("common.close")}
-          </button>
-        </div>
-      )}
     </header>
   );
 }

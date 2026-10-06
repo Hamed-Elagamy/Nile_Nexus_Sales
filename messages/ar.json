@@ -52,7 +52,21 @@
     "resetSuccess": "تم! شيك على الإيميل 📧",
     "invalidCredentials": "الإيميل أو كلمة المرور غلط",
     "accountDisabled": "الحساب ده متوقف. كلّم المسؤول.",
-    "sessionExpired": "الجلسة انتهت. سجّل دخولك تاني."
+    "sessionExpired": "الجلسة انتهت. سجّل دخولك تاني.",
+    "signUp": "إنشاء حساب",
+    "signUpTitle": "إنشاء حساب جديد",
+    "signUpSubtitle": "سجّل مستخدم جديد للوصول إلى منصة المبيعات",
+    "fullName": "الاسم الكامل",
+    "fullNamePlaceholder": "مثال: أحمد الشناوي",
+    "role": "الدور الوظيفي",
+    "roleGm": "المدير العام (GM)",
+    "roleAdmin": "مشرف النظام (Admin)",
+    "roleSales": "مسؤول مبيعات (Sales)",
+    "signUpButton": "إنشاء الحساب",
+    "hasAccount": "لديك حساب بالفعل؟ تسجيل الدخول",
+    "noAccount": "ليس لديك حساب؟ إنشاء حساب جديد",
+    "signUpSuccess": "تم إنشاء الحساب بنجاح! يمكنك تسجيل الدخول الآن.",
+    "checkEmailConfirmation": "تم استلام التسجيل! إذا كان تأكيد البريد مفعلاً، يُرجى تأكيد البريد أو مراجعة المشرف في Supabase."
   },
   "nav": {
     "dashboard": "الرئيسية",
