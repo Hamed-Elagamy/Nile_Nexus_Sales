@@ -5,6 +5,10 @@ import { z } from "zod";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { demoProfiles } from "@/lib/demo-data";
+import {
+  updateProfileSchema,
+  type UpdateProfileInput,
+} from "@/lib/schemas/profile";
 import type { Profile } from "@/types/domain";
 
 export type ActionResult<T = unknown> = {
@@ -12,15 +16,6 @@ export type ActionResult<T = unknown> = {
   data?: T;
   error?: string;
 };
-
-export const updateProfileSchema = z.object({
-  full_name: z.string().min(2, "الاسم يجب أن يكون حرفين على الأقل"),
-  phone: z.string().optional().nullable(),
-  avatar_url: z.string().optional().nullable(),
-  preferred_locale: z.enum(["ar", "en"]).default("ar"),
-});
-
-export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 
 function getErrorMessage(err: unknown, fallback: string): string {
   if (err instanceof Error) return err.message;
