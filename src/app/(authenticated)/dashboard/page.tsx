@@ -17,6 +17,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { getDashboardMetrics } from "@/lib/actions/dashboard";
 import { DealStageBadge } from "@/components/deals/deal-stage-badge";
 
+import { createClient } from "@/lib/supabase/server";
+
 export const metadata = {
   title: "لوحة التحكم | Nile Nexus Sales",
   description: "لوحة مؤشرات الأداء ومتابعة المبيعات والصفقات",
@@ -25,6 +27,15 @@ export const metadata = {
 export default async function DashboardPage() {
   const t = await getTranslations("dashboard");
   const tCommon = await getTranslations("common");
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const displayName =
+    (user?.user_metadata?.full_name as string) ||
+    user?.email?.split("@")[0] ||
+    "Mohamed Hamed";
 
   const metricsRes = await getDashboardMetrics();
   const metrics = metricsRes.success && metricsRes.data ? metricsRes.data : null;
@@ -35,7 +46,7 @@ export default async function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-border/60">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-            <span>{t("greeting")}</span>
+            <span>{t("greeting", { name: displayName })}</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             {t("subtitle")}

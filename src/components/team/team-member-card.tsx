@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useTransition } from "react";
+import React, { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Mail, Phone, ShieldCheck, UserCheck, UserX } from "lucide-react";
+import { Mail, Phone, ShieldCheck, UserCheck, UserX, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   updateMemberRole,
   toggleMemberStatus,
+  deleteTeamMember,
   type TeamMemberWithStats,
 } from "@/lib/actions/team";
 import type { UserRole } from "@/lib/schemas/team";
@@ -16,11 +17,18 @@ import type { UserRole } from "@/lib/schemas/team";
 interface TeamMemberCardProps {
   member: TeamMemberWithStats;
   currentUserId?: string;
+  currentUserRole?: UserRole;
   onRefresh?: () => void;
 }
 
-export function TeamMemberCard({ member, currentUserId, onRefresh }: TeamMemberCardProps) {
+export function TeamMemberCard({
+  member,
+  currentUserId,
+  currentUserRole,
+  onRefresh,
+}: TeamMemberCardProps) {
   const [isPending, startTransition] = useTransition();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleRoleChange = (newRole: UserRole) => {
     startTransition(async () => {
@@ -50,6 +58,20 @@ export function TeamMemberCard({ member, currentUserId, onRefresh }: TeamMemberC
         onRefresh?.();
       } else {
         toast.error(res.error || "فشل تحديث الحالة");
+      }
+    });
+  };
+
+  const handleDelete = () => {
+    startTransition(async () => {
+      const res = await deleteTeamMember({ user_id: member.id });
+
+      if (res.success) {
+        toast.success(res.warning || `تم حذف حساب ${member.full_name} بنجاح`);
+        setShowDeleteConfirm(false);
+        onRefresh?.();
+      } else {
+        toast.error(res.error || "فشل حذف المستخدم");
       }
     });
   };
@@ -85,9 +107,20 @@ export function TeamMemberCard({ member, currentUserId, onRefresh }: TeamMemberC
     <Card className="p-4 bg-card border-border shadow-sm space-y-3">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-base">
-            {member.full_name ? member.full_name.charAt(0).toUpperCase() : "U"}
-          </div>
+          {member.avatar_url ? (
+            <div className="h-10 w-10 rounded-full overflow-hidden border border-border shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={member.avatar_url}
+                alt={member.full_name}
+                className="h-full w-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-base shrink-0">
+              {member.full_name ? member.full_name.charAt(0).toUpperCase() : "U"}
+            </div>
+          )}
 
           <div>
             <div className="flex items-center gap-2">
@@ -117,6 +150,35 @@ export function TeamMemberCard({ member, currentUserId, onRefresh }: TeamMemberC
         </div>
       )}
 
+      {/* Inline Delete Confirmation */}
+      {showDeleteConfirm && (
+        <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs space-y-2">
+          <p className="font-semibold text-rose-700 dark:text-rose-300">
+            هل أنت متأكد من حذف حساب {member.full_name || member.email} نهائياً؟
+          </p>
+          <div className="flex items-center gap-2 justify-end">
+            <Button
+              size="xs"
+              variant="outline"
+              onClick={() => setShowDeleteConfirm(false)}
+              disabled={isPending}
+              className="cursor-pointer"
+            >
+              إلغاء
+            </Button>
+            <Button
+              size="xs"
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isPending}
+              className="bg-rose-600 hover:bg-rose-700 text-white cursor-pointer"
+            >
+              تأكيد الحذف
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Role and Status Actions */}
       <div className="pt-2 border-t border-border/50 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-1.5">
@@ -133,29 +195,47 @@ export function TeamMemberCard({ member, currentUserId, onRefresh }: TeamMemberC
           </select>
         </div>
 
-        <Button
-          size="xs"
-          variant="outline"
-          onClick={handleToggleActive}
-          disabled={isPending || member.id === currentUserId}
-          className={`text-[11px] h-7 gap-1 ${
-            member.is_active
-              ? "text-rose-600 hover:bg-rose-500/10"
-              : "text-emerald-600 hover:bg-emerald-500/10"
-          }`}
-        >
-          {member.is_active ? (
-            <>
-              <UserX className="h-3 w-3" />
-              <span>تعطيل</span>
-            </>
-          ) : (
-            <>
-              <UserCheck className="h-3 w-3" />
-              <span>تفعيل</span>
-            </>
+        <div className="flex items-center gap-1.5">
+          {/* GM User Delete Action */}
+          {currentUserRole === "GM" && member.id !== currentUserId && (
+            <Button
+              size="xs"
+              variant="ghost"
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={isPending || showDeleteConfirm}
+              className="text-[11px] h-7 text-rose-600 hover:text-rose-700 hover:bg-rose-500/10 gap-1 cursor-pointer"
+              title="حذف المستخدم"
+            >
+              <Trash2 className="h-3 w-3" />
+              <span>حذف</span>
+            </Button>
           )}
-        </Button>
+
+          {/* Toggle Active / Deactivate */}
+          <Button
+            size="xs"
+            variant="outline"
+            onClick={handleToggleActive}
+            disabled={isPending || member.id === currentUserId}
+            className={`text-[11px] h-7 gap-1 cursor-pointer ${
+              member.is_active
+                ? "text-rose-600 hover:bg-rose-500/10"
+                : "text-emerald-600 hover:bg-emerald-500/10"
+            }`}
+          >
+            {member.is_active ? (
+              <>
+                <UserX className="h-3 w-3" />
+                <span>تعطيل</span>
+              </>
+            ) : (
+              <>
+                <UserCheck className="h-3 w-3" />
+                <span>تفعيل</span>
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </Card>
   );

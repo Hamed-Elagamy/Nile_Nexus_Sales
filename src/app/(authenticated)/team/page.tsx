@@ -3,6 +3,7 @@ import { Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getTeamMembers } from "@/lib/actions/team";
 import { TeamList } from "@/components/team/team-list";
+import type { UserRole } from "@/lib/schemas/team";
 
 export const metadata = {
   title: "فريق المبيعات | Nile Nexus Sales",
@@ -11,7 +12,19 @@ export const metadata = {
 
 export default async function TeamPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let currentUserRole: UserRole = "SALES";
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    currentUserRole = (profile?.role || user.user_metadata?.role || "SALES") as UserRole;
+  }
 
   const membersRes = await getTeamMembers();
   const members = membersRes.success && membersRes.data ? membersRes.data : [];
@@ -30,7 +43,11 @@ export default async function TeamPage() {
       </div>
 
       {/* Team Members List */}
-      <TeamList members={members} currentUserId={user?.id} />
+      <TeamList
+        members={members}
+        currentUserId={user?.id}
+        currentUserRole={currentUserRole}
+      />
     </div>
   );
 }

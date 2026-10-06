@@ -6,13 +6,15 @@ import { Users, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { TeamMemberCard } from "./team-member-card";
 import type { TeamMemberWithStats } from "@/lib/actions/team";
+import type { UserRole } from "@/lib/schemas/team";
 
 interface TeamListProps {
   members: TeamMemberWithStats[];
   currentUserId?: string;
+  currentUserRole?: UserRole;
 }
 
-export function TeamList({ members, currentUserId }: TeamListProps) {
+export function TeamList({ members, currentUserId, currentUserRole }: TeamListProps) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("ALL");
@@ -73,6 +75,7 @@ export function TeamList({ members, currentUserId }: TeamListProps) {
               key={m.id}
               member={m}
               currentUserId={currentUserId}
+              currentUserRole={currentUserRole}
               onRefresh={() => router.refresh()}
             />
           ))}

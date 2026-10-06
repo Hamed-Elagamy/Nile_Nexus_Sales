@@ -85,7 +85,7 @@
     "settings": "Settings"
   },
   "dashboard": {
-    "greeting": "Welcome back, champion 🚀",
+    "greeting": "Welcome back, {name} 🚀",
     "subtitle": "Real-time command center for sales operations and commercial deals",
     "searchClients": "Search Leads",
     "newDeal": "+ New Deal",

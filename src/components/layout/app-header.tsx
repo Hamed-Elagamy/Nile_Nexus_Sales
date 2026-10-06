@@ -74,14 +74,34 @@ export function AppHeader({ user }: AppHeaderProps) {
           </Link>
 
           <div className="hidden md:flex items-center gap-2 ms-2 ps-2 border-s border-[var(--border)]">
-            <div className="flex flex-col text-end">
-              <span className="text-xs font-medium text-[var(--foreground)]">
-                {displayName}
-              </span>
-              <span className="text-[10px] text-[var(--muted-foreground)]">
-                {userRole}
-              </span>
-            </div>
+            <Link
+              href="/settings"
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              title="الملف الشخصي والإعدادات"
+            >
+              {user.user_metadata?.avatar_url ? (
+                <div className="h-7 w-7 rounded-full overflow-hidden border border-[var(--border)] shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={user.user_metadata.avatar_url}
+                    alt={displayName}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="h-7 w-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
+                  {displayName ? displayName.charAt(0).toUpperCase() : "U"}
+                </div>
+              )}
+              <div className="flex flex-col text-end">
+                <span className="text-xs font-medium text-[var(--foreground)]">
+                  {displayName}
+                </span>
+                <span className="text-[10px] text-[var(--muted-foreground)]">
+                  {userRole}
+                </span>
+              </div>
+            </Link>
             <button
               onClick={handleSignOut}
               className="p-2 rounded-lg hover:bg-[var(--muted)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors cursor-pointer"

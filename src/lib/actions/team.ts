@@ -161,3 +161,93 @@ export async function toggleMemberStatus(
     return { success: false, error: getErrorMessage(err, "Failed to toggle status") };
   }
 }
+
+/**
+ * Remove / Delete a team member (GM role only)
+ */
+export async function deleteTeamMember(input: {
+  user_id: string;
+}): Promise<ActionResult> {
+  try {
+    if (!input.user_id) {
+      return { success: false, error: "Missing user ID" };
+    }
+
+    if (!isSupabaseConfigured()) {
+      const idx = demoProfiles.findIndex((p) => p.id === input.user_id);
+      if (idx !== -1) {
+        demoProfiles.splice(idx, 1);
+      }
+      revalidatePath("/team");
+      return { success: true };
+    }
+
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Authentication required" };
+    }
+
+    // Verify current caller is GM
+    const { data: currentProfile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (currentProfile?.role !== "GM") {
+      return {
+        success: false,
+        error: "فقط المدير العام (GM) يمتلك صلاحية حذف المستخدمين",
+      };
+    }
+
+    if (input.user_id === user.id) {
+      return {
+        success: false,
+        error: "لا يمكنك حذف حسابك الشخصي بصفتك المدير العام",
+      };
+    }
+
+    // Attempt RPC delete_user_by_gm if available
+    try {
+      const { error: rpcErr } = await supabase.rpc("delete_user_by_gm", {
+        target_user_id: input.user_id,
+      });
+      if (!rpcErr) {
+        revalidatePath("/team");
+        return { success: true };
+      }
+    } catch {
+      // RPC not defined yet, continue with standard delete
+    }
+
+    // Delete profile directly
+    const { error: deleteError } = await supabase
+      .from("profiles")
+      .delete()
+      .eq("id", input.user_id);
+
+    if (deleteError) {
+      // If foreign keys prevent hard delete, deactivate the user
+      await supabase
+        .from("profiles")
+        .update({ is_active: false })
+        .eq("id", input.user_id);
+
+      return {
+        success: true,
+        warning: "تم تعطيل حساب المستخدم بدلاً من الحذف نظراً لوجود سجلات مرتبطة به",
+      };
+    }
+
+    revalidatePath("/team");
+    return { success: true };
+  } catch (err: unknown) {
+    return { success: false, error: getErrorMessage(err, "Failed to delete team member") };
+  }
+}
+
