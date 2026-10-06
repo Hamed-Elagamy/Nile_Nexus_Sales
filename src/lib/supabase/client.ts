@@ -1,6 +1,7 @@
 import { createBrowserClient } from "@supabase/ssr";
 import {
   isSupabaseConfigured,
+  getSupabaseUrl,
   getSupabaseAnonKey,
   FALLBACK_SUPABASE_URL,
   FALLBACK_SUPABASE_ANON_KEY,
@@ -13,7 +14,7 @@ import {
  */
 export function createClient() {
   const url = isSupabaseConfigured()
-    ? process.env.NEXT_PUBLIC_SUPABASE_URL!
+    ? getSupabaseUrl()
     : FALLBACK_SUPABASE_URL;
 
   const key = isSupabaseConfigured()

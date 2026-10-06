@@ -2,18 +2,24 @@
  * Supabase configuration utilities & environment detector
  */
 
+export function getSupabaseUrl(): string {
+  const raw = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  return raw.replace(/^\uFEFF/, "").trim();
+}
+
 export function getSupabaseAnonKey(): string {
-  return (
+  const raw = (
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
     ""
   );
+  return raw.replace(/^\uFEFF/, "").trim();
 }
 
 export function isSupabaseConfigured(): boolean {
   if (process.env.NODE_ENV === "test") return true;
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const url = getSupabaseUrl();
   const key = getSupabaseAnonKey();
 
   if (!url || !key) return false;
