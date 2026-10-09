@@ -121,7 +121,7 @@ Production Deployed — Live on Vercel & Connected to Supabase
 - `SUPABASE_SERVICE_ROLE_KEY` (optional)
 
 ## Latest Pushed Commit
-- `91351fb` (feat(supabase): support publishable API key format and initialize supabase config)
+- `789f812` (fix(i18n): localize calendar, tasks, approvals, reports, notifications, team, and settings)
 
 ## Next Actions
 - Verify live production user workflows on `https://nile-nexus-sales.vercel.app`
