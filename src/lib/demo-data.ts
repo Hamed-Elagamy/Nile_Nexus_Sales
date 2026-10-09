@@ -63,6 +63,32 @@ export const demoProfiles: Profile[] = [
     created_at: "2026-01-15T08:00:00Z",
     updated_at: "2026-01-15T08:00:00Z",
   },
+  {
+    id: "00000000-0000-0000-0000-000000000005",
+    email: "Hamedelagamy00@gmail.com",
+    full_name: "Mohamed Hamed",
+    employee_id: "EMP-005",
+    role: "GM",
+    phone: null,
+    avatar_url: null,
+    preferred_locale: "ar",
+    is_active: true,
+    created_at: "2026-01-01T08:00:00Z",
+    updated_at: "2026-01-01T08:00:00Z",
+  },
+  {
+    id: "00000000-0000-0000-0000-000000000006",
+    email: "ezzreem726@gmail.com",
+    full_name: "Reem Ezz",
+    employee_id: "EMP-006",
+    role: "GM",
+    phone: null,
+    avatar_url: null,
+    preferred_locale: "ar",
+    is_active: true,
+    created_at: "2026-01-01T08:00:00Z",
+    updated_at: "2026-01-01T08:00:00Z",
+  },
 ];
 
 // ─── Demo Services Catalog ────────────────────────────────────

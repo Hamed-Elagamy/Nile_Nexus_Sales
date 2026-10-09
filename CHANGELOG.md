@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.1] - 2026-10-09
+
+### Security & Roles
+- **Locked Public Registration to Sales Role**:
+  - Removed the role selection dropdown from public signup (`src/components/auth/login-form.tsx`).
+  - Hardcoded public signups strictly to `role: "SALES"` on both client and auth metadata.
+  - Added security notice that administrative roles (GM, Admin) can only be assigned by the General Manager.
+  - Hardened database trigger `handle_new_user()` in `supabase/migrations/006_create_gm_reem_ezz_and_secure_signup.sql` to strictly force `'SALES'` for all public signups.
+- **GM Account for Reem Ezz**:
+  - Pre-registered and configured GM account for Reem Ezz (`ezzreem726@gmail.com`) with `NileNexus2026!`.
+  - Confirmed GM role for Mohamed Hamed (`hamedelagamy00@gmail.com`).
+  - Added Reem Ezz and Mohamed Hamed to mock/demo dataset in `src/lib/demo-data.ts`.
+
 ## [0.9.0] - 2026-10-09
 
 ### Added & Enhanced

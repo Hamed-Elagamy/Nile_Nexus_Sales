@@ -16,7 +16,6 @@ export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [role, setRole] = useState<"GM" | "ADMIN" | "SALES">("SALES");
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -77,7 +76,7 @@ export function LoginForm() {
       options: {
         data: {
           full_name: fullName.trim(),
-          role: role,
+          role: "SALES",
         },
       },
     });
@@ -192,27 +191,10 @@ export function LoginForm() {
               </div>
             </div>
 
-            {/* Role Selection */}
-            <div className="space-y-1.5">
-              <label
-                htmlFor="role"
-                className="text-xs font-semibold text-[var(--foreground)]"
-              >
-                {t("role")}
-              </label>
-              <div className="relative">
-                <ShieldCheck className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]" />
-                <select
-                  id="role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value as "GM" | "ADMIN" | "SALES")}
-                  className="w-full ps-10 pe-4 py-2 rounded-lg border border-[var(--input)] bg-[var(--background)] text-sm text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] transition-colors"
-                >
-                  <option value="GM">{t("roleGm")}</option>
-                  <option value="ADMIN">{t("roleAdmin")}</option>
-                  <option value="SALES">{t("roleSales")}</option>
-                </select>
-              </div>
+            {/* Sales Role Notice */}
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-[var(--muted)]/60 border border-[var(--border)] text-xs text-[var(--muted-foreground)]">
+              <ShieldCheck className="h-4 w-4 text-[var(--primary)] shrink-0" />
+              <span>حساب جديد بصلاحية مسؤول مبيعات (Sales Rep) — ترقية الصلاحيات تتم حصرياً بواسطة المدير العام.</span>
             </div>
           </>
         )}
