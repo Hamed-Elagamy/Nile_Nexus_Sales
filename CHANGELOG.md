@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.0] - 2026-10-09
+
+### Added & Enhanced
+- **Device Photo Upload & Avatar Customization**:
+  - Implemented direct photo upload from user device (`<input type="file" accept="image/*">`) in `src/components/settings/user-profile-form.tsx`.
+  - Added interactive avatar circle with hover camera overlay for 1-click photo replacement.
+  - Added smart client-side HTML5 canvas center-crop and compression (320x320 JPEG, 85% quality, ~25KB-35KB) for instant loading, zero storage bucket dependencies, and seamless rendering everywhere.
+  - Enhanced `src/app/(authenticated)/layout.tsx` to query live `profiles` table directly, ensuring user avatar and name update immediately across `AppHeader` without delay.
+  - Integrated `router.refresh()` in profile update flow for instantaneous UI synchronization.
+
 ## [0.8.1] - 2026-10-06
 
 ### Fixed & Enhanced

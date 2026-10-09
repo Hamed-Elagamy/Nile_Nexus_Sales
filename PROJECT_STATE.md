@@ -74,6 +74,8 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - UI components and pages: `/proposals`, `/proposals/new`, `/proposals/[id]`, `ProposalBuilder`, `ProposalPrintView`, `ProposalDetail`
 - **Team, Settings & Dashboard Modules**:
   - Team management with role badges and active toggling (`/team`)
+  - Direct photo upload from user device with smart client-side center-crop and compression (`/settings`)
+  - Real-time profile photo and name synchronization across navigation header (`AppHeader`)
   - Services catalog and lead sources management (`/settings`)
   - Live executive dashboard with real KPI metrics and urgent overdue recovery (`/dashboard`)
 - **All Auxiliary Routes**:
