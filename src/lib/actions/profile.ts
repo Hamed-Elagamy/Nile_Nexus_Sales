@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { demoProfiles } from "@/lib/demo-data";
 import {
@@ -41,7 +42,11 @@ export async function getCurrentUserProfile(): Promise<ActionResult<Profile>> {
       return { success: true, data: demoUser };
     }
 
-    const { data, error } = await supabase
+    const dbClient = process.env.SUPABASE_SERVICE_ROLE_KEY
+      ? await createAdminClient()
+      : supabase;
+
+    const { data, error } = await dbClient
       .from("profiles")
       .select("*")
       .eq("id", user.id)
@@ -99,29 +104,56 @@ export async function updateCurrentUserProfile(
       return { success: true, data: demoUser };
     }
 
-    // 1. Update profiles table
-    const { data: updatedProfile, error: dbError } = await supabase
+    const dbClient = process.env.SUPABASE_SERVICE_ROLE_KEY
+      ? await createAdminClient()
+      : supabase;
+
+    // 1. Try to UPDATE existing row first.
+    // Unlike .upsert() which triggers an INSERT RLS check, an UPDATE statement uses
+    // the existing `profiles_update_own` RLS policy (USING (id = auth.uid()) WITH CHECK (id = auth.uid())).
+    const { data: updatedProfile, error: updateError } = await dbClient
       .from("profiles")
-      .upsert(
-        {
+      .update({
+        full_name: validated.full_name,
+        phone: validated.phone || null,
+        avatar_url: validated.avatar_url || null,
+        preferred_locale: validated.preferred_locale,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", user.id)
+      .select()
+      .maybeSingle();
+
+    if (updateError) {
+      return { success: false, error: updateError.message };
+    }
+
+    let finalProfile = updatedProfile;
+
+    // 2. If no existing row was updated (profile didn't exist yet), insert it
+    if (!finalProfile) {
+      const { data: insertedProfile, error: insertError } = await dbClient
+        .from("profiles")
+        .insert({
           id: user.id,
           email: user.email || "",
           full_name: validated.full_name,
+          role: ((user.user_metadata?.role as string) || "SALES") as Profile["role"],
           phone: validated.phone || null,
           avatar_url: validated.avatar_url || null,
           preferred_locale: validated.preferred_locale,
           updated_at: new Date().toISOString(),
-        },
-        { onConflict: "id" }
-      )
-      .select()
-      .single();
+        })
+        .select()
+        .single();
 
-    if (dbError) {
-      return { success: false, error: dbError.message };
+      if (insertError) {
+        return { success: false, error: insertError.message };
+      }
+      finalProfile = insertedProfile;
     }
 
-    // 2. Also update auth user metadata so header and session match immediately
+    // 3. Also update auth user metadata so header and session match immediately
     try {
       await supabase.auth.updateUser({
         data: {
@@ -139,7 +171,7 @@ export async function updateCurrentUserProfile(
     revalidatePath("/settings");
     revalidatePath("/team");
 
-    return { success: true, data: updatedProfile as unknown as Profile };
+    return { success: true, data: finalProfile as unknown as Profile };
   } catch (err: unknown) {
     return { success: false, error: getErrorMessage(err, "Failed to update profile") };
   }

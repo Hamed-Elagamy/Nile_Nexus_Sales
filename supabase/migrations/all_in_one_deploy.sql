@@ -941,6 +941,18 @@ CREATE POLICY profiles_update_own ON profiles FOR UPDATE
 CREATE POLICY profiles_update_admin ON profiles FOR UPDATE
   USING (is_admin_or_gm());
 
+-- Users can insert their own profile
+CREATE POLICY profiles_insert_own ON profiles FOR INSERT
+  WITH CHECK (id = auth.uid());
+
+-- GM/Admin can insert any profile
+CREATE POLICY profiles_insert_admin ON profiles FOR INSERT
+  WITH CHECK (is_admin_or_gm());
+
+-- GM can delete profiles
+CREATE POLICY profiles_delete_gm ON profiles FOR DELETE
+  USING (is_admin_or_gm());
+
 -- ============================================================================
 -- REFERENCE DATA (read by everyone, managed by admin)
 -- ============================================================================

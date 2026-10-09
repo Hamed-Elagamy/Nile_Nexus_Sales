@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { demoProfiles } from "@/lib/demo-data";
 import {
@@ -225,15 +226,19 @@ export async function deleteTeamMember(input: {
       // RPC not defined yet, continue with standard delete
     }
 
+    const dbClient = process.env.SUPABASE_SERVICE_ROLE_KEY
+      ? await createAdminClient()
+      : supabase;
+
     // Delete profile directly
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await dbClient
       .from("profiles")
       .delete()
       .eq("id", input.user_id);
 
     if (deleteError) {
       // If foreign keys prevent hard delete, deactivate the user
-      await supabase
+      await dbClient
         .from("profiles")
         .update({ is_active: false })
         .eq("id", input.user_id);

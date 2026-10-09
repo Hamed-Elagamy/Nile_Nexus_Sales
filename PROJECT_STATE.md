@@ -88,10 +88,14 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - 60 Vitest unit tests passing across 13 test suites (100% pass rate)
 
 ## Database State
-- 3 migrations written + unified deploy script:
+- 7 migrations written + unified deploy script:
   - `001_initial_schema.sql` — all core tables, indexes, triggers, functions
   - `002_rls_policies.sql` — comprehensive RLS for all tables
   - `003_seed_data.sql` — pipeline stages, services, permissions, settings
+  - `004_create_initial_admin_users.sql` — initial administrative seed accounts
+  - `005_fix_user_cascade_delete.sql` — user cascade deletion
+  - `006_create_gm_reem_ezz_and_secure_signup.sql` — GM creation and lock public signups to SALES
+  - `007_fix_profiles_rls_and_insert_policy.sql` — profiles INSERT/DELETE RLS policies and user backfill
   - `all_in_one_deploy.sql` — consolidated single-run deployment migration
 
 ## Security State

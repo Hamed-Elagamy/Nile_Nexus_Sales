@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.3] - 2026-10-09
+
+### Fixed
+- **Profiles RLS & Profile Saving Fix**:
+  - Replaced `.upsert()` with resilient update-first logic in `src/lib/actions/profile.ts` so modifying phone, name, or avatar uses the existing `profiles_update_own` RLS policy (`id = auth.uid()`) without triggering PostgreSQL's `INSERT` RLS policy check.
+  - Added support for `createAdminClient()` fallback in profile and team server actions when `SUPABASE_SERVICE_ROLE_KEY` is configured.
+  - Created migration `supabase/migrations/007_fix_profiles_rls_and_insert_policy.sql` to define missing `profiles_insert_own`, `profiles_insert_admin`, and `profiles_delete_gm` policies, and backfill any missing profile records from `auth.users`.
+  - Synchronized `002_rls_policies.sql` and `all_in_one_deploy.sql` with the new profile policies.
+
 ## [0.9.2] - 2026-10-09
 
 ### Fixed
