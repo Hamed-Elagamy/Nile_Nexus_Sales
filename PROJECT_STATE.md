@@ -125,7 +125,7 @@ Production Deployed — Live on Vercel & Connected to Supabase
 - `SUPABASE_SERVICE_ROLE_KEY` (optional)
 
 ## Latest Pushed Commit
-- `789f812` (fix(i18n): localize calendar, tasks, approvals, reports, notifications, team, and settings)
+- `0691c22` (fix(rls): resolve profiles row-level security violation on profile update and add insert policies)
 
 ## Next Actions
 - Verify live production user workflows on `https://nile-nexus-sales.vercel.app`
