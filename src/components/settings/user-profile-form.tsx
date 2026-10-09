@@ -20,7 +20,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { updateCurrentUserProfile } from "@/lib/actions/profile";
+import { updateCurrentUserProfile, uploadAvatar } from "@/lib/actions/profile";
 import type { Profile } from "@/types/domain";
 
 interface UserProfileFormProps {
@@ -37,9 +37,9 @@ const AVATAR_PRESETS = [
 
 /**
  * Resizes and compresses any user-uploaded image into a centered square avatar
- * (320x320 JPEG, 85% quality) to guarantee lightning-fast load times and minimal storage size (~25KB-40KB).
+ * (160x160 JPEG, 75% quality) to guarantee lightning-fast load times and minimal size (~8KB-12KB).
  */
-function processAndCompressImage(file: File, maxSize = 320): Promise<string> {
+function processAndCompressImage(file: File, maxSize = 160): Promise<string> {
   return new Promise((resolve, reject) => {
     if (!file.type.startsWith("image/")) {
       reject(new Error("Invalid image file format"));
@@ -88,8 +88,8 @@ function processAndCompressImage(file: File, maxSize = 320): Promise<string> {
             maxSize
           );
 
-          // Convert to compressed JPEG data URL
-          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.85);
+          // Convert to compressed JPEG data URL (160x160, 75% quality ~8KB)
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.75);
           resolve(compressedDataUrl);
         } catch {
           resolve(result);
@@ -143,7 +143,23 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
 
     setIsProcessingFile(true);
     try {
-      const compressedDataUrl = await processAndCompressImage(file, 320);
+      // 1. Try uploading directly to Supabase Storage
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const uploadRes = await uploadAvatar(formData);
+      if (uploadRes.success && uploadRes.data) {
+        setAvatarUrl(uploadRes.data);
+        setIsUploadedFromDevice(true);
+        setShowCustomAvatarUrl(false);
+        toast.success(t("savedSuccess"));
+        return;
+      }
+
+      // 2. Fallback to lightweight compressed thumbnail (160x160 ~8KB)
+      // Note: server action updateCurrentUserProfile will NEVER put this in JWT cookies,
+      // completely protecting against 494 REQUEST_HEADER_TOO_LARGE.
+      const compressedDataUrl = await processAndCompressImage(file, 160);
       setAvatarUrl(compressedDataUrl);
       setIsUploadedFromDevice(true);
       setShowCustomAvatarUrl(false);

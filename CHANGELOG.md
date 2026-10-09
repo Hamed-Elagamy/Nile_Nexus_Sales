@@ -10,6 +10,10 @@ All notable changes to this project will be documented in this file.
   - Added support for `createAdminClient()` fallback in profile and team server actions when `SUPABASE_SERVICE_ROLE_KEY` is configured.
   - Created migration `supabase/migrations/007_fix_profiles_rls_and_insert_policy.sql` to define missing `profiles_insert_own`, `profiles_insert_admin`, and `profiles_delete_gm` policies, and backfill any missing profile records from `auth.users`.
   - Synchronized `002_rls_policies.sql` and `all_in_one_deploy.sql` with the new profile policies.
+- **Resolved 494 REQUEST_HEADER_TOO_LARGE (Cookie Size Overflow)**:
+  - Disallowed storing base64 data URLs in `supabase.auth.updateUser` metadata, keeping the JWT session cookie below 1KB and permanently preventing Vercel's 16KB header size limit breach.
+  - Added `uploadAvatar` server action to upload profile pictures directly to Supabase Storage `avatars` bucket.
+  - Added migration SQL in `007` to clean up oversized `avatar_url` from `auth.users.raw_user_meta_data` and configure public storage policies for `avatars`.
 
 ## [0.9.2] - 2026-10-09
 

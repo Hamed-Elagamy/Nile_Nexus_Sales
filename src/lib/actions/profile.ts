@@ -77,6 +77,70 @@ export async function getCurrentUserProfile(): Promise<ActionResult<Profile>> {
 }
 
 /**
+ * Upload an avatar image file to Supabase Storage 'avatars' bucket
+ */
+export async function uploadAvatar(formData: FormData): Promise<ActionResult<string>> {
+  try {
+    const file = formData.get("file") as File;
+    if (!file) {
+      return { success: false, error: "No image file provided" };
+    }
+
+    if (!file.type.startsWith("image/")) {
+      return { success: false, error: "Invalid image file format" };
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      return { success: false, error: "Image size exceeds 5MB limit" };
+    }
+
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Authentication required" };
+    }
+
+    if (!isSupabaseConfigured()) {
+      return { success: false, error: "Supabase storage is not configured" };
+    }
+
+    const dbClient = process.env.SUPABASE_SERVICE_ROLE_KEY
+      ? await createAdminClient()
+      : supabase;
+
+    const fileExt = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const filePath = `${user.id}/avatar.${fileExt}`;
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const { error: uploadError } = await dbClient.storage
+      .from("avatars")
+      .upload(filePath, buffer, {
+        contentType: file.type || "image/jpeg",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      return { success: false, error: uploadError.message };
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("avatars").getPublicUrl(filePath);
+
+    // Append cache-buster timestamp
+    const avatarUrl = `${publicUrl}?v=${Date.now()}`;
+
+    return { success: true, data: avatarUrl };
+  } catch (err: unknown) {
+    return { success: false, error: getErrorMessage(err, "Failed to upload avatar image") };
+  }
+}
+
+/**
  * Update the profile information (full_name, phone, avatar_url, preferred_locale)
  */
 export async function updateCurrentUserProfile(
@@ -153,13 +217,23 @@ export async function updateCurrentUserProfile(
       finalProfile = insertedProfile;
     }
 
-    // 3. Also update auth user metadata so header and session match immediately
+    // 3. Update auth user metadata safely (name and phone ONLY).
+    // CRITICAL: NEVER pass data: URLs into auth.updateUser!
+    // Supabase stores user_metadata in the JWT session token which gets placed in the browser Cookie header.
+    // Putting data URLs (30KB+) in cookies immediately violates Vercel's 16KB header limit (494 REQUEST_HEADER_TOO_LARGE).
     try {
+      const isHttpUrl = Boolean(
+        validated.avatar_url &&
+          (validated.avatar_url.startsWith("http://") ||
+            validated.avatar_url.startsWith("https://"))
+      );
+
       await supabase.auth.updateUser({
         data: {
           full_name: validated.full_name,
           phone: validated.phone || null,
-          avatar_url: validated.avatar_url || null,
+          // Only store clean HTTP URLs in metadata, or null to keep JWT under 1KB
+          avatar_url: isHttpUrl ? validated.avatar_url : null,
         },
       });
     } catch {
