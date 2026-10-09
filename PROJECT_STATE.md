@@ -125,7 +125,7 @@ Production Deployed — Live on Vercel & Connected to Supabase
 - `SUPABASE_SERVICE_ROLE_KEY` (optional)
 
 ## Latest Pushed Commit
-- `0691c22` (fix(rls): resolve profiles row-level security violation on profile update and add insert policies)
+- `0a1339e` (fix(auth): prevent cookie overflow 494 REQUEST_HEADER_TOO_LARGE and add Supabase Storage avatar support)
 
 ## Next Actions
 - Verify live production user workflows on `https://nile-nexus-sales.vercel.app`
