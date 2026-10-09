@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Mail, Phone, ShieldCheck, UserCheck, UserX, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -27,6 +28,8 @@ export function TeamMemberCard({
   currentUserRole,
   onRefresh,
 }: TeamMemberCardProps) {
+  const t = useTranslations("team");
+  const tCommon = useTranslations("common");
   const [isPending, startTransition] = useTransition();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -38,7 +41,7 @@ export function TeamMemberCard({
       });
 
       if (res.success) {
-        toast.success(`تم تغيير دور ${member.full_name} إلى ${newRole} بنجاح`);
+        toast.success(`تم تغيير دور ${member.full_name} بنجاح`);
         onRefresh?.();
       } else {
         toast.error(res.error || "فشل تعديل الدور");
@@ -54,7 +57,7 @@ export function TeamMemberCard({
       });
 
       if (res.success) {
-        toast.success(`تم ${member.is_active ? "تعطيل" : "تفعيل"} الحساب بنجاح`);
+        toast.success(`تم تحديث حالة الحساب بنجاح`);
         onRefresh?.();
       } else {
         toast.error(res.error || "فشل تحديث الحالة");
@@ -67,7 +70,7 @@ export function TeamMemberCard({
       const res = await deleteTeamMember({ user_id: member.id });
 
       if (res.success) {
-        toast.success(res.warning || `تم حذف حساب ${member.full_name} بنجاح`);
+        toast.success(res.warning || `تم حذف الحساب بنجاح`);
         setShowDeleteConfirm(false);
         onRefresh?.();
       } else {
@@ -82,14 +85,14 @@ export function TeamMemberCard({
         return (
           <Badge className="bg-purple-600 text-white hover:bg-purple-700 text-xs gap-1 font-bold">
             <ShieldCheck className="h-3 w-3" />
-            <span>المدير العام (GM)</span>
+            <span>{t("roles.GM")}</span>
           </Badge>
         );
       case "ADMIN":
         return (
           <Badge className="bg-blue-600 text-white hover:bg-blue-700 text-xs gap-1 font-bold">
             <ShieldCheck className="h-3 w-3" />
-            <span>مدير النظام (ADMIN)</span>
+            <span>{t("roles.ADMIN")}</span>
           </Badge>
         );
       case "SALES":
@@ -97,7 +100,7 @@ export function TeamMemberCard({
         return (
           <Badge className="bg-emerald-600 text-white hover:bg-emerald-700 text-xs gap-1 font-bold">
             <UserCheck className="h-3 w-3" />
-            <span>مسؤول مبيعات (SALES)</span>
+            <span>{t("roles.SALES")}</span>
           </Badge>
         );
     }
@@ -154,7 +157,7 @@ export function TeamMemberCard({
       {showDeleteConfirm && (
         <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs space-y-2">
           <p className="font-semibold text-rose-700 dark:text-rose-300">
-            هل أنت متأكد من حذف حساب {member.full_name || member.email} نهائياً؟
+            {t("confirmDelete")} ({member.full_name || member.email})
           </p>
           <div className="flex items-center gap-2 justify-end">
             <Button
@@ -164,7 +167,7 @@ export function TeamMemberCard({
               disabled={isPending}
               className="cursor-pointer"
             >
-              إلغاء
+              {tCommon("cancel")}
             </Button>
             <Button
               size="xs"
@@ -173,7 +176,7 @@ export function TeamMemberCard({
               disabled={isPending}
               className="bg-rose-600 hover:bg-rose-700 text-white cursor-pointer"
             >
-              تأكيد الحذف
+              {tCommon("delete")}
             </Button>
           </div>
         </div>
@@ -182,7 +185,7 @@ export function TeamMemberCard({
       {/* Role and Status Actions */}
       <div className="pt-2 border-t border-border/50 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-1.5">
-          <span className="text-[11px] text-muted-foreground">تعديل الدور:</span>
+          <span className="text-[11px] text-muted-foreground">{t("changeRole")}:</span>
           <select
             value={member.role}
             onChange={(e) => handleRoleChange(e.target.value as UserRole)}
@@ -204,10 +207,10 @@ export function TeamMemberCard({
               onClick={() => setShowDeleteConfirm(true)}
               disabled={isPending || showDeleteConfirm}
               className="text-[11px] h-7 text-rose-600 hover:text-rose-700 hover:bg-rose-500/10 gap-1 cursor-pointer"
-              title="حذف المستخدم"
+              title={t("deleteUser")}
             >
               <Trash2 className="h-3 w-3" />
-              <span>حذف</span>
+              <span>{t("deleteUser")}</span>
             </Button>
           )}
 
@@ -226,12 +229,12 @@ export function TeamMemberCard({
             {member.is_active ? (
               <>
                 <UserX className="h-3 w-3" />
-                <span>تعطيل</span>
+                <span>{t("deactivate")}</span>
               </>
             ) : (
               <>
                 <UserCheck className="h-3 w-3" />
-                <span>تفعيل</span>
+                <span>{t("activate")}</span>
               </>
             )}
           </Button>

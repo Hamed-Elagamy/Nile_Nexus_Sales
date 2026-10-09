@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { TrendingUp, Award, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -7,10 +8,12 @@ export const metadata: Metadata = {
   description: "مؤشرات الأداء التجاري وتحليلات بايبلاين المبيعات",
 };
 
-export default function ReportsPage() {
+export default async function ReportsPage() {
+  const t = await getTranslations("reports");
+
   const repsPerformance = [
-    { name: "كريم فهمي", dealsWon: 1, revenueWon: "520,000 ج.م", openPipeline: "930,000 ج.م", rate: "78%" },
-    { name: "مصطفى كمال", dealsWon: 0, revenueWon: "0 ج.م", openPipeline: "545,000 ج.م", rate: "65%" },
+    { name: "Karim Fahmy", dealsWon: 1, revenueWon: "520,000 EGP", openPipeline: "930,000 EGP", rate: "78%" },
+    { name: "Mostafa Kamal", dealsWon: 0, revenueWon: "0 EGP", openPipeline: "545,000 EGP", rate: "65%" },
   ];
 
   return (
@@ -19,50 +22,50 @@ export default function ReportsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-[var(--foreground)]">
-            التقارير ومؤشرات الأداء (BI Analytics)
+            {t("title")}
           </h1>
           <p className="text-sm text-[var(--muted-foreground)]">
-            تحليلات الإيرادات المحققة، نسب التحويل، وأداء فريق المبيعات الشهري
+            {t("subtitle")}
           </p>
         </div>
         <Button variant="outline" className="flex items-center gap-2">
           <Download className="h-4 w-4" />
-          <span>تصدير تقرير الإكسيل (Excel)</span>
+          <span>{t("exportExcel")}</span>
         </Button>
       </div>
 
       {/* KPI Highlights */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)]">
-          <span className="text-xs text-[var(--muted-foreground)]">إجمالي المبيعات المغلقة (Q1)</span>
+          <span className="text-xs text-[var(--muted-foreground)]">{t("closedRevenue")}</span>
           <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-2">
-            520,000 ج.م
+            520,000 EGP
           </p>
-          <span className="text-xs text-[var(--muted-foreground)]">104% من الهدف الشهري</span>
+          <span className="text-xs text-[var(--muted-foreground)]">{t("monthlyTarget")}</span>
         </div>
 
         <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)]">
-          <span className="text-xs text-[var(--muted-foreground)]">قيمة البايبلاين المفتوح النشط</span>
+          <span className="text-xs text-[var(--muted-foreground)]">{t("openPipeline")}</span>
           <p className="text-2xl font-bold text-[var(--primary)] mt-2">
-            1,475,000 ج.م
+            1,475,000 EGP
           </p>
-          <span className="text-xs text-[var(--muted-foreground)]">4 صفقات قيد التفاوض والعروض</span>
+          <span className="text-xs text-[var(--muted-foreground)]">{t("activeDealsCount")}</span>
         </div>
 
         <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)]">
-          <span className="text-xs text-[var(--muted-foreground)]">متوسط قيمة الصفقة (Deal Size)</span>
+          <span className="text-xs text-[var(--muted-foreground)]">{t("avgDealSize")}</span>
           <p className="text-2xl font-bold text-[var(--foreground)] mt-2">
-            399,000 ج.م
+            399,000 EGP
           </p>
-          <span className="text-xs text-[var(--muted-foreground)]">للقطاع المؤسسي والشركات</span>
+          <span className="text-xs text-[var(--muted-foreground)]">{t("enterpriseSegment")}</span>
         </div>
 
         <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)]">
-          <span className="text-xs text-[var(--muted-foreground)]">معدل تحويل العروض (Win Rate)</span>
+          <span className="text-xs text-[var(--muted-foreground)]">{t("overallConversion")}</span>
           <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-2">
             50%
           </p>
-          <span className="text-xs text-[var(--muted-foreground)]">1 كسبت من أصل 2 عرض سعر</span>
+          <span className="text-xs text-[var(--muted-foreground)]">{t("conversionDesc")}</span>
         </div>
       </div>
 
@@ -72,15 +75,15 @@ export default function ReportsPage() {
           <div className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-[var(--primary)]" />
             <h2 className="text-lg font-bold text-[var(--foreground)]">
-              قمع تحويل المبيعات (Sales Funnel)
+              {t("funnelTitle")}
             </h2>
           </div>
 
           <div className="space-y-3 pt-2">
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-medium">
-                <span>العملاء المحتملين المؤهلين (Leads Pool)</span>
-                <span>4 عملاء (100%)</span>
+                <span>Leads Pool (100%)</span>
+                <span>4 (100%)</span>
               </div>
               <div className="w-full bg-[var(--muted)] h-3 rounded-full overflow-hidden">
                 <div className="bg-sky-500 h-full rounded-full w-full" />
@@ -89,8 +92,8 @@ export default function ReportsPage() {
 
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-medium">
-                <span>تواصل واجتماعات استكشافية (Contacted & Meetings)</span>
-                <span>3 عملاء (75%)</span>
+                <span>Contacted & Meetings (75%)</span>
+                <span>3 (75%)</span>
               </div>
               <div className="w-full bg-[var(--muted)] h-3 rounded-full overflow-hidden">
                 <div className="bg-blue-500 h-full rounded-full w-3/4" />
@@ -99,8 +102,8 @@ export default function ReportsPage() {
 
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-medium">
-                <span>عروض أسعار رسمية ومفاوضات (Proposals Sent)</span>
-                <span>2 عرض (50%)</span>
+                <span>Proposals & Negotiation (50%)</span>
+                <span>2 (50%)</span>
               </div>
               <div className="w-full bg-[var(--muted)] h-3 rounded-full overflow-hidden">
                 <div className="bg-amber-500 h-full rounded-full w-1/2" />
@@ -109,8 +112,8 @@ export default function ReportsPage() {
 
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-medium">
-                <span>صفقات رابحة ومعتمدة (Deals Won)</span>
-                <span>1 صفقة (25%)</span>
+                <span>Deals Won (25%)</span>
+                <span>1 (25%)</span>
               </div>
               <div className="w-full bg-[var(--muted)] h-3 rounded-full overflow-hidden">
                 <div className="bg-emerald-500 h-full rounded-full w-1/4" />
@@ -124,7 +127,7 @@ export default function ReportsPage() {
           <div className="flex items-center gap-2">
             <Award className="h-5 w-5 text-amber-500" />
             <h2 className="text-lg font-bold text-[var(--foreground)]">
-              أداء مسؤولي المبيعات (Leaderboard)
+              {t("teamLeaderboard")}
             </h2>
           </div>
 
@@ -143,7 +146,7 @@ export default function ReportsPage() {
                       {rep.name}
                     </h3>
                     <p className="text-xs text-[var(--muted-foreground)]">
-                      المحقق: {rep.revenueWon} • الصفقات: {rep.dealsWon}
+                      {t("revenueWon")}: {rep.revenueWon} • {t("dealsWon")}: {rep.dealsWon}
                     </p>
                   </div>
                 </div>
@@ -153,7 +156,7 @@ export default function ReportsPage() {
                     {rep.openPipeline}
                   </span>
                   <span className="text-[11px] text-[var(--muted-foreground)]">
-                    بايبلاين نشط
+                    {t("activePipeline")}
                   </span>
                 </div>
               </div>

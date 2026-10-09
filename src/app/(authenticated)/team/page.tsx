@@ -1,5 +1,6 @@
 import React from "react";
 import { Users } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getTeamMembers } from "@/lib/actions/team";
 import { TeamList } from "@/components/team/team-list";
@@ -11,6 +12,7 @@ export const metadata = {
 };
 
 export default async function TeamPage() {
+  const t = await getTranslations("team");
   const supabase = await createClient();
   const {
     data: { user },
@@ -35,10 +37,10 @@ export default async function TeamPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
           <Users className="h-6 w-6 text-primary" />
-          <span>فريق العمل (Team Members)</span>
+          <span>{t("title")}</span>
         </h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          إدارة مستخدمي النظام وتوزيع أدوار (GM / ADMIN / SALES) 👥
+          {t("subtitle")}
         </p>
       </div>
 

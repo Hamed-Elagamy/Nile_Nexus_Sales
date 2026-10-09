@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
   User,
@@ -41,7 +42,7 @@ const AVATAR_PRESETS = [
 function processAndCompressImage(file: File, maxSize = 320): Promise<string> {
   return new Promise((resolve, reject) => {
     if (!file.type.startsWith("image/")) {
-      reject(new Error("الملف المحدد ليس صورة صالحة"));
+      reject(new Error("Invalid image file format"));
       return;
     }
 
@@ -49,7 +50,7 @@ function processAndCompressImage(file: File, maxSize = 320): Promise<string> {
     reader.onload = (e) => {
       const result = e.target?.result as string;
       if (!result) {
-        reject(new Error("فشل قراءة الملف"));
+        reject(new Error("Failed to read image file"));
         return;
       }
 
@@ -95,16 +96,18 @@ function processAndCompressImage(file: File, maxSize = 320): Promise<string> {
         }
       };
 
-      img.onerror = () => reject(new Error("تعذر معالجة الصورة المحددة"));
+      img.onerror = () => reject(new Error("Failed to process image"));
       img.src = result;
     };
 
-    reader.onerror = () => reject(new Error("حدث خطأ أثناء قراءة الصورة من الجهاز"));
+    reader.onerror = () => reject(new Error("Failed to read file from device"));
     reader.readAsDataURL(file);
   });
 }
 
 export function UserProfileForm({ profile }: UserProfileFormProps) {
+  const t = useTranslations("settings");
+  const tTeam = useTranslations("team");
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
@@ -129,12 +132,12 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      toast.error("يرجى اختيار ملف صورة صالح (JPG, PNG, WEBP)");
+      toast.error("Please select a valid image file (JPG, PNG, WEBP)");
       return;
     }
 
     if (file.size > 12 * 1024 * 1024) {
-      toast.error("حجم الصورة كبير جداً (أكبر من 12MB). يرجى اختيار صورة أصغر.");
+      toast.error("Image size exceeds 12MB limit");
       return;
     }
 
@@ -144,9 +147,9 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
       setAvatarUrl(compressedDataUrl);
       setIsUploadedFromDevice(true);
       setShowCustomAvatarUrl(false);
-      toast.success("تم اختيار صورتك بنجاح! 📸 اضغط على 'حفظ التعديلات' لتطبيقها.");
+      toast.success(t("savedSuccess"));
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "فشل تحميل الصورة";
+      const msg = err instanceof Error ? err.message : "Failed to load image";
       toast.error(msg);
     } finally {
       setIsProcessingFile(false);
@@ -174,10 +177,10 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
       });
 
       if (res.success) {
-        toast.success("تم تحديث الملف الشخصي والصورة بنجاح! 👏");
+        toast.success(t("savedSuccess"));
         router.refresh();
       } else {
-        toast.error(res.error || "فشل تحديث البيانات");
+        toast.error(res.error || "Update failed");
       }
     });
   };
@@ -187,7 +190,7 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
       <CardHeader className="pb-4 border-b border-border/60">
         <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
           <User className="h-5 w-5 text-primary" />
-          <span>الملف الشخصي والمعلومات الشخصية (My Profile)</span>
+          <span>{t("profileTitle")}</span>
         </CardTitle>
       </CardHeader>
 
@@ -198,13 +201,13 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
             <div className="flex items-center justify-between">
               <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                 <ImageIcon className="h-3.5 w-3.5 text-primary" />
-                <span>الصورة الشخصية (Profile Picture)</span>
+                <span>{t("avatarLabel")}</span>
               </label>
 
               {isUploadedFromDevice && (
                 <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
                   <CheckCircle2 className="h-3 w-3" />
-                  <span>صورة من جهازك الشخصي</span>
+                  <span>{t("devicePhotoBadge")}</span>
                 </span>
               )}
             </div>
@@ -222,7 +225,7 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
               {/* Clickable Avatar Circle Preview */}
               <div
                 onClick={() => fileInputRef.current?.click()}
-                title="اضغط لتغيير الصورة من جهازك"
+                title={t("uploadFromDevice")}
                 className="group relative h-20 w-20 rounded-full overflow-hidden border-2 border-primary/30 bg-muted flex items-center justify-center shrink-0 cursor-pointer shadow-sm hover:border-primary transition-all"
               >
                 {avatarUrl ? (
@@ -245,7 +248,7 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
                   ) : (
                     <>
                       <Camera className="h-5 w-5 mb-0.5" />
-                      <span>تغيير</span>
+                      <span>{t("uploadFromDevice")}</span>
                     </>
                   )}
                 </div>
@@ -266,12 +269,12 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
                     {isProcessingFile ? (
                       <>
                         <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                        <span>جاري المعالجة...</span>
+                        <span>{t("processing")}</span>
                       </>
                     ) : (
                       <>
                         <Upload className="h-3.5 w-3.5 text-primary" />
-                        <span>رفع صورة من جهازك (Upload Photo)</span>
+                        <span>{t("uploadFromDevice")}</span>
                       </>
                     )}
                   </Button>
@@ -283,7 +286,7 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
                     className="h-9 px-2.5 rounded-lg border border-dashed border-border text-[11px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors flex items-center gap-1 cursor-pointer"
                   >
                     <Sparkles className="h-3 w-3" />
-                    <span>رابط صورة مباشر</span>
+                    <span>{t("customUrl")}</span>
                   </button>
 
                   {/* Remove Photo */}
@@ -294,7 +297,7 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
                       className="h-9 px-2.5 rounded-lg text-xs text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors flex items-center gap-1 cursor-pointer"
                     >
                       <X className="h-3.5 w-3.5" />
-                      <span>إزالة الصورة</span>
+                      <span>{t("removeAvatar")}</span>
                     </button>
                   )}
                 </div>
@@ -302,7 +305,7 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
                 {/* Preset Avatars Row */}
                 <div className="flex items-center gap-2 pt-0.5">
                   <span className="text-[11px] text-muted-foreground font-medium shrink-0">
-                    أو اختر نموذجاً:
+                    {t("orPresets")}
                   </span>
                   <div className="flex items-center gap-1.5 overflow-x-auto">
                     {AVATAR_PRESETS.map((preset, idx) => (
@@ -319,7 +322,7 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
                             ? "border-primary ring-2 ring-primary/30"
                             : "border-border"
                         }`}
-                        title={`نموذج ${idx + 1}`}
+                        title={`Preset ${idx + 1}`}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
@@ -341,7 +344,7 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
                         setAvatarUrl(e.target.value);
                         setIsUploadedFromDevice(false);
                       }}
-                      placeholder="https://example.com/photo.jpg (رابط صورة مباشر)"
+                      placeholder="https://example.com/photo.jpg"
                       className="text-xs h-8 font-mono"
                       dir="ltr"
                     />
@@ -355,7 +358,7 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
             {/* Full Name */}
             <div className="space-y-1.5">
               <label htmlFor="fullName" className="text-xs font-semibold text-foreground">
-                الاسم الكامل (Full Name) *
+                {t("fullName")} *
               </label>
               <div className="relative">
                 <User className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -364,7 +367,7 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
-                  placeholder="مثال: محمد حامد"
+                  placeholder="Mohamed Hamed"
                   className="ps-9 h-10 text-sm"
                 />
               </div>
@@ -373,7 +376,7 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
             {/* Phone Number */}
             <div className="space-y-1.5">
               <label htmlFor="phone" className="text-xs font-semibold text-foreground">
-                رقم الهاتف / الواتساب (Phone Number)
+                {t("phone")}
               </label>
               <div className="relative">
                 <Phone className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -391,7 +394,7 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
             {/* Email (Read-only) */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-muted-foreground">
-                البريد الإلكتروني (Email)
+                {t("email")}
               </label>
               <div className="relative">
                 <Mail className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -407,18 +410,12 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
             {/* Role (Read-only) */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-muted-foreground">
-                الدور الوظيفي (Role)
+                {t("role")}
               </label>
               <div className="relative">
                 <ShieldCheck className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary" />
                 <Input
-                  value={`${profile.role} (${
-                    profile.role === "GM"
-                      ? "المدير العام"
-                      : profile.role === "ADMIN"
-                      ? "مشرف"
-                      : "مبيعات"
-                  })`}
+                  value={tTeam(`roles.${profile.role}` as any)}
                   disabled
                   className="ps-9 h-10 text-sm bg-muted/50 cursor-not-allowed font-semibold text-primary"
                 />
@@ -435,12 +432,12 @@ export function UserProfileForm({ profile }: UserProfileFormProps) {
               {isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>جاري الحفظ...</span>
+                  <span>{t("saving")}</span>
                 </>
               ) : (
                 <>
                   <CheckCircle2 className="h-4 w-4" />
-                  <span>حفظ التعديلات (Save Profile)</span>
+                  <span>{t("saveProfile")}</span>
                 </>
               )}
             </Button>

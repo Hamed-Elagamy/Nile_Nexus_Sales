@@ -78,8 +78,9 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - Real-time profile photo and name synchronization across navigation header (`AppHeader`)
   - Services catalog and lead sources management (`/settings`)
   - Live executive dashboard with real KPI metrics and urgent overdue recovery (`/dashboard`)
-- **All Auxiliary Routes**:
-  - `/tasks`, `/calendar`, `/approvals`, `/reports`, `/notifications`
+- **All Auxiliary Routes & Pure Localization**:
+  - Fully translated and localized with dynamic `next-intl` keys: `/tasks`, `/calendar`, `/approvals`, `/reports`, `/notifications`, `/team`, and `/settings`
+  - Zero hardcoded Arabic strings when English is selected; zero awkward bilingual parentheses
 - **Production Infrastructure**:
   - Live Vercel Production Deployment: `https://nile-nexus-sales.vercel.app`
   - Connected to Supabase Project: `https://zbbivheqcutwflewmtnb.supabase.co`

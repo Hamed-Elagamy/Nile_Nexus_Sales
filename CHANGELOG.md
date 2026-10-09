@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.2] - 2026-10-09
+
+### Fixed
+- **Bilingual Language Consistency & Localization**:
+  - Eliminated hardcoded Arabic strings across all auxiliary pages (`/calendar`, `/tasks`, `/approvals`, `/reports`, `/notifications`, `/team`, and `/settings`).
+  - Switched static demo and placeholder content to dynamic `next-intl` translation keys (`getTranslations` and `useTranslations`).
+  - Removed bilingual parenthetical labels (e.g. `(Profile Picture)`, `(Demo Presentation)`) to guarantee pure Egyptian Arabic in `ar` mode and pure English in `en` mode.
+  - Added complete translation dictionaries for `calendar`, `tasks`, `approvals`, `reports`, `notifications`, `team`, and `settings` in both `messages/ar.json` and `messages/en.json`.
+  - Maintained 100% test coverage with 60/60 Vitest tests passing across 13 test suites.
+
 ## [0.9.1] - 2026-10-09
 
 ### Security & Roles

@@ -1,5 +1,6 @@
 import React from "react";
 import { Settings } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { getServices, getLeadSources } from "@/lib/actions/settings";
 import { getCurrentUserProfile } from "@/lib/actions/profile";
 import { UserProfileForm } from "@/components/settings/user-profile-form";
@@ -12,6 +13,7 @@ export const metadata = {
 };
 
 export default async function SettingsPage() {
+  const t = await getTranslations("settings");
   const [profileRes, servicesRes, leadSourcesRes] = await Promise.all([
     getCurrentUserProfile(),
     getServices(),
@@ -29,10 +31,10 @@ export default async function SettingsPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
           <Settings className="h-6 w-6 text-primary" />
-          <span>إعدادات النظام والملف الشخصي (Settings)</span>
+          <span>{t("title")}</span>
         </h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          تعديل بيانات الحساب الشخصي (الاسم، الهاتف، الصورة) وإدارة كتالوج الخدمات ⚙️
+          {t("subtitle")}
         </p>
       </div>
 

@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Calendar as CalendarIcon, Clock, MapPin, Video, Phone, Plus } from "lucide-react";
 import { demoFollowUps } from "@/lib/demo-data";
 import { Badge } from "@/components/ui/badge";
@@ -9,51 +10,53 @@ export const metadata: Metadata = {
   description: "جدول المواعيد والاجتماعات والعروض التقديمية",
 };
 
-export default function CalendarPage() {
+export default async function CalendarPage() {
+  const t = await getTranslations("calendar");
+
   const events = [
     {
       id: "evt-01",
-      title: "اجتماع عرض تجريبي مباشر (Demo Presentation)",
-      clientName: "شركة النيل للمقاولات والتجارة",
-      dealTitle: "ميكنة إدارة المبيعات لشركة النيل للمقاولات",
-      date: "اليوم",
-      time: "02:00 م - 03:30 م",
+      title: t("events.e1Title"),
+      clientName: t("events.e1Client"),
+      dealTitle: t("events.e1Deal"),
+      date: t("today"),
+      time: "02:00 - 03:30",
       type: "MEETING",
-      location: "مقر الشركة - مصر الجديدة",
-      rep: "كريم فهمي",
+      location: t("events.e1Loc"),
+      rep: "Karim Fahmy",
     },
     {
       id: "evt-02",
-      title: "مكالمة هاتفية لمراجعة شروط الدفع والخصم",
-      clientName: "تبارك للاستثمار والتطوير العقاري",
-      dealTitle: "باقة المنصة السحابية المتكاملة",
-      date: "غداً",
-      time: "11:00 ص - 11:30 ص",
+      title: t("events.e2Title"),
+      clientName: t("events.e2Client"),
+      dealTitle: t("events.e2Deal"),
+      date: t("tomorrow"),
+      time: "11:00 - 11:30",
       type: "CALL",
-      location: "مكالمة هاتفية مباشرة",
-      rep: "كريم فهمي",
+      location: t("events.e2Loc"),
+      rep: "Karim Fahmy",
     },
     {
       id: "evt-03",
-      title: "جلسة نقاش فني وتقني عبر زووم",
-      clientName: "تكنو سوفت مصر للحلول الرقمية",
-      dealTitle: "استشارات تكامل العمليات",
-      date: "الخميس القادم",
-      time: "01:00 م - 02:00 م",
+      title: t("events.e3Title"),
+      clientName: t("events.e3Client"),
+      dealTitle: t("events.e3Deal"),
+      date: t("nextThursday"),
+      time: "01:00 - 02:00",
       type: "ONLINE",
-      location: "Zoom Cloud Meeting",
-      rep: "مصطفى كمال",
+      location: t("events.e3Loc"),
+      rep: "Mostafa Kamal",
     },
     {
       id: "evt-04",
-      title: "زيارة ميدانية لمصنع العاشر من رمضان",
-      clientName: "القاهرة للصناعات الغذائية والتعبئة",
-      dealTitle: "نظام إدارة الموزعين ومندوبي التوزيع",
-      date: "الأسبوع القادم",
-      time: "10:00 ص - 01:00 م",
+      title: t("events.e4Title"),
+      clientName: t("events.e4Client"),
+      dealTitle: t("events.e4Deal"),
+      date: t("nextWeek"),
+      time: "10:00 - 01:00",
       type: "VISIT",
-      location: "المنطقة الصناعية الأولى، العاشر من رمضان",
-      rep: "مصطفى كمال",
+      location: t("events.e4Loc"),
+      rep: "Mostafa Kamal",
     },
   ];
 
@@ -63,36 +66,36 @@ export default function CalendarPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-[var(--foreground)]">
-            التقويم التجاري
+            {t("title")}
           </h1>
           <p className="text-sm text-[var(--muted-foreground)]">
-            جدول المقابلات الميدانية، الاجتماعات الافتراضية، ومواعيد إغلاق الصفقات
+            {t("subtitle")}
           </p>
         </div>
         <Button className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
-          <span>موعد جديد</span>
+          <span>{t("newEvent")}</span>
         </Button>
       </div>
 
       {/* Calendar Stats Banner */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)]">
-          <span className="text-xs text-[var(--muted-foreground)]">اجتماعات اليوم</span>
-          <p className="text-xl font-bold text-[var(--foreground)] mt-1">1 اجتماع</p>
+          <span className="text-xs text-[var(--muted-foreground)]">{t("todayMeetings")}</span>
+          <p className="text-xl font-bold text-[var(--foreground)] mt-1">1 {t("meetingUnit")}</p>
         </div>
         <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)]">
-          <span className="text-xs text-[var(--muted-foreground)]">مواعيد هذا الأسبوع</span>
-          <p className="text-xl font-bold text-[var(--foreground)] mt-1">3 مواعيد</p>
+          <span className="text-xs text-[var(--muted-foreground)]">{t("thisWeekEvents")}</span>
+          <p className="text-xl font-bold text-[var(--foreground)] mt-1">3 {t("appointmentUnit")}</p>
         </div>
         <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)]">
-          <span className="text-xs text-[var(--muted-foreground)]">عروض تقديمية مجدولة</span>
-          <p className="text-xl font-bold text-[var(--foreground)] mt-1">2 عرض فني</p>
+          <span className="text-xs text-[var(--muted-foreground)]">{t("scheduledDemos")}</span>
+          <p className="text-xl font-bold text-[var(--foreground)] mt-1">2 {t("demoUnit")}</p>
         </div>
         <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)]">
-          <span className="text-xs text-[var(--muted-foreground)]">متابعات هاتفية معلقة</span>
+          <span className="text-xs text-[var(--muted-foreground)]">{t("pendingFollowUps")}</span>
           <p className="text-xl font-bold text-amber-600 dark:text-amber-400 mt-1">
-            {demoFollowUps.filter((f) => f.status === "PENDING").length} مكالمة
+            {demoFollowUps.filter((f) => f.status === "PENDING").length} {t("callUnit")}
           </p>
         </div>
       </div>
@@ -103,10 +106,10 @@ export default function CalendarPage() {
           <div className="flex items-center gap-2">
             <CalendarIcon className="h-5 w-5 text-[var(--primary)]" />
             <h2 className="text-lg font-bold text-[var(--foreground)]">
-              أجندة المواعيد القادمة
+              {t("upcomingAgenda")}
             </h2>
           </div>
-          <span className="text-xs text-[var(--muted-foreground)]">توقيت القاهرة (GMT+2)</span>
+          <span className="text-xs text-[var(--muted-foreground)]">{t("timezone")}</span>
         </div>
 
         <div className="space-y-4">
@@ -127,10 +130,10 @@ export default function CalendarPage() {
 
                 <div className="flex items-center gap-4 text-xs text-[var(--muted-foreground)] flex-wrap">
                   <span className="font-medium text-[var(--foreground)]">
-                    العميل: {evt.clientName}
+                    {evt.clientName}
                   </span>
-                  <span>الصفقة: {evt.dealTitle}</span>
-                  <span className="flex items-center gap-1 text-[var(--primary)]">
+                  <span>{evt.dealTitle}</span>
+                  <span className="flex items-center gap-1 text-[var(--primary)] font-mono">
                     <Clock className="h-3 w-3" />
                     {evt.time}
                   </span>
@@ -149,10 +152,10 @@ export default function CalendarPage() {
 
               <div className="flex items-center gap-2 self-end md:self-center">
                 <Button variant="outline" size="sm">
-                  تفاصيل الموعد
+                  {t("details")}
                 </Button>
                 <Button size="sm">
-                  تسجيل المحضر
+                  {t("checkIn")}
                 </Button>
               </div>
             </div>

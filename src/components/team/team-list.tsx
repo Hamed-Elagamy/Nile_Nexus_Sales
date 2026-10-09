@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Users, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { TeamMemberCard } from "./team-member-card";
@@ -15,6 +16,7 @@ interface TeamListProps {
 }
 
 export function TeamList({ members, currentUserId, currentUserRole }: TeamListProps) {
+  const t = useTranslations("team");
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("ALL");
@@ -32,12 +34,12 @@ export function TeamList({ members, currentUserId, currentUserRole }: TeamListPr
       {/* Search and Filters */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <Input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="بحث بالاسم أو البريد الإلكتروني..."
-            className="pr-9 h-9 text-xs"
+            placeholder={t("searchPlaceholder")}
+            className="ps-9 h-9 text-xs"
           />
         </div>
 
@@ -46,13 +48,13 @@ export function TeamList({ members, currentUserId, currentUserRole }: TeamListPr
             <button
               key={r}
               onClick={() => setRoleFilter(r)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                 roleFilter === r
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-primary text-primary-foreground shadow-sm font-semibold"
                   : "bg-card border border-border text-muted-foreground hover:bg-muted"
               }`}
             >
-              {r === "ALL" ? "الكل" : r}
+              {r === "ALL" ? t("all") : r}
             </button>
           ))}
         </div>
@@ -65,7 +67,7 @@ export function TeamList({ members, currentUserId, currentUserRole }: TeamListPr
             <Users className="h-8 w-8" />
           </div>
           <h3 className="text-base font-semibold text-foreground">
-            لا يوجد أعضاء مطابقين للبحث
+            {t("noMembers")}
           </h3>
         </div>
       ) : (

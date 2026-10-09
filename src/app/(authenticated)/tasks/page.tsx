@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { CheckSquare, Plus, Clock, AlertCircle } from "lucide-react";
 import { demoTasks, demoProfiles, demoClients, demoDeals } from "@/lib/demo-data";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
   description: "متابعة وإدارة المهام وتكليفات فريق المبيعات",
 };
 
-export default function TasksPage() {
+export default async function TasksPage() {
+  const t = await getTranslations("tasks");
+  const tCommon = await getTranslations("common");
   const tasks = demoTasks;
 
   return (
@@ -18,15 +21,15 @@ export default function TasksPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-[var(--foreground)]">
-            المهام التنفيذية
+            {t("title")}
           </h1>
           <p className="text-sm text-[var(--muted-foreground)]">
-            متابعة المهام التشغيلية، الإجراءات المطلوبة، والتوثيق القانوني للصفقات
+            {t("subtitle")}
           </p>
         </div>
         <Button className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
-          <span>مهمة جديدة</span>
+          <span>{t("addNew")}</span>
         </Button>
       </div>
 
@@ -34,7 +37,7 @@ export default function TasksPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-[var(--muted-foreground)]">إجمالي المهام</span>
+            <span className="text-sm font-medium text-[var(--muted-foreground)]">{t("totalTasks")}</span>
             <CheckSquare className="h-4 w-4 text-[var(--primary)]" />
           </div>
           <p className="text-2xl font-bold text-[var(--foreground)] mt-2">{tasks.length}</p>
@@ -42,21 +45,21 @@ export default function TasksPage() {
 
         <div className="p-4 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-red-700 dark:text-red-300">مهام عاجلة</span>
+            <span className="text-sm font-medium text-red-700 dark:text-red-300">{t("urgentTasks")}</span>
             <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
           </div>
           <p className="text-2xl font-bold text-red-700 dark:text-red-300 mt-2">
-            {tasks.filter((t) => t.priority === "URGENT").length}
+            {tasks.filter((tItem) => tItem.priority === "URGENT").length}
           </p>
         </div>
 
         <div className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-[var(--muted-foreground)]">قيد التنفيذ</span>
+            <span className="text-sm font-medium text-[var(--muted-foreground)]">{t("inProgressTasks")}</span>
             <Clock className="h-4 w-4 text-blue-500" />
           </div>
           <p className="text-2xl font-bold text-[var(--foreground)] mt-2">
-            {tasks.filter((t) => t.status === "IN_PROGRESS").length}
+            {tasks.filter((tItem) => tItem.status === "IN_PROGRESS").length}
           </p>
         </div>
       </div>
@@ -87,18 +90,10 @@ export default function TasksPage() {
                         : "secondary"
                     }
                   >
-                    {task.priority === "URGENT"
-                      ? "عاجل"
-                      : task.priority === "IMPORTANT"
-                      ? "هام"
-                      : "عادي"}
+                    {t(`priority.${task.priority}` as any)}
                   </Badge>
                   <Badge variant="outline">
-                    {task.status === "IN_PROGRESS"
-                      ? "قيد التنفيذ"
-                      : task.status === "DONE"
-                      ? "مكتملة"
-                      : "في الانتظار"}
+                    {t(`status.${task.status}` as any)}
                   </Badge>
                 </div>
 
@@ -107,17 +102,17 @@ export default function TasksPage() {
                 )}
 
                 <div className="flex items-center gap-4 text-xs text-[var(--muted-foreground)] flex-wrap pt-1">
-                  {client && <span>العميل: {client.name}</span>}
-                  {deal && <span>الصفقة: {deal.title}</span>}
+                  {client && <span>{t("client")}: {client.name}</span>}
+                  {deal && <span>{t("deal")}: {deal.title}</span>}
                   {task.deadline && (
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 font-mono">
                       <Clock className="h-3 w-3" />
-                      الموعد: {new Date(task.deadline).toLocaleDateString("ar-EG")}
+                      {t("dueDate")}: {new Date(task.deadline).toISOString().split("T")[0]}
                     </span>
                   )}
                   {assignee && (
                     <span className="text-[var(--primary)] font-medium">
-                      المسؤول: {assignee.full_name}
+                      {t("assignedTo")}: {assignee.full_name}
                     </span>
                   )}
                 </div>
@@ -125,10 +120,10 @@ export default function TasksPage() {
 
               <div className="flex items-center gap-2 self-end md:self-center">
                 <Button variant="outline" size="sm">
-                  تفاصيل
+                  {tCommon("details")}
                 </Button>
                 <Button size="sm">
-                  إنجاز المهمة
+                  {t("completedTasks")}
                 </Button>
               </div>
             </div>
