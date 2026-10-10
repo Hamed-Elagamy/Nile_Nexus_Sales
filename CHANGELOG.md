@@ -18,6 +18,12 @@ All notable changes to this project will be documented in this file.
   - **Server Actions & Database Security**:
     - Implemented `deleteService`, `updateLeadSource`, and `deleteLeadSource` with strict multi-layer GM/Admin authorization and database RLS alignment.
     - 100% synchronized translation keys between `messages/ar.json` and `messages/en.json`.
+- **Sales Representative Training & Operations Manual (Egyptian Arabic)**:
+  - Authored comprehensive 7-page manual (`docs/Nile_Nexus_Sales_Manual_Guide_AR.pdf` & `docs/SALES_REP_MANUAL_AR.md`) in motivating, professional Egyptian Arabic tailored specifically for company sales representatives.
+  - Covers: Morning Routine, Profile setup, Potential Clients qualification & 1-click conversion, 6-stage Pipeline Kanban, Daily Follow-ups with 1-click WhatsApp/Call, 2-minute Commercial Proposal creation with GM discount rules (>5%), and the 7 Golden Rules for winning deals.
+  - Formatted with Cairo Arabic typography, optimal readability font size, structured callouts, tables, and workflow badges.
+  - Automated PDF compilation engine via `scripts/generate-sales-manual-pdf.mjs`.
+
 
 
 ## [1.1.0] - 2026-10-11

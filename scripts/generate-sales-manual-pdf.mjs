@@ -1,0 +1,935 @@
+import fs from "fs";
+import path from "path";
+import { chromium } from "@playwright/test";
+
+const htmlContent = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>دليل مسؤول المبيعات | Nile Nexus Sales</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 14mm 14mm 14mm 14mm;
+      @bottom-right {
+        content: counter(page);
+        font-family: 'Cairo', sans-serif;
+        font-size: 10pt;
+        color: #64748b;
+      }
+      @bottom-left {
+        content: "Nile Nexus Sales — دليل مسؤول المبيعات";
+        font-family: 'Cairo', sans-serif;
+        font-size: 9pt;
+        color: #94a3b8;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+      color: #1e293b;
+      line-height: 1.65;
+      font-size: 11.5pt;
+      direction: rtl;
+    }
+
+    .page {
+      page-break-after: always;
+      position: relative;
+      min-height: 260mm;
+      padding-bottom: 5mm;
+    }
+
+    .page:last-child {
+      page-break-after: auto;
+    }
+
+    /* Cover Page Styling */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 265mm;
+      padding: 15mm 10mm;
+      background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+      color: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .cover::before {
+      content: "";
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(99, 102, 241, 0) 70%);
+      border-radius: 50%;
+    }
+
+    .cover-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      padding-bottom: 15px;
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 11pt;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .cover-body {
+      margin: 40px 0;
+    }
+
+    .cover-tag {
+      display: inline-block;
+      background: #4f46e5;
+      color: #ffffff;
+      font-size: 11pt;
+      font-weight: 800;
+      padding: 6px 18px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    .cover-title {
+      font-size: 32pt;
+      font-weight: 900;
+      line-height: 1.25;
+      margin: 0 0 15px 0;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .cover-subtitle {
+      font-size: 16pt;
+      font-weight: 600;
+      color: #cbd5e1;
+      line-height: 1.5;
+      margin-bottom: 25px;
+    }
+
+    .cover-description {
+      font-size: 12.5pt;
+      color: #94a3b8;
+      max-width: 90%;
+      line-height: 1.8;
+      border-right: 4px solid #6366f1;
+      padding-right: 15px;
+    }
+
+    .cover-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10.5pt;
+      color: #94a3b8;
+    }
+
+    /* Content Typography & Headers */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 8px;
+      margin-bottom: 18px;
+    }
+
+    .chapter-tag {
+      font-size: 9.5pt;
+      font-weight: 800;
+      color: #4f46e5;
+      background: #eef2ff;
+      padding: 3px 12px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    h1.chapter-title {
+      font-size: 20pt;
+      font-weight: 900;
+      color: #0f172a;
+      margin: 0 0 14px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h2.section-title {
+      font-size: 14pt;
+      font-weight: 800;
+      color: #1e293b;
+      margin: 18px 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-right: 3px solid #4f46e5;
+      padding-right: 10px;
+    }
+
+    p {
+      margin: 0 0 10px 0;
+      color: #334155;
+    }
+
+    /* Boxes & Cards */
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-weight: 800;
+      font-size: 12pt;
+      color: #0f172a;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .callout {
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin: 12px 0;
+      font-size: 11pt;
+    }
+
+    .callout-tip {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-right: 4px solid #16a34a;
+      color: #166534;
+    }
+
+    .callout-warning {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-right: 4px solid #d97706;
+      color: #92400e;
+    }
+
+    .callout-info {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-right: 4px solid #2563eb;
+      color: #1e40af;
+    }
+
+    .callout-danger {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-right: 4px solid #dc2626;
+      color: #991b1b;
+    }
+
+    /* Steps & Numbered Lists */
+    .steps {
+      list-style: none;
+      padding: 0;
+      margin: 12px 0;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .step-number {
+      width: 28px;
+      height: 28px;
+      background: #4f46e5;
+      color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 11pt;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-content {
+      flex: 1;
+    }
+
+    .step-title {
+      font-weight: 800;
+      color: #0f172a;
+      font-size: 11.5pt;
+      margin-bottom: 2px;
+    }
+
+    .step-desc {
+      color: #475569;
+      font-size: 10.5pt;
+      margin: 0;
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 12px 0;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 10.5pt;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #0f172a;
+      font-weight: 800;
+      text-align: right;
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
+    }
+
+    td {
+      padding: 8px 10px;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+    }
+
+    tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 9pt;
+      font-weight: 700;
+    }
+
+    .badge-primary { background: #e0e7ff; color: #3730a3; }
+    .badge-success { background: #dcfce7; color: #166534; }
+    .badge-warning { background: #fef3c7; color: #92400e; }
+    .badge-danger { background: #fee2e2; color: #991b1b; }
+
+    /* Footer on inner pages */
+    .footer-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 8.5pt;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================== -->
+  <!-- PAGE 1: الفخامة والغلاف                                         -->
+  <!-- ============================================================== -->
+  <div class="page">
+    <div class="cover">
+      <div class="cover-header">
+        <div class="brand-badge">
+          <span>🚀 Nile Nexus Sales</span>
+        </div>
+        <div style="font-size: 11pt; color: #cbd5e1;">منظومة إدارة المبيعات الحديثة</div>
+      </div>
+
+      <div class="cover-body">
+        <span class="cover-tag">دليل الاستخدام والتدريب الميداني</span>
+        <h1 class="cover-title">دليل مسؤول المبيعات<br>لتحقيق أهداف البيع وإغلاق الصفقات</h1>
+        <div class="cover-subtitle">رحلتك العملية من أول عميل محتمل لحد توقيع العقد والـ Closed Won 🏆</div>
+        
+        <div class="cover-description">
+          وداعاً لشيتات الإكسيل والورق اللي بيضيع الصفقات! الدليل ده معمول مخصوص عشانك عشان تفهم كل خطوة في المنصة خطوة بخطوة بالعامية المصرية السهلة، تظبط يومك، تركز في عملائك، وتضمن عمولاتك بأعلى كفاءة وسرعة.
+        </div>
+      </div>
+
+      <div class="cover-footer">
+        <div>إعداد: إدارة المبيعات والعمليات | Nile Nexus 2026</div>
+        <div>الإصدار المعتمد v1.2</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- PAGE 2: روتين الصباح وتظبيط الحساب                              -->
+  <!-- ============================================================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="chapter-tag">الفصل الأول</span>
+      <span style="font-size: 10pt; color: #64748b;">Nile Nexus Sales — دليل مسؤول المبيعات</span>
+    </div>
+
+    <h1 class="chapter-title">🌅 البداية وروتين أول 10 دقايق في اليوم</h1>
+
+    <p>
+      أهلاً بيك يا بطل المبيعات! المنصة دي اتصممت مخصوص عشان توفر وقتك وتخليك تركز في حاجة واحدة بس: <strong>الكلام مع العملاء وقفل الصفقات</strong>. مفيش بيانات هتتنسي، ومفيش عميل هيقع في النص.
+    </p>
+
+    <h2 class="section-title">1. تظبيط حسابك الشخصي (Profile Settings)</h2>
+    <div class="card">
+      <div class="card-title">⚙️ من صفحة الإعدادات (Settings):</div>
+      <ul style="margin: 0; padding-right: 20px; font-size: 10.5pt; color: #334155;">
+        <li><strong>صورتك الشخصية:</strong> ارفع صورتك من جهازك أو موبايلك عشان زمايلك والمدير العام يعرفوا مين اللي بيقفل الصفقات العظيمة دي.</li>
+        <li><strong>الاسم ورقم التليفون:</strong> اتأكد من كتابة اسمك الكامل ورقم تليفونك والواتساب المباشر.</li>
+        <li><strong>اللغة والشاشة:</strong> تقدر في أي وقت تبدل بين العربي والإنجليزي، أو الوضع الليلي (Dark Mode) حسب راحتك.</li>
+      </ul>
+    </div>
+
+    <h2 class="section-title">2. استخدام المنصة من الموبايل (Mobile Navigation)</h2>
+    <p>
+      لو إنت في الشارع أو عند عميل، المنصة شغالة معاك من الموبايل بامتياز:
+    </p>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">📱 الشريط السفلي السريع</div>
+        <p style="font-size: 10pt; margin: 0;">يوصلك فوراً لأهم 4 حاجات: <strong>الرئيسية، العملاء، الصفقات، المتابعات</strong>.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">☰ زرار "المزيد" والقائمة</div>
+        <p style="font-size: 10pt; margin: 0;">يفتحلك القائمة الجانبية الكاملة بكل الـ 14 قسم (المهام، التقويم، العروض، التقارير...).</p>
+      </div>
+    </div>
+
+    <h2 class="section-title">3. روتين الصباح على لوحة التحكم (Dashboard)</h2>
+    <p>أول ما توصل أو تبدأ يومك، افتح صفحة <strong>الرئيسية</strong>، عينك هتروح على 3 حاجات رئيسية:</p>
+
+    <div class="steps">
+      <div class="step-item">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <div class="step-title">🚨 تنبيه المتابعات المتأخرة (Overdue Alerts)</div>
+          <p class="step-desc">لو عندك رقم باللون الأحمر هنا، ده معناه إن فيه عملاء كان المفروض تكلمهم ومكلمتهمش! ابدأ بيهم يومك فوراً قبل ما العميل يبرد أو يشوف منافس.</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <div class="step-title">📞 متابعات اليوم المجدولة (Today's Follow-ups)</div>
+          <p class="step-desc">المكالمات والاجتماعات اللي إنت محددها لتاريخ النهاردة. دول خطتك التنفيذية لليوم.</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <div class="step-title">💼 البايبلاين المفتوح وقيمته المالية</div>
+          <p class="step-desc">بيفكرك دايماً بحجم الصفقات اللي في إيدك، وإنت فاضلك قد إيه عشان تحقق التارجت الشهري وتكسر أرقامك السابقة.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      💡 <strong>نصيحة ذهبية:</strong> مندوب المبيعات الشاطر بيقفل كل متابعاته المتأخرة قبل الساعة 11 الصبح، عشان بقية اليوم يكون مخصص للاتصالات الجديدة والاجتماعات الحية.
+    </div>
+
+    <div class="footer-bar">
+      <span>Nile Nexus Sales — دليل مسؤول المبيعات</span>
+      <span>صفحة 2 من 7</span>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- PAGE 3: بنك العملاء المحتملين                                  -->
+  <!-- ============================================================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="chapter-tag">الفصل الثاني</span>
+      <span style="font-size: 10pt; color: #64748b;">Nile Nexus Sales — دليل مسؤول المبيعات</span>
+    </div>
+
+    <h1 class="chapter-title">🎯 بنك العملاء المحتملين (Potential Clients)</h1>
+
+    <div class="callout callout-info">
+      📌 <strong>قاعدة أساسية في السيستم:</strong> العميل المحتمل (Lead) <strong>مش</strong> هو العميل المؤكد (Client).<br>
+      <strong>العميل المحتمل:</strong> ليد جديد جاي من إعلان أو ترشيح، لسه بنكلمه ونتأكد هل هو مهتم حقيقي ومعاه ميزانية ولا لأ.
+    </div>
+
+    <h2 class="section-title">إزاي تضيف عميل محتمل جديد؟</h2>
+    <p>
+      من القائمة اضغط على <strong>العملاء المحتملين</strong> ثم زرار <strong>+ عميل محتمل جديد</strong>:
+    </p>
+
+    <div class="card">
+      <div class="card-title">📝 البيانات المطلوبة بدقة:</div>
+      <table style="margin-top: 6px;">
+        <tr>
+          <th style="width: 30%;">البيان</th>
+          <th>طريقة التسجيل الصحيحة</th>
+        </tr>
+        <tr>
+          <td><strong>اسم العميل والشركة</strong></td>
+          <td>اكتب اسم الشخص صاحب القرار واسم شركته بوضوح (مثال: أ. كريم ممدوح - شركة الأهرام).</td>
+        </tr>
+        <tr>
+          <td><strong>رقم التليفون</strong></td>
+          <td>اكتب الرقم بالصيغة الصحيحة (مثال: 01012345678 أو بالمفتاح الدولي لو من الخليج).</td>
+        </tr>
+        <tr>
+          <td><strong>مصدر العميل (Source)</strong></td>
+          <td>اختار المصدر الحقيقي: فيسبوك، واتساب، موقع إلكتروني، إحالة (Referral)... ده بيساعدنا نعرف إعلاناتنا شغالة إزاي.</td>
+        </tr>
+        <tr>
+          <td><strong>فرصة الخدمة (Opportunity)</strong></td>
+          <td>اختار الخدمة اللي بيسأل عليها (SaaS، تصميم UI/UX، حلول سحابية، استشارات...).</td>
+        </tr>
+      </table>
+    </div>
+
+    <h2 class="section-title">حالات العميل المحتمل (Lead Stages):</h2>
+    <div class="grid-3">
+      <div class="card" style="text-align: center;">
+        <span class="badge badge-primary">جديد (New)</span>
+        <p style="font-size: 10pt; margin-top: 6px;">ليد لسه واصل حالا ومحدش كلمه.</p>
+      </div>
+      <div class="card" style="text-align: center;">
+        <span class="badge badge-warning">جاري التواصل (Contacted)</span>
+        <p style="font-size: 10pt; margin-top: 6px;">اتكلمنا معاه وبعتناله وبنحدد احتياجاته.</p>
+      </div>
+      <div class="card" style="text-align: center;">
+        <span class="badge badge-success">مؤهل (Qualified)</span>
+        <p style="font-size: 10pt; margin-top: 6px;">عنده احتياج وميزانية وجاهز لعرض سعر.</p>
+      </div>
+    </div>
+
+    <h2 class="section-title">🚀 حركة السحر: التحويل إلى عميل وصفقة (Convert to Deal)</h2>
+    <p>
+      أول ما العميل يقولك "تمام أنا مهتم وعايز عرض سعر"، متقعدش تكتب بياناته تاني في صفحة الصفقات!
+    </p>
+    <div class="card" style="background: #eef2ff; border-color: #c7d2fe;">
+      <p style="font-weight: 800; color: #3730a3; margin-bottom: 6px;">اضغط على زرار: ⚡ تحويل إلى عميل وصفقة (Convert)</p>
+      <p style="font-size: 10.5pt; color: #4338ca; margin: 0;">
+        السيستم في ثانية واحدة هيعمل الآتي تلقائياً:
+        <br>1. ينقله لدفتر <strong>العملاء المؤكدين</strong>.
+        <br>2. يفتحله <strong>صفقة جديدة (Deal)</strong> في البايبلاين مربوطة بيه.
+        <br>3. يحول كل ملاحظاته وتليفوناته وتاريخه بدون ضياع أي حرف!
+      </p>
+    </div>
+
+    <div class="callout callout-warning">
+      ⚠️ <strong>لو العميل اعتذر أو مطلعش مهتم؟</strong><br>
+      اختار حالته <strong>غير مهتم (Disqualified)</strong> واكتب السبب (مثال: السعر مش مناسب، مش وقته حالياً)، اوعى تمسح الليد عشان نعرف إحصائياتنا صح.
+    </div>
+
+    <div class="footer-bar">
+      <span>Nile Nexus Sales — دليل مسؤول المبيعات</span>
+      <span>صفحة 3 من 7</span>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- PAGE 4: البايبلاين وإدارة الصفقات                               -->
+  <!-- ============================================================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="chapter-tag">الفصل الثالث</span>
+      <span style="font-size: 10pt; color: #64748b;">Nile Nexus Sales — دليل مسؤول المبيعات</span>
+    </div>
+
+    <h1 class="chapter-title">💼 البايبلاين ومراحل الصفقات (Deals & Pipeline)</h1>
+
+    <p>
+      <strong>البايبلاين (Pipeline)</strong> هو الشاشة اللي بتشوف فيها صفقاتك بتتحرك زي الماتش خطوة بخطوة لحد ما تجيب جون (Closed Won 🏆).
+    </p>
+
+    <h2 class="section-title">مراحل الصفقة الـ 6 (Deal Stages):</h2>
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 25%;">المرحلة</th>
+          <th style="width: 45%;">المطلوب منك كمسؤول مبيعات</th>
+          <th style="width: 30%;">نسبة النجاح المتوقعة</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. تواصل أولي<br><small>(Initial Contact)</small></strong></td>
+          <td>أول مكالمة ترحيب بالعميل وكسر الجليد لفهم نشاطه وتحدياته الحالية.</td>
+          <td><span class="badge badge-primary">احتمالية 20%</span></td>
+        </tr>
+        <tr>
+          <td><strong>2. تحديد الاحتياجات<br><small>(Needs Discovery)</small></strong></td>
+          <td>جلسة استكشافية لمعرفة متطلبات العميل التقنية وحجم مشروعه وفريقه.</td>
+          <td><span class="badge badge-primary">احتمالية 40%</span></td>
+        </tr>
+        <tr>
+          <td><strong>3. عرض تجريبي / ديمو<br><small>(Demo / Presentation)</small></strong></td>
+          <td>عمل ديمو مباشر لشرح حلول Nile Nexus وكيفية حل مشكلته العملية.</td>
+          <td><span class="badge badge-warning">احتمالية 60%</span></td>
+        </tr>
+        <tr>
+          <td><strong>4. إرسال العرض<br><small>(Proposal Sent)</small></strong></td>
+          <td>تجهيز عرض السعر الرسمي وإرساله للعميل والمدير المالي.</td>
+          <td><span class="badge badge-warning">احتمالية 75%</span></td>
+        </tr>
+        <tr>
+          <td><strong>5. مرحلة التفاوض<br><small>(Negotiation)</small></strong></td>
+          <td>مناقشة تفاصيل الدفع والخصم وفترة التسليم والاعتماد النهائي.</td>
+          <td><span class="badge badge-success">احتمالية 90%</span></td>
+        </tr>
+        <tr>
+          <td><strong>6. صفقة رابحة 🏆<br><small>(Closed Won)</small></strong></td>
+          <td>توقيع العقد، استلام الدفعة الأولى، وتحويل المشروع لفريق التنفيذ!</td>
+          <td><span class="badge badge-success" style="background:#16a34a; color:#fff;">فوز مؤكد 100%</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="section-title">ميزة السحب والإفلات (Drag & Drop):</h2>
+    <div class="card">
+      <p style="margin: 0; font-size: 11pt;">
+        في صفحة <strong>البايبلاين</strong>، كل صفقة بتظهر كـ كارت أنيق فيه: اسم العميل، قيمة الصفقة بالجنيه، واسم الخدمة.<br>
+        لما تخلص مرحلة، <strong>اسحب الكارت بالماوس (أو بصابعك على الموبايل) ونزله في المرحلة اللي بعدها</strong>، السيستم هيحدث النسبة والاحتمالية في ثانية!
+      </p>
+    </div>
+
+    <h2 class="section-title">لو الصفقة خسرت؟ (Closed Lost)</h2>
+    <p>
+      طبيعي في البيع إن مش كل عميل هيشتري. لو العميل قرر ميكملش:
+    </p>
+    <div class="callout callout-danger" style="margin: 0;">
+      انقل الصفقة لـ <strong>خاسرة (Closed Lost)</strong> واختار سبب الخسارة الحقيقي من القائمة (مثال: اختار منافس، الميزانية اتلغت، السعر غالي).<br>
+      ده بيخلي إدارة الشركة تطور المنتجات والأسعار وتساعدك في الصفقات الجاية.
+    </div>
+
+    <div class="footer-bar">
+      <span>Nile Nexus Sales — دليل مسؤول المبيعات</span>
+      <span>صفحة 4 من 7</span>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- PAGE 5: ورشة المتابعات اليومية والواتساب                         -->
+  <!-- ============================================================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="chapter-tag">الفصل الرابع</span>
+      <span style="font-size: 10pt; color: #64748b;">Nile Nexus Sales — دليل مسؤول المبيعات</span>
+    </div>
+
+    <h1 class="chapter-title">📞 ورشة المتابعات اليومية (Follow-ups Workspace)</h1>
+
+    <p>
+      شاشة <strong>المتابعات (Follow-ups)</strong> هي الشاشة اللي هتقضي فيها معظم وقت يومك. كل عميل محتاج متابعة بيظهرلك هنا بالموعد والتفاصيل.
+    </p>
+
+    <h2 class="section-title">ميزات التفاعل السريع بضغطة واحدة:</h2>
+    <div class="grid-2">
+      <div class="card" style="border-right: 4px solid #16a34a;">
+        <div class="card-title">🟢 زرار الواتساب (WhatsApp Direct)</div>
+        <p style="font-size: 10pt; margin: 0;">
+          اضغط عليه يفتحلك محادثة الواتساب فوراً برقم العميل، <strong>من غير ما تحتاج تسجل رقمه على موبايلك الأول!</strong>
+        </p>
+      </div>
+
+      <div class="card" style="border-right: 4px solid #2563eb;">
+        <div class="card-title">🔵 زرار الاتصال المباشر (Direct Call)</div>
+        <p style="font-size: 10pt; margin: 0;">
+          لو داخل من الموبايل، اضغط على زرار السماعة هيطلب الرقم فوراً على خطك ويبدأ الرنين في لحظة.
+        </p>
+      </div>
+    </div>
+
+    <h2 class="section-title">حركة المتابعة المزدوجة (Complete & Schedule Next):</h2>
+    <p>
+      لما تخلص مكالمة مع عميل، اضغط على <strong>إنهاء المتابعة</strong>. السيستم هيفتحلك نافذة سريعة بتعمل حاجتين في ثانية واحدة:
+    </p>
+
+    <div class="steps">
+      <div class="step-item">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <div class="step-title">تسجيل نتيجة المكالمة (What happened?)</div>
+          <p class="step-desc">اكتب جملتين ملخص: (مثال: العميل قال هيرد بعد ما يرجع من السفر يوم التلات الجاي وعايز خصم 5%).</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <div class="step-title">تحديد موعد المتابعة اللي بعدها (Next Follow-up Date)</div>
+          <p class="step-desc">اختار تاريخ وساعة المتابعة الجاية ونوعها (مكالمة، مقابلة، واتساب). وبكده السيستم هيفكرك في ميعادها بالظبط!</p>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">التقويم والأجندة (Calendar):</h2>
+    <p>
+      في صفحة <strong>التقويم</strong> هتشوف كل مواعيدك الأسبوعية والشهرية منظمة:
+    </p>
+    <div class="card">
+      <ul style="margin: 0; padding-right: 20px; font-size: 10.5pt;">
+        <li>اجتماعات الديمو المباشرة (Zoom أو أوفيس).</li>
+        <li>الزيارات الميدانية لمقرات الشركات.</li>
+        <li>تذكيرات بالمواعيد النهائية لتسليم عروض الأسعار.</li>
+      </ul>
+    </div>
+
+    <div class="callout callout-tip">
+      🎯 <strong>السر الصغير لنجاح المبيعات:</strong><br>
+      أي مكالمة تعملها لازم يخرج منها ميعاد تواصل تالي محدد بالساعة واليوم. كلمة "هكلمك بعدين" بتموت الصفقات، لكن "هكلم حضرتك الأربعاء الساعة 2 الظهر" بتقفلها!
+    </div>
+
+    <div class="footer-bar">
+      <span>Nile Nexus Sales — دليل مسؤول المبيعات</span>
+      <span>صفحة 5 من 7</span>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- PAGE 6: عروض الأسعار والموافقات                                 -->
+  <!-- ============================================================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="chapter-tag">الفصل الخامس</span>
+      <span style="font-size: 10pt; color: #64748b;">Nile Nexus Sales — دليل مسؤول المبيعات</span>
+    </div>
+
+    <h1 class="chapter-title">📑 عروض الأسعار والموافقات (Proposals)</h1>
+
+    <p>
+      زمان كان مندوب المبيعات بيقعد ساعتين يعمل ملف وورد أو إكسيل لعرض السعر وممكن يغلط في الحسبة. في <strong>Nile Nexus Sales</strong> إنت بتعمل العرض الرسمي المعتمد في دقيقتين بالظبط!
+    </p>
+
+    <h2 class="section-title">خطوات عمل عرض سعر جديد (New Proposal):</h2>
+    <div class="steps">
+      <div class="step-item">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <div class="step-title">اختيار العميل والصفقة</div>
+          <p class="step-desc">من صفحة العروض اضغط <strong>+ عرض سعر جديد</strong>، واختار اسم العميل والصفقة المعنية.</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <div class="step-title">إضافة الخدمات من الكتالوج (Line Items)</div>
+          <p class="step-desc">اختار الخدمات المطلوبة (مثال: منصة سحابية، تكامل أنظمة...). السيستم بيحط السعر المرجعي المعتمد تلقائياً، وإنت بتحدد الكمية والمدة.</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <div class="step-title">الحسابات والضرائب والخصم</div>
+          <p class="step-desc">السيستم بيحسب الإجمالي، والخصم، وضريبة القيمة المضافة (VAT 14%) بالمليم من غير أي أخطاء حسابية.</p>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <div class="step-title">الطباعة وتحميل الـ PDF الفخم</div>
+          <p class="step-desc">اضغط على زرار <strong>طباعة / PDF</strong> هيطلعلك ملف عرض سعر رسمي يحمل لوجو Nile Nexus، شروط الدفع، التوقيعات، وتفاصيل الحساب البنكي.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">🚨 سياسة الخصومات المؤسسية والموافقات (Approvals):</h2>
+    <div class="card" style="border-right: 4px solid #d97706; background: #fffbeb;">
+      <p style="font-weight: 800; color: #b45309; margin-bottom: 4px;">قاعدة الشركة الذهبية للخصومات:</p>
+      <p style="font-size: 10.5pt; color: #92400e; margin: 0;">
+        • مسموح لك كمسؤول مبيعات بخصم يصل إلى <strong>5% كحد أقصى</strong> لتشجيع العميل على الإغلاق السريع.<br>
+        • لو العميل صمم على خصم <strong>أكبر من 5%</strong>، النظام بيحول العرض تلقائياً لحالة <strong>"في انتظار الموافقة (Pending Approval)"</strong> وبيبعت إشعار للمدير العام (GM) لاعتماده قبل ما تقدر تطبعه أو تبعته.
+      </p>
+    </div>
+
+    <h2 class="section-title">عدم تعديل العروض بعد الإرسال (Version Control):</h2>
+    <p>
+      لو بعت العرض للعميل، وبعد أسبوع قالك "عايز أشيل خدمة وأزود خدمة تانية":
+    </p>
+    <div class="card">
+      <p style="font-size: 10.5pt; margin: 0;">
+        متقلقش! اضغط على زرار <strong>إصدار جديد (New Version)</strong>، السيستم هيعمل نسخة <strong>v2</strong> قابلة للتعديل ويحتفظ بنسخة <strong>v1</strong> القديمة زي ما هي للأرشيف والشفافية.
+      </p>
+    </div>
+
+    <div class="footer-bar">
+      <span>Nile Nexus Sales — دليل مسؤول المبيعات</span>
+      <span>صفحة 6 من 7</span>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- PAGE 7: الوصايا الذهبية والأسئلة الشائعة                          -->
+  <!-- ============================================================== -->
+  <div class="page">
+    <div class="header-bar">
+      <span class="chapter-tag">الفصل السادس</span>
+      <span style="font-size: 10pt; color: #64748b;">Nile Nexus Sales — دليل مسؤول المبيعات</span>
+    </div>
+
+    <h1 class="chapter-title">🏆 الوصايا الـ 7 لكسر التارجت وزيادة العمولات</h1>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">1. السرعة في أول تواصل ⚡</div>
+        <p style="font-size: 10pt; margin: 0;">العميل اللي بتكلمه في أول 15 دقيقة من تسجيله نسبة قفله بتزيد 400% عن اللي بتكلمه تاني يوم.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">2. المتابعة ديماً بميعاد محدد ⏰</div>
+        <p style="font-size: 10pt; margin: 0;">متقفلش مكالمة إلا وإنت متفق مع العميل على اليوم والساعة للخطوة اللي بعدها.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">3. توثيق الملاحظات في السيستم 📝</div>
+        <p style="font-size: 10pt; margin: 0;">اكتب كل تفصيلة في ملخص المكالمة، عشان لو كلمته بعد أسبوع تفتكر كلامه كأنك لسه قافل معاه حالا.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">4. ركز في الـ Pain Points 🎯</div>
+        <p style="font-size: 10pt; margin: 0;">العميل مبيشتريش برمجيات، العميل بيشتري حل لمشكلته (توفير وقت، تقليل مصاريف، زيادة مبيعات).</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">5. متخافش من كلمة "لأ" 💪</div>
+        <p style="font-size: 10pt; margin: 0;">اعتذار العميل مش نهاية المطاف، اعرف السبب الحقيقي، واقترح عليه حل بديل أو باقة تناسب ميزانيته.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">6. احمي عمولتك بالنظام الرسمي 🛡️</div>
+        <p style="font-size: 10pt; margin: 0;">كل صفقة متسجلة باسمك في السيستم هي حقك المضمون في العمولة ومحدش يقدر ينازعك فيها.</p>
+      </div>
+    </div>
+
+    <h2 class="section-title">❓ أسئلة شائعة بتواجه مسؤول المبيعات:</h2>
+
+    <div class="card">
+      <p style="font-weight: 800; color: #0f172a; margin-bottom: 2px;">س: العميل مش بيرد على التليفون، أعمل إيه؟</p>
+      <p style="font-size: 10pt; color: #475569; margin-bottom: 8px;">
+        ج: ابعتله رسالة واتساب مهنية سريعة بضغطة زرار من السيستم، وجدول متابعة تانية بعد 24 ساعة. متكررش الاتصال أكتر من مرتين في نفس اليوم عشان ميحسش بالإزعاج.
+      </p>
+
+      <p style="font-weight: 800; color: #0f172a; margin-bottom: 2px;">س: هل أقدر أعدل سعر الخدمة بنفسي؟</p>
+      <p style="font-size: 10pt; color: #475569; margin-bottom: 8px;">
+        ج: أسعار الكتالوج الأساسية بيحددها المدير العام (GM) والمشرف (Admin) لضمان ربحية الشركة. إنت ليك حرية تعديل الكمية وإعطاء خصم تجاري لحد 5%.
+      </p>
+
+      <p style="font-weight: 800; color: #0f172a; margin-bottom: 2px;">س: هل ينفع أعمل فاتورة من السيستم؟</p>
+      <p style="font-size: 10pt; color: #475569; margin: 0;">
+        ج: نظام المبيعات بينتهي عند <strong>عرض السعر وتوقيع الصفقة (Closed Won)</strong>. الفواتير والتحصيل مسؤولية الإدارة المالية لضمان الحوكمة وتفرغك للبيع.
+      </p>
+    </div>
+
+    <div style="text-align: center; margin-top: 15px; padding: 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+      <p style="font-weight: 900; font-size: 12pt; color: #4f46e5; margin: 0;">
+        🚀 بالتوفيق يا بطل المبيعات، ومستنيينك في صدارة ليدربورد الأرباح الشهرية لـ Nile Nexus!
+      </p>
+    </div>
+
+    <div class="footer-bar">
+      <span>Nile Nexus Sales — دليل مسؤول المبيعات</span>
+      <span>صفحة 7 من 7 (نهاية الدليل)</span>
+    </div>
+  </div>
+
+</body>
+</html>
+`;
+
+async function generatePDF() {
+  console.log("Generating Sales Manual Guide HTML & PDF...");
+  
+  const docsDir = path.resolve(process.cwd(), "docs");
+  if (!fs.existsSync(docsDir)) {
+    fs.mkdirSync(docsDir, { recursive: true });
+  }
+
+  const htmlPath = path.join(docsDir, "Nile_Nexus_Sales_Manual_Guide_AR.html");
+  const pdfPath = path.join(docsDir, "Nile_Nexus_Sales_Manual_Guide_AR.pdf");
+  
+  // Artifact path
+  const artifactDir = "C:\\Users\\Moham\\.gemini\\antigravity\\brain\\0bbbfad2-8de5-4e95-be20-6f61359b9804";
+  const artifactPdfPath = path.join(artifactDir, "Nile_Nexus_Sales_Manual_Guide_AR.pdf");
+
+  fs.writeFileSync(htmlPath, htmlContent, "utf8");
+  console.log("Wrote HTML to:", htmlPath);
+
+  const browser = await chromium.launch({ channel: "msedge", headless: true });
+  const page = await browser.newPage();
+  
+  await page.setContent(htmlContent, { waitUntil: "networkidle" });
+  
+  // Wait a moment for webfonts to render cleanly
+  await page.waitForTimeout(2000);
+
+  await page.pdf({
+    path: pdfPath,
+    format: "A4",
+    printBackground: true,
+    margin: {
+      top: "12mm",
+      bottom: "12mm",
+      left: "12mm",
+      right: "12mm",
+    },
+  });
+
+  await browser.close();
+  console.log("Successfully generated PDF at:", pdfPath);
+
+  // Copy to artifacts directory
+  if (fs.existsSync(artifactDir)) {
+    fs.copyFileSync(pdfPath, artifactPdfPath);
+    console.log("Successfully copied PDF to artifact directory:", artifactPdfPath);
+  }
+}
+
+generatePDF().catch((err) => {
+  console.error("PDF generation failed:", err);
+  process.exit(1);
+});

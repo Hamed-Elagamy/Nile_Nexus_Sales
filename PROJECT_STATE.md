@@ -69,6 +69,11 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - Enforced multi-layer role protection (GM and Admin only) in UI and server actions
   - Converted Settings page metadata to dynamic locale-aware metadata
   - Zero TypeScript errors (`tsc --noEmit`) and 60/60 tests passing (100% pass rate)
+- **Phase 15 (Sales Representative Training & Operations Manual - Egyptian Arabic)**:
+  - Authored official 7-page Sales Representative training manual in Egyptian Arabic
+  - Generated professional vector PDF with Cairo typography: `docs/Nile_Nexus_Sales_Manual_Guide_AR.pdf`
+  - Created in-repo markdown guide: `docs/SALES_REP_MANUAL_AR.md`
+  - Automated PDF build pipeline: `scripts/generate-sales-manual-pdf.mjs`
 
 ## Completed Work
 - **Design System & UI Components**:
