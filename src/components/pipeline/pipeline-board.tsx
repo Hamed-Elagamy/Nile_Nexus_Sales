@@ -38,7 +38,7 @@ export function PipelineBoard({ initialStages, onRefresh }: PipelineBoardProps) 
         toast.success(t("movedSuccess", { stage: tDeals(`stages.${nextStage}`) }));
         onRefresh?.();
       } else {
-        toast.error(res.error || "فشل نقل الصفقة");
+        toast.error(res.error || t("moveFailed"));
       }
     });
   };
@@ -56,7 +56,7 @@ export function PipelineBoard({ initialStages, onRefresh }: PipelineBoardProps) 
         });
         onRefresh?.();
       } else {
-        toast.error(res.error || "فشل تحديث الصفقة");
+        toast.error(res.error || tDeals("updateFailed"));
       }
     });
   };

@@ -72,7 +72,7 @@ export function CreatePotentialClientDialog({
     const check = await checkDuplicatePotentialClient({ phone, name });
     if (check.isDuplicate) {
       const matchNames = check.matches.map((m) => `${m.name} (${m.business_id})`).join(", ");
-      setDuplicateWarning(`العميل ده موجود عندنا بالفعل تقريبًا 👀: ${matchNames}`);
+      setDuplicateWarning(t("duplicateWarningWithMatch", { matches: matchNames }));
     } else {
       setDuplicateWarning(null);
     }
@@ -89,7 +89,7 @@ export function CreatePotentialClientDialog({
     setFormError(null);
 
     if (!name.trim()) {
-      setFormError("اسم العميل المحتمل مطلوب");
+      setFormError(t("nameRequired"));
       return;
     }
 
@@ -167,7 +167,7 @@ export function CreatePotentialClientDialog({
                 {t("name")} <span className="text-destructive">*</span>
               </label>
               <Input
-                placeholder="مثال: CORE Coffee"
+                placeholder={t("namePlaceholder")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -178,7 +178,7 @@ export function CreatePotentialClientDialog({
                 {t("area")}
               </label>
               <Input
-                placeholder="مثال: المعادي، القاهرة"
+                placeholder={t("areaPlaceholder")}
                 value={area}
                 onChange={(e) => setArea(e.target.value)}
               />
@@ -270,7 +270,7 @@ export function CreatePotentialClientDialog({
               {t("notes")}
             </label>
             <Textarea
-              placeholder="اكتب كل الملاحظات اللي عرفتها عن العميل ونشاطه..."
+              placeholder={t("notesPlaceholder")}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}

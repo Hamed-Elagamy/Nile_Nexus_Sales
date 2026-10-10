@@ -42,11 +42,11 @@ export function PotentialClientsClient({ initialData }: PotentialClientsClientPr
         if (res.success && res.data) {
           setData(res.data);
         } else {
-          toast.error(res.error || "فشل تحميل البيانات");
+          toast.error(res.error || t("errorLoading"));
         }
       });
     },
-    [query, status]
+    [query, status, t]
   );
 
   // Debounce search query
@@ -64,7 +64,7 @@ export function PotentialClientsClient({ initialData }: PotentialClientsClientPr
         toast.success(t("statusUpdated"));
         loadData(query, status, data.page);
       } else {
-        toast.error(res.error || "فشل تحديث الحالة");
+        toast.error(res.error || t("errorUpdatingStatus"));
       }
     });
   };

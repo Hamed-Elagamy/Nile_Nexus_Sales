@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Plus, CalendarPlus } from "lucide-react";
 import {
@@ -37,6 +38,10 @@ export function CreateFollowUpDialog({
   triggerButton,
   onSuccess,
 }: CreateFollowUpDialogProps) {
+  const tFollowUps = useTranslations("followUps");
+  const tDialog = useTranslations("followUps.scheduleDialog");
+  const tActions = useTranslations("followUps.actions");
+  const tCommon = useTranslations("common");
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -50,12 +55,12 @@ export function CreateFollowUpDialog({
     const finalClientId = prefilledClientId || clientId;
 
     if (!finalClientId) {
-      toast.error("يرجى اختيار العميل");
+      toast.error(tDialog("clientRequired"));
       return;
     }
 
     if (!dueAt) {
-      toast.error("يرجى تحديد موعد المتابعة");
+      toast.error(tDialog("dueRequired"));
       return;
     }
 
@@ -69,13 +74,13 @@ export function CreateFollowUpDialog({
       });
 
       if (res.success) {
-        toast.success("تمت جدولة المتابعة بنجاح! 📅");
+        toast.success(tDialog("successToast"));
         setOpen(false);
         setDueAt("");
         setNotes("");
         onSuccess?.();
       } else {
-        toast.error(res.error || "فشل إنشاء المتابعة");
+        toast.error(res.error || tDialog("failedToast"));
       }
     });
   };
@@ -89,7 +94,7 @@ export function CreateFollowUpDialog({
           ) : (
             <Button size="sm" className="gap-1.5">
               <Plus className="h-4 w-4" />
-              <span>جدولة متابعة</span>
+              <span>{tFollowUps("scheduleButton")}</span>
             </Button>
           )
         }
@@ -99,10 +104,10 @@ export function CreateFollowUpDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-foreground">
             <CalendarPlus className="h-5 w-5 text-primary" />
-            <span>جدولة متابعة جديدة</span>
+            <span>{tDialog("title")}</span>
           </DialogTitle>
           <DialogDescription>
-            حدد نوع الإجراء والموعد المستهدف للمتابعة بدقة
+            {tDialog("desc")}
           </DialogDescription>
         </DialogHeader>
 
@@ -111,7 +116,7 @@ export function CreateFollowUpDialog({
           {!prefilledClientId && (
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground">
-                العميل <span className="text-destructive">*</span>
+                {tDialog("clientLabel")} <span className="text-destructive">*</span>
               </label>
               <select
                 value={clientId}
@@ -119,7 +124,7 @@ export function CreateFollowUpDialog({
                 required
                 className="w-full h-9 rounded-md border border-input bg-card px-3 text-xs focus:ring-1 focus:ring-primary"
               >
-                <option value="">اختر العميل...</option>
+                <option value="">{tDialog("selectClient")}</option>
                 {clients.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name} ({c.business_id})
@@ -131,24 +136,24 @@ export function CreateFollowUpDialog({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">نوع الإجراء</label>
+              <label className="text-xs font-semibold text-foreground">{tDialog("actionTypeLabel")}</label>
               <select
                 value={action}
                 onChange={(e) => setAction(e.target.value)}
                 className="w-full h-9 rounded-md border border-input bg-card px-3 text-xs focus:ring-1 focus:ring-primary"
               >
-                <option value="CALL">اتصال هاتفي</option>
-                <option value="MEETING">اجتماع / مقابلة</option>
-                <option value="WHATSAPP">محادثة واتساب</option>
-                <option value="EMAIL">إرسال إيميل</option>
-                <option value="VISIT">زيارة ميدانية</option>
-                <option value="OTHER">إجراء آخر</option>
+                <option value="CALL">{tActions("CALL")}</option>
+                <option value="MEETING">{tActions("MEETING")}</option>
+                <option value="WHATSAPP">{tActions("WHATSAPP")}</option>
+                <option value="EMAIL">{tActions("EMAIL")}</option>
+                <option value="VISIT">{tActions("VISIT")}</option>
+                <option value="OTHER">{tActions("OTHER")}</option>
               </select>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground">
-                الموعد المحدد <span className="text-destructive">*</span>
+                {tDialog("dueAtLabel")} <span className="text-destructive">*</span>
               </label>
               <Input
                 type="datetime-local"
@@ -162,12 +167,12 @@ export function CreateFollowUpDialog({
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-foreground">
-              ملاحظات / هدف المتابعة
+              {tDialog("notesLabel")}
             </label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="اكتب الهدف من المتابعة أو النقاط الرئيسية المطلوبة..."
+              placeholder={tDialog("notesPlaceholder")}
               rows={3}
               className="text-xs resize-none"
             />
@@ -181,10 +186,10 @@ export function CreateFollowUpDialog({
               onClick={() => setOpen(false)}
               disabled={isPending}
             >
-              إلغاء
+              {tCommon("cancel")}
             </Button>
             <Button type="submit" size="sm" disabled={isPending}>
-              {isPending ? "جارٍ الحفظ..." : "حفظ المتابعة"}
+              {isPending ? tCommon("loading") : tDialog("saveButton")}
             </Button>
           </div>
         </form>

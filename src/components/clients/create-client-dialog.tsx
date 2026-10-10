@@ -24,6 +24,7 @@ interface CreateClientDialogProps {
 }
 
 export function CreateClientDialog({ onSuccess, triggerButton }: CreateClientDialogProps) {
+  const t = useTranslations("clients");
   const tCommon = useTranslations("common");
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -66,7 +67,7 @@ export function CreateClientDialog({ onSuccess, triggerButton }: CreateClientDia
     setFormError(null);
 
     if (!name.trim()) {
-      setFormError("اسم العميل مطلوب");
+      setFormError(t("nameRequired"));
       return;
     }
 
@@ -96,7 +97,7 @@ export function CreateClientDialog({ onSuccess, triggerButton }: CreateClientDia
         return;
       }
 
-      toast.success("عاش 👏 العميل اتسجل بنجاح!");
+      toast.success(t("createSuccess"));
       setOpen(false);
       resetForm();
       onSuccess?.();
@@ -112,7 +113,7 @@ export function CreateClientDialog({ onSuccess, triggerButton }: CreateClientDia
           ) : (
             <Button className="gap-2 bg-primary text-primary-foreground font-medium shadow-sm hover:opacity-95">
               <Plus className="h-4 w-4" />
-              <span>عميل جديد</span>
+              <span>{t("addNew")}</span>
             </Button>
           )
         }
@@ -121,7 +122,7 @@ export function CreateClientDialog({ onSuccess, triggerButton }: CreateClientDia
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold">
             <Building2 className="h-5 w-5 text-primary" />
-            <span>تسجيل عميل جديد</span>
+            <span>{t("createDialogTitle")}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -135,7 +136,7 @@ export function CreateClientDialog({ onSuccess, triggerButton }: CreateClientDia
 
           {/* Client Type Selector */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-foreground">نوع العميل</label>
+            <label className="text-xs font-semibold text-foreground">{t("clientTypeLabel")}</label>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
@@ -147,7 +148,7 @@ export function CreateClientDialog({ onSuccess, triggerButton }: CreateClientDia
                 }`}
               >
                 <Building2 className="h-4 w-4" />
-                <span>شركة (B2B)</span>
+                <span>{t("companyOption")}</span>
               </button>
               <button
                 type="button"
@@ -159,7 +160,7 @@ export function CreateClientDialog({ onSuccess, triggerButton }: CreateClientDia
                 }`}
               >
                 <User className="h-4 w-4" />
-                <span>فرد / عميل مباشر</span>
+                <span>{t("individualOption")}</span>
               </button>
             </div>
           </div>
@@ -168,10 +169,10 @@ export function CreateClientDialog({ onSuccess, triggerButton }: CreateClientDia
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground">
-                اسم العميل / الشركة <span className="text-destructive">*</span>
+                {t("nameCompanyLabel")} <span className="text-destructive">*</span>
               </label>
               <Input
-                placeholder={type === "COMPANY" ? "مثال: مصنع النيل للبلاستيك" : "مثال: م. أحمد عبد الله"}
+                placeholder={type === "COMPANY" ? t("nameCompanyPlaceholder") : t("nameIndividualPlaceholder")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -179,10 +180,10 @@ export function CreateClientDialog({ onSuccess, triggerButton }: CreateClientDia
             </div>
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground">
-                {type === "COMPANY" ? "المجال / الصناعة" : "الوظيفة / التخصص"}
+                {type === "COMPANY" ? t("industryCompanyLabel") : t("industryIndividualLabel")}
               </label>
               <Input
-                placeholder="مثال: تصنيع، تجارة، مقاولات"
+                placeholder={t("industryPlaceholder")}
                 value={industry}
                 onChange={(e) => setIndustry(e.target.value)}
               />
@@ -192,7 +193,7 @@ export function CreateClientDialog({ onSuccess, triggerButton }: CreateClientDia
           {/* Phone & Email */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">رقم التليفون الرئيسي</label>
+              <label className="text-xs font-semibold text-foreground">{t("phoneLabel")}</label>
               <Input
                 placeholder="010XXXXXXXX"
                 dir="ltr"
@@ -201,7 +202,7 @@ export function CreateClientDialog({ onSuccess, triggerButton }: CreateClientDia
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">البريد الإلكتروني</label>
+              <label className="text-xs font-semibold text-foreground">{t("emailLabel")}</label>
               <Input
                 type="email"
                 placeholder="info@company.com"
@@ -215,15 +216,15 @@ export function CreateClientDialog({ onSuccess, triggerButton }: CreateClientDia
           {/* Area & Website */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">المنطقة / المحافظة</label>
+              <label className="text-xs font-semibold text-foreground">{t("areaLabel")}</label>
               <Input
-                placeholder="مثال: التجمع الخامس، القاهرة"
+                placeholder={t("areaPlaceholder")}
                 value={area}
                 onChange={(e) => setArea(e.target.value)}
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">الموقع الإلكتروني</label>
+              <label className="text-xs font-semibold text-foreground">{t("websiteLabel")}</label>
               <Input
                 placeholder="https://company.com"
                 dir="ltr"
@@ -236,23 +237,23 @@ export function CreateClientDialog({ onSuccess, triggerButton }: CreateClientDia
           {/* Primary Contact Section */}
           <div className="p-3 bg-muted/40 rounded-xl border border-border/80 space-y-3">
             <span className="text-xs font-bold text-foreground block">
-              👤 جهة الاتصال الأساسية (اختياري)
+              {t("primaryContactSection")}
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <Input
-                placeholder="الاسم"
+                placeholder={t("contactNamePlaceholder")}
                 value={contactName}
                 onChange={(e) => setContactName(e.target.value)}
                 className="bg-card text-xs"
               />
               <Input
-                placeholder="المسمى الوظيفي"
+                placeholder={t("contactJobTitlePlaceholder")}
                 value={contactJobTitle}
                 onChange={(e) => setContactJobTitle(e.target.value)}
                 className="bg-card text-xs"
               />
               <Input
-                placeholder="رقم التواصل"
+                placeholder={t("contactPhonePlaceholder")}
                 dir="ltr"
                 value={contactPhone}
                 onChange={(e) => setContactPhone(e.target.value)}
@@ -263,9 +264,9 @@ export function CreateClientDialog({ onSuccess, triggerButton }: CreateClientDia
 
           {/* Notes */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-foreground">ملاحظات عامة</label>
+            <label className="text-xs font-semibold text-foreground">{t("generalNotesLabel")}</label>
             <Textarea
-              placeholder="أي تفاصيل أو ملاحظات مهمة عن العميل..."
+              placeholder={t("notesPlaceholder")}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}

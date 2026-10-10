@@ -69,7 +69,7 @@ export default async function ApprovalsPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm bg-[var(--muted)]/40 p-3 rounded-xl">
               <div>
-                <span className="text-xs text-[var(--muted-foreground)] block">العميل / Client</span>
+                <span className="text-xs text-[var(--muted-foreground)] block">{t("client")}</span>
                 <span className="font-medium text-[var(--foreground)]">{appr.client_name}</span>
               </div>
               <div>

@@ -23,6 +23,7 @@ interface AddContactDialogProps {
 }
 
 export function AddContactDialog({ clientId, onSuccess, triggerButton }: AddContactDialogProps) {
+  const t = useTranslations("clients");
   const tCommon = useTranslations("common");
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -50,7 +51,7 @@ export function AddContactDialog({ clientId, onSuccess, triggerButton }: AddCont
     setFormError(null);
 
     if (!name.trim()) {
-      setFormError("اسم الشخص مطلوب");
+      setFormError(t("namePersonRequired"));
       return;
     }
 
@@ -71,7 +72,7 @@ export function AddContactDialog({ clientId, onSuccess, triggerButton }: AddCont
         return;
       }
 
-      toast.success("تم إضافة جهة الاتصال بنجاح! 👏");
+      toast.success(t("addContactSuccess"));
       setOpen(false);
       resetForm();
       onSuccess?.();
@@ -87,7 +88,7 @@ export function AddContactDialog({ clientId, onSuccess, triggerButton }: AddCont
           ) : (
             <Button size="sm" variant="outline" className="gap-1.5 text-xs">
               <Plus className="h-3.5 w-3.5" />
-              <span>إضافة جهة اتصال</span>
+              <span>{t("addContact")}</span>
             </Button>
           )
         }
@@ -96,7 +97,7 @@ export function AddContactDialog({ clientId, onSuccess, triggerButton }: AddCont
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg font-bold">
             <UserPlus className="h-5 w-5 text-primary" />
-            <span>إضافة جهة اتصال جديدة</span>
+            <span>{t("addContactTitle")}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -110,10 +111,10 @@ export function AddContactDialog({ clientId, onSuccess, triggerButton }: AddCont
 
           <div className="space-y-1">
             <label className="text-xs font-semibold text-foreground">
-              الاسم بالكامل <span className="text-destructive">*</span>
+              {t("contactFullName")} <span className="text-destructive">*</span>
             </label>
             <Input
-              placeholder="مثال: أحمد عبد الرحمن"
+              placeholder={t("contactNameExample")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -121,9 +122,9 @@ export function AddContactDialog({ clientId, onSuccess, triggerButton }: AddCont
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-foreground">المسمى الوظيفي</label>
+            <label className="text-xs font-semibold text-foreground">{t("jobTitle")}</label>
             <Input
-              placeholder="مثال: مدير المشتريات / الشريك المؤسس"
+              placeholder={t("jobTitleExample")}
               value={jobTitle}
               onChange={(e) => setJobTitle(e.target.value)}
             />
@@ -131,7 +132,7 @@ export function AddContactDialog({ clientId, onSuccess, triggerButton }: AddCont
 
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-foreground">رقم الهاتف</label>
+              <label className="text-xs font-semibold text-foreground">{t("phoneLabel")}</label>
               <Input
                 placeholder="010XXXXXXXX"
                 dir="ltr"
@@ -140,7 +141,7 @@ export function AddContactDialog({ clientId, onSuccess, triggerButton }: AddCont
               />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-foreground">واتساب (إن وجد)</label>
+              <label className="text-xs font-semibold text-foreground">{t("whatsappOptional")}</label>
               <Input
                 placeholder="010XXXXXXXX"
                 dir="ltr"
@@ -151,7 +152,7 @@ export function AddContactDialog({ clientId, onSuccess, triggerButton }: AddCont
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-foreground">البريد الإلكتروني</label>
+            <label className="text-xs font-semibold text-foreground">{t("emailLabel")}</label>
             <Input
               type="email"
               placeholder="name@company.com"
@@ -170,7 +171,7 @@ export function AddContactDialog({ clientId, onSuccess, triggerButton }: AddCont
               className="rounded border-border text-primary focus:ring-primary h-4 w-4"
             />
             <label htmlFor="isPrimary" className="text-xs font-medium text-foreground cursor-pointer">
-              تعيين كجهة اتصال أساسية للعميل
+              {t("setAsPrimary")}
             </label>
           </div>
 

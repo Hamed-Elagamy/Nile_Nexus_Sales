@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import {
   Calendar,
@@ -28,17 +29,18 @@ interface FollowUpCardProps {
 }
 
 export function FollowUpCard({ followUp, onRefresh, isOverdue = false }: FollowUpCardProps) {
+  const tCard = useTranslations("followUps.card");
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
   const [rescheduleDialogOpen, setRescheduleDialogOpen] = useState(false);
 
   const dueDate = new Date(followUp.due_at);
 
-  const formattedDate = dueDate.toLocaleDateString("ar-EG", {
+  const formattedDate = dueDate.toLocaleDateString(undefined, {
     weekday: "short",
     month: "short",
     day: "numeric",
   });
-  const formattedTime = dueDate.toLocaleTimeString("ar-EG", {
+  const formattedTime = dueDate.toLocaleTimeString(undefined, {
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -70,7 +72,7 @@ export function FollowUpCard({ followUp, onRefresh, isOverdue = false }: FollowU
                   className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20 text-xs font-semibold gap-1"
                 >
                   <AlertCircle className="h-3 w-3" />
-                  <span>متأخرة!</span>
+                  <span>{tCard("overdueBadge")}</span>
                 </Badge>
               )}
 
@@ -80,7 +82,7 @@ export function FollowUpCard({ followUp, onRefresh, isOverdue = false }: FollowU
                   className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-xs font-semibold gap-1"
                 >
                   <CheckCircle2 className="h-3 w-3" />
-                  <span>تم الإنجاز</span>
+                  <span>{tCard("completedBadge")}</span>
                 </Badge>
               )}
 
@@ -108,7 +110,7 @@ export function FollowUpCard({ followUp, onRefresh, isOverdue = false }: FollowU
                   className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
                 >
                   <Briefcase className="h-3 w-3" />
-                  <span>الصفقة: {followUp.deal.title}</span>
+                  <span>{tCard("dealPrefix", { title: followUp.deal.title })}</span>
                 </Link>
               )}
             </div>
@@ -123,7 +125,7 @@ export function FollowUpCard({ followUp, onRefresh, isOverdue = false }: FollowU
             {/* Completion Result if Completed */}
             {followUp.status === "COMPLETED" && followUp.completion_result && (
               <div className="mt-2 p-2.5 rounded-lg bg-emerald-500/5 border border-emerald-500/20 text-xs text-emerald-800 dark:text-emerald-300">
-                <span className="font-semibold block mb-0.5">نتيجة المتابعة:</span>
+                <span className="font-semibold block mb-0.5">{tCard("followUpResult")}</span>
                 <p className="leading-relaxed">{followUp.completion_result}</p>
               </div>
             )}
@@ -137,7 +139,7 @@ export function FollowUpCard({ followUp, onRefresh, isOverdue = false }: FollowU
                 <a
                   href={`tel:${followUp.client.phone}`}
                   className="p-1.5 rounded-md border border-border bg-card text-muted-foreground hover:text-blue-600 hover:border-blue-500/30 transition-colors"
-                  title="اتصال هاتفي"
+                  title={tCard("callAction")}
                 >
                   <Phone className="h-3.5 w-3.5" />
                 </a>
@@ -149,7 +151,7 @@ export function FollowUpCard({ followUp, onRefresh, isOverdue = false }: FollowU
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-1.5 rounded-md border border-border bg-card text-muted-foreground hover:text-emerald-600 hover:border-emerald-500/30 transition-colors"
-                  title="مراسلة واتساب"
+                  title={tCard("whatsappAction")}
                 >
                   <MessageSquare className="h-3.5 w-3.5" />
                 </a>
@@ -166,7 +168,7 @@ export function FollowUpCard({ followUp, onRefresh, isOverdue = false }: FollowU
                   className="text-xs h-7 gap-1"
                 >
                   <CalendarClock className="h-3 w-3" />
-                  <span>تأجيل</span>
+                  <span>{tCard("reschedule")}</span>
                 </Button>
 
                 <Button
@@ -175,7 +177,7 @@ export function FollowUpCard({ followUp, onRefresh, isOverdue = false }: FollowU
                   className="text-xs h-7 gap-1 bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
                   <CheckCircle2 className="h-3 w-3" />
-                  <span>إتمام</span>
+                  <span>{tCard("complete")}</span>
                 </Button>
               </div>
             )}
@@ -187,7 +189,7 @@ export function FollowUpCard({ followUp, onRefresh, isOverdue = false }: FollowU
           <div className="mt-3 pt-2 border-t border-border/40 flex items-center justify-between text-[11px] text-muted-foreground">
             <span className="flex items-center gap-1">
               <User className="h-3 w-3" />
-              المسؤول: {followUp.responsible.full_name || followUp.responsible.email}
+              {tCard("responsiblePrefix", { name: followUp.responsible.full_name || followUp.responsible.email })}
             </span>
           </div>
         )}

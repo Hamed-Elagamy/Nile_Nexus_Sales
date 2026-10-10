@@ -2,6 +2,7 @@
 
 import React, { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Plus, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,8 @@ interface ServicesCatalogProps {
 }
 
 export function ServicesCatalog({ services }: ServicesCatalogProps) {
+  const t = useTranslations("settings");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [openDialog, setOpenDialog] = useState(false);
@@ -38,7 +41,7 @@ export function ServicesCatalog({ services }: ServicesCatalogProps) {
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!nameAr || !nameEn) {
-      toast.error("يرجى ملء الاسم بالعربية والإنجليزية");
+      toast.error(t("fillBothNames"));
       return;
     }
 
@@ -52,14 +55,14 @@ export function ServicesCatalog({ services }: ServicesCatalogProps) {
       });
 
       if (res.success) {
-        toast.success("تمت إضافة الخدمة إلى الكتالوج بنجاح! 🏷️");
+        toast.success(t("serviceAdded"));
         setOpenDialog(false);
         setNameAr("");
         setNameEn("");
         setPrice("");
         router.refresh();
       } else {
-        toast.error(res.error || "فشل إضافة الخدمة");
+        toast.error(res.error || t("serviceAddFailed"));
       }
     });
   };
@@ -71,10 +74,10 @@ export function ServicesCatalog({ services }: ServicesCatalogProps) {
       });
 
       if (res.success) {
-        toast.success(`تم ${service.is_active ? "تعطيل" : "تفعيل"} الخدمة بنجاح`);
+        toast.success(t("serviceStatusUpdated"));
         router.refresh();
       } else {
-        toast.error(res.error || "فشل تعديل الحالة");
+        toast.error(res.error || t("serviceStatusFailed"));
       }
     });
   };
@@ -83,9 +86,9 @@ export function ServicesCatalog({ services }: ServicesCatalogProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-base font-bold text-foreground">كتالوج الخدمات (Services)</h2>
+          <h2 className="text-base font-bold text-foreground">{t("servicesCatalogTitle")}</h2>
           <p className="text-xs text-muted-foreground">
-            الخدمات المعتمدة المعروضة في الصفقات وعروض الأسعار
+            {t("servicesCatalogDesc")}
           </p>
         </div>
 
@@ -94,7 +97,7 @@ export function ServicesCatalog({ services }: ServicesCatalogProps) {
             render={
               <Button size="sm" className="gap-1.5">
                 <Plus className="h-4 w-4" />
-                <span>إضافة خدمة</span>
+                <span>{t("addService")}</span>
               </Button>
             }
           />
@@ -102,28 +105,28 @@ export function ServicesCatalog({ services }: ServicesCatalogProps) {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Tag className="h-5 w-5 text-primary" />
-                <span>إضافة خدمة جديدة إلى الكتالوج</span>
+                <span>{t("addServiceTitle")}</span>
               </DialogTitle>
             </DialogHeader>
 
             <form onSubmit={handleCreate} className="space-y-4 pt-2">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold">اسم الخدمة (عربي) *</label>
+                <label className="text-xs font-semibold">{t("serviceNameAr")}</label>
                 <Input
                   value={nameAr}
                   onChange={(e) => setNameAr(e.target.value)}
-                  placeholder="مثال: تطوير متجر إلكتروني"
+                  placeholder={t("serviceNameArPlaceholder")}
                   required
                   className="h-9 text-xs"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold">اسم الخدمة (إنجليزي) *</label>
+                <label className="text-xs font-semibold">{t("serviceNameEn")}</label>
                 <Input
                   value={nameEn}
                   onChange={(e) => setNameEn(e.target.value)}
-                  placeholder="e.g. E-Commerce Development"
+                  placeholder={t("serviceNameEnPlaceholder")}
                   required
                   className="h-9 text-xs font-mono"
                 />
@@ -131,18 +134,18 @@ export function ServicesCatalog({ services }: ServicesCatalogProps) {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold">السعر المرجعي</label>
+                  <label className="text-xs font-semibold">{t("referencePrice")}</label>
                   <Input
                     type="number"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    placeholder="25000"
+                    placeholder={t("referencePricePlaceholder")}
                     className="h-9 text-xs font-mono"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold">العملة</label>
+                  <label className="text-xs font-semibold">{t("currency")}</label>
                   <select
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
@@ -162,10 +165,10 @@ export function ServicesCatalog({ services }: ServicesCatalogProps) {
                   size="sm"
                   onClick={() => setOpenDialog(false)}
                 >
-                  إلغاء
+                  {tCommon("cancel")}
                 </Button>
                 <Button type="submit" size="sm" disabled={isPending}>
-                  {isPending ? "جارٍ الحفظ..." : "حفظ الخدمة"}
+                  {isPending ? t("saving") : tCommon("save")}
                 </Button>
               </div>
             </form>
@@ -175,13 +178,13 @@ export function ServicesCatalog({ services }: ServicesCatalogProps) {
 
       {/* Services Table */}
       <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <table className="w-full text-right text-xs">
+        <table className="w-full text-start text-xs">
           <thead className="bg-muted/50 border-b border-border text-muted-foreground font-semibold">
             <tr>
-              <th className="p-3">اسم الخدمة</th>
-              <th className="p-3">الاسم بالإنجليزية</th>
-              <th className="p-3 text-left">السعر المرجعي</th>
-              <th className="p-3 text-center">الحالة</th>
+              <th className="p-3 text-start">{t("serviceColName")}</th>
+              <th className="p-3 text-start">{t("serviceColNameEn")}</th>
+              <th className="p-3 text-start">{t("serviceColPrice")}</th>
+              <th className="p-3 text-center">{t("serviceColStatus")}</th>
               <th className="p-3 text-center w-20"></th>
             </tr>
           </thead>
@@ -190,7 +193,7 @@ export function ServicesCatalog({ services }: ServicesCatalogProps) {
               <tr key={s.id} className="hover:bg-muted/30">
                 <td className="p-3 font-semibold text-foreground">{s.name_ar}</td>
                 <td className="p-3 text-muted-foreground font-mono">{s.name_en}</td>
-                <td className="p-3 text-left font-mono font-semibold text-foreground">
+                <td className="p-3 text-start font-mono font-semibold text-foreground">
                   {s.internal_reference_price
                     ? `${Number(s.internal_reference_price).toLocaleString()} ${s.currency}`
                     : "—"}
@@ -198,11 +201,11 @@ export function ServicesCatalog({ services }: ServicesCatalogProps) {
                 <td className="p-3 text-center">
                   {s.is_active ? (
                     <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs">
-                      نشطة
+                      {t("active")}
                     </Badge>
                   ) : (
                     <Badge variant="outline" className="bg-rose-500/10 text-rose-600 border-rose-500/20 text-xs">
-                      معطلة
+                      {t("inactive")}
                     </Badge>
                   )}
                 </td>
@@ -214,7 +217,7 @@ export function ServicesCatalog({ services }: ServicesCatalogProps) {
                     disabled={isPending}
                     className="h-7 text-xs"
                   >
-                    {s.is_active ? "تعطيل" : "تفعيل"}
+                    {s.is_active ? t("deactivate") : t("activate")}
                   </Button>
                 </td>
               </tr>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { CalendarClock } from "lucide-react";
 import {
@@ -27,6 +28,9 @@ export function RescheduleFollowUpDialog({
   onOpenChange,
   onSuccess,
 }: RescheduleFollowUpDialogProps) {
+  const tDialog = useTranslations("followUps.rescheduleDialog");
+  const tComplete = useTranslations("followUps.completeDialog");
+  const tCommon = useTranslations("common");
   const [isPending, startTransition] = useTransition();
   const [newDueAt, setNewDueAt] = useState("");
   const [reason, setReason] = useState("");
@@ -36,7 +40,7 @@ export function RescheduleFollowUpDialog({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newDueAt) {
-      toast.error("يرجى تحديد الموعد الجديد");
+      toast.error(tDialog("newDateRequired"));
       return;
     }
 
@@ -48,13 +52,13 @@ export function RescheduleFollowUpDialog({
       });
 
       if (res.success) {
-        toast.success("تم تأجيل موعد المتابعة بنجاح! ⏱️");
+        toast.success(tDialog("successToast"));
         onOpenChange(false);
         setNewDueAt("");
         setReason("");
         onSuccess?.();
       } else {
-        toast.error(res.error || "فشل تأجيل المتابعة");
+        toast.error(res.error || tDialog("failedToast"));
       }
     });
   };
@@ -65,17 +69,17 @@ export function RescheduleFollowUpDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-foreground">
             <CalendarClock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-            <span>تأجيل موعد المتابعة</span>
+            <span>{tDialog("title")}</span>
           </DialogTitle>
           <DialogDescription>
-            {followUp.client ? `العميل: ${followUp.client.name}` : ""}
+            {followUp.client ? tComplete("clientPrefix", { name: followUp.client.name }) : ""}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-foreground">
-              الموعد الجديد <span className="text-destructive">*</span>
+              {tDialog("newDateLabel")} <span className="text-destructive">*</span>
             </label>
             <Input
               type="datetime-local"
@@ -87,11 +91,11 @@ export function RescheduleFollowUpDialog({
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-foreground">سبب التأجيل (اختياري)</label>
+            <label className="text-xs font-semibold text-foreground">{tDialog("reasonLabel")}</label>
             <Input
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="مثال: العميل طلب التواصل بعد الساعة 5"
+              placeholder={tDialog("reasonPlaceholder")}
               className="text-xs h-9"
             />
           </div>
@@ -104,10 +108,10 @@ export function RescheduleFollowUpDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              إلغاء
+              {tCommon("cancel")}
             </Button>
             <Button type="submit" size="sm" disabled={isPending}>
-              {isPending ? "جارٍ الحفظ..." : "حفظ الموعد"}
+              {isPending ? tCommon("loading") : tDialog("saveButton")}
             </Button>
           </div>
         </form>

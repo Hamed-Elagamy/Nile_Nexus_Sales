@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -32,6 +33,8 @@ interface CreateProposalWizardProps {
 }
 
 export function CreateProposalWizard({ clients, deals }: CreateProposalWizardProps) {
+  const t = useTranslations("proposals");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
@@ -51,10 +54,9 @@ export function CreateProposalWizard({ clients, deals }: CreateProposalWizardPro
     discountPercentage: 0,
     discountAmount: 0,
     taxPercentage: 14,
-    deliveryDuration: "30 يوم عمل من تاريخ التوقيع وسداد الدفعة الأولى",
-    paymentTerms: "50% دفعة أولى مقدمة، 50% عند التسليم النهائي والاعتماد",
-    termsAndConditions:
-      "1. الأسعار سارية خلال مدة صلاحية العرض فقط.\n2. أي تعديلات جوهرية خارج نطاق العمل المتفق عليه تخضع لعرض أسعار إضافي.\n3. التسليم يخضع لتجاوب العميل في توفير المحتوى والموافقات.",
+    deliveryDuration: t("defaultDelivery"),
+    paymentTerms: t("defaultPaymentTerms"),
+    termsAndConditions: t("defaultTermsConditions"),
     validUntil: "",
     notes: "",
   });
@@ -68,18 +70,18 @@ export function CreateProposalWizard({ clients, deals }: CreateProposalWizardPro
     e.preventDefault();
 
     if (!clientId) {
-      toast.error("يرجى اختيار العميل");
+      toast.error(t("clientRequired"));
       return;
     }
 
     if (!dealId) {
-      toast.error("يرجى اختيار الصفقة المرتبطة بهذا العرض");
+      toast.error(t("dealRequired"));
       return;
     }
 
     const validItems = builderState.items.filter((it) => it.description_ar.trim().length > 0);
     if (validItems.length === 0) {
-      toast.error("يجب إدخال بند واحد على الأقل مع وصفه وسعره");
+      toast.error(t("itemsRequired"));
       return;
     }
 
@@ -104,10 +106,10 @@ export function CreateProposalWizard({ clients, deals }: CreateProposalWizardPro
       });
 
       if (res.success && res.data) {
-        toast.success("تم إنشاء عرض السعر بنجاح! 🚀");
+        toast.success(t("createSuccess"));
         router.push(`/proposals/${res.data.id}`);
       } else {
-        toast.error(res.error || "فشل إنشاء عرض السعر");
+        toast.error(res.error || t("createFailed"));
       }
     });
   };
@@ -122,14 +124,14 @@ export function CreateProposalWizard({ clients, deals }: CreateProposalWizardPro
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-1"
           >
             <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
-            <span>إلغاء والعودة</span>
+            <span>{tCommon("cancel")}</span>
           </Link>
           <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
             <FileText className="h-6 w-6 text-primary" />
-            <span>إنشاء عرض أسعار جديد</span>
+            <span>{t("newProposalTitle")}</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            إعداد عرض مالي وفني مفصل للعميل بالبنود والشروط التعاقدية 📄
+            {t("newProposalSubtitle")}
           </p>
         </div>
 
@@ -139,7 +141,7 @@ export function CreateProposalWizard({ clients, deals }: CreateProposalWizardPro
             disabled={isPending}
             className="gap-2 bg-primary text-primary-foreground font-semibold shadow-sm"
           >
-            {isPending ? "جارٍ الحفظ..." : "حفظ وإنشاء العرض"}
+            {isPending ? tCommon("loading") : t("saveProposal")}
           </Button>
         </div>
       </div>
@@ -147,14 +149,14 @@ export function CreateProposalWizard({ clients, deals }: CreateProposalWizardPro
       {/* Client and Deal Selection */}
       <Card className="p-4 bg-card border-border space-y-4">
         <h3 className="text-xs font-semibold text-foreground">
-          بيانات العميل والصفقة
+          {t("clientAndDealData")}
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
               <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
-              <span>العميل <span className="text-destructive">*</span></span>
+              <span>{t("clientLabel")} <span className="text-destructive">*</span></span>
             </label>
             <select
               value={clientId}
@@ -165,7 +167,7 @@ export function CreateProposalWizard({ clients, deals }: CreateProposalWizardPro
               required
               className="w-full h-9 rounded-md border border-input bg-card px-3 text-xs focus:ring-1 focus:ring-primary"
             >
-              <option value="">اختر العميل...</option>
+              <option value="">{t("selectClient")}</option>
               {clients.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name} ({c.business_id})
@@ -177,7 +179,7 @@ export function CreateProposalWizard({ clients, deals }: CreateProposalWizardPro
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
               <Briefcase className="h-3.5 w-3.5 text-muted-foreground" />
-              <span>الصفقة المرتبطة <span className="text-destructive">*</span></span>
+              <span>{t("linkedDealLabel")} <span className="text-destructive">*</span></span>
             </label>
             <select
               value={dealId}
@@ -187,7 +189,7 @@ export function CreateProposalWizard({ clients, deals }: CreateProposalWizardPro
               className="w-full h-9 rounded-md border border-input bg-card px-3 text-xs focus:ring-1 focus:ring-primary disabled:opacity-50"
             >
               <option value="">
-                {clientId ? "اختر الصفقة المرتبطة..." : "اختر العميل أولاً"}
+                {clientId ? t("selectDeal") : t("selectClientFirst")}
               </option>
               {availableDeals.map((d) => (
                 <option key={d.id} value={d.id}>

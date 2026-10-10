@@ -29,6 +29,7 @@ export function LostDealDialog({
   onOpenChange,
   onSuccess,
 }: LostDealDialogProps) {
+  const tDeals = useTranslations("deals.lostDialog");
   const tCommon = useTranslations("common");
   const [isPending, startTransition] = useTransition();
 
@@ -55,7 +56,7 @@ export function LostDealDialog({
         return;
       }
 
-      toast.info("تم تسجيل سبب خسارة الصفقة وتحديث الحالة");
+      toast.info(tDeals("successToast"));
       onOpenChange(false);
       setNotes("");
       setResurfaceDate("");
@@ -69,7 +70,7 @@ export function LostDealDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg font-bold text-rose-600 dark:text-rose-400">
             <XCircle className="h-5 w-5" />
-            <span>تسجيل خسارة الصفقة</span>
+            <span>{tDeals("title")}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -83,10 +84,10 @@ export function LostDealDialog({
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-foreground">
-              سبب الخسارة وتفاصيل ما تم
+              {tDeals("notesLabel")}
             </label>
             <Textarea
-              placeholder="اكتب ليه العميل ما كملش (السعر، منافس، الميزانية اتلغت...)"
+              placeholder={tDeals("notesPlaceholder")}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
@@ -96,7 +97,7 @@ export function LostDealDialog({
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-foreground">
-              تاريخ إعادة التواصل (Resurface Date)
+              {tDeals("resurfaceDateLabel")}
             </label>
             <Input
               type="date"
@@ -105,7 +106,7 @@ export function LostDealDialog({
               className="text-xs"
             />
             <p className="text-[11px] text-muted-foreground">
-              لو في فرصة نرجع نكلمه بعد فترة (مثلاً الربع القادم)، حدد التاريخ عشان السيستم يفكرك.
+              {tDeals("resurfaceDateHint")}
             </p>
           </div>
 
@@ -124,7 +125,7 @@ export function LostDealDialog({
               className="gap-2 bg-rose-600 hover:bg-rose-700 text-white"
             >
               {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              <span>تأكيد تسجيل الخسارة</span>
+              <span>{tDeals("confirmButton")}</span>
             </Button>
           </DialogFooter>
         </form>

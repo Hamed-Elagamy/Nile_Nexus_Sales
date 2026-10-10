@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { ProposalsFilter } from "./proposals-filter";
 import { ProposalsTable } from "./proposals-table";
@@ -15,6 +16,7 @@ interface ProposalsClientProps {
 }
 
 export function ProposalsClient({ initialData }: ProposalsClientProps) {
+  const t = useTranslations("proposals");
   const [isPending, startTransition] = useTransition();
 
   const [data, setData] = useState<PaginatedProposalsResult>(
@@ -43,11 +45,11 @@ export function ProposalsClient({ initialData }: ProposalsClientProps) {
         if (res.success && res.data) {
           setData(res.data);
         } else {
-          toast.error(res.error || "فشل تحميل عروض الأسعار");
+          toast.error(res.error || t("loadFailed"));
         }
       });
     },
-    [query, selectedStatus]
+    [query, selectedStatus, t]
   );
 
   const handleSearch = (newQuery: string) => {
@@ -72,7 +74,7 @@ export function ProposalsClient({ initialData }: ProposalsClientProps) {
       {/* Loading state indicator */}
       {isPending && (
         <div className="text-center py-2 text-xs text-muted-foreground animate-pulse">
-          جارٍ تحديث البيانات...
+          {t("updatingData")}
         </div>
       )}
 
@@ -83,7 +85,7 @@ export function ProposalsClient({ initialData }: ProposalsClientProps) {
       {data.totalPages > 1 && (
         <div className="flex items-center justify-between pt-4 border-t border-border">
           <p className="text-xs text-muted-foreground">
-            صفحة {data.page} من {data.totalPages} (إجمالي {data.total} عرض سعر)
+            {t("pagination.pageOf", { page: data.page, totalPages: data.totalPages, total: data.total })}
           </p>
 
           <div className="flex items-center gap-2">
@@ -92,14 +94,14 @@ export function ProposalsClient({ initialData }: ProposalsClientProps) {
               disabled={data.page <= 1 || isPending}
               className="px-3 py-1 rounded border border-border text-xs disabled:opacity-50 hover:bg-muted"
             >
-              السابق
+              {t("pagination.previous")}
             </button>
             <button
               onClick={() => loadData(query, selectedStatus, data.page + 1)}
               disabled={data.page >= data.totalPages || isPending}
               className="px-3 py-1 rounded border border-border text-xs disabled:opacity-50 hover:bg-muted"
             >
-              التالي
+              {t("pagination.next")}
             </button>
           </div>
         </div>

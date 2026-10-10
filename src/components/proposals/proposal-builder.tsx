@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Plus, Trash2, Calculator, Coins } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,8 @@ interface ProposalBuilderProps {
 }
 
 export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps) {
+  const t = useTranslations("proposals");
+
   const [items, setItems] = useState<ProposalItemInput[]>(
     initialState?.items && initialState.items.length > 0
       ? initialState.items
@@ -51,14 +54,13 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
     initialState?.taxPercentage ?? 14
   );
   const [deliveryDuration, setDeliveryDuration] = useState(
-    initialState?.deliveryDuration || "30 يوم عمل من تاريخ التوقيع وسداد الدفعة الأولى"
+    initialState?.deliveryDuration || t("defaultDelivery")
   );
   const [paymentTerms, setPaymentTerms] = useState(
-    initialState?.paymentTerms || "50% دفعة أولى مقدمة، 50% عند التسليم النهائي والاعتماد"
+    initialState?.paymentTerms || t("defaultPaymentTerms")
   );
   const [termsAndConditions, setTermsAndConditions] = useState(
-    initialState?.termsAndConditions ||
-      "1. الأسعار سارية خلال مدة صلاحية العرض فقط.\n2. أي تعديلات جوهرية خارج نطاق العمل المتفق عليه تخضع لعرض أسعار إضافي.\n3. التسليم يخضع لتجاوب العميل في توفير المحتوى والموافقات."
+    initialState?.termsAndConditions || t("defaultTermsConditions")
   );
   const [validUntil, setValidUntil] = useState(initialState?.validUntil || "");
   const [notes, setNotes] = useState(initialState?.notes || "");
@@ -137,7 +139,7 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Calculator className="h-4 w-4 text-primary" />
-            <span>بنود عرض السعر (Line Items)</span>
+            <span>{t("lineItemsTitle")}</span>
           </h3>
           <Button
             type="button"
@@ -147,20 +149,20 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
             className="text-xs h-8 gap-1.5"
           >
             <Plus className="h-3.5 w-3.5" />
-            <span>إضافة بند جديد</span>
+            <span>{t("addItem")}</span>
           </Button>
         </div>
 
         <div className="border border-border rounded-lg overflow-hidden bg-card">
           <div className="overflow-x-auto">
-            <table className="w-full text-right text-xs">
+            <table className="w-full text-right rtl:text-right ltr:text-left text-xs">
               <thead className="bg-muted/50 border-b border-border text-muted-foreground">
                 <tr>
-                  <th className="p-3 w-10 text-center">#</th>
-                  <th className="p-3 min-w-[240px]">وصف البند / الخدمة</th>
-                  <th className="p-3 w-24 text-center">الكمية</th>
-                  <th className="p-3 w-32 text-center">سعر الوحدة</th>
-                  <th className="p-3 w-32 text-left">الإجمالي</th>
+                  <th className="p-3 w-10 text-center">{t("tableNumber")}</th>
+                  <th className="p-3 min-w-[240px]">{t("tableDescription")}</th>
+                  <th className="p-3 w-24 text-center">{t("tableQuantity")}</th>
+                  <th className="p-3 w-32 text-center">{t("tableUnitPrice")}</th>
+                  <th className="p-3 w-32 text-left rtl:text-left ltr:text-right">{t("tableTotal")}</th>
                   <th className="p-3 w-12 text-center"></th>
                 </tr>
               </thead>
@@ -180,7 +182,7 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
                           onChange={(e) =>
                             handleItemChange(idx, "description_ar", e.target.value)
                           }
-                          placeholder="اكتب وصف الخدمة أو البند بالتفصيل..."
+                          placeholder={t("itemDescriptionPlaceholder")}
                           required
                           className="h-8 text-xs"
                         />
@@ -219,7 +221,7 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
                           className="h-8 text-xs text-center font-mono"
                         />
                       </td>
-                      <td className="p-3 text-left font-semibold font-mono text-foreground">
+                      <td className="p-3 text-left rtl:text-left ltr:text-right font-semibold font-mono text-foreground">
                         {lineTotal.toLocaleString()} {currency}
                       </td>
                       <td className="p-2 text-center">
@@ -228,7 +230,7 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
                           onClick={() => handleRemoveItem(idx)}
                           disabled={items.length <= 1}
                           className="p-1 text-muted-foreground hover:text-rose-600 disabled:opacity-30 transition-colors"
-                          title="حذف البند"
+                          title={t("deleteItem")}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -248,12 +250,12 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
         <Card className="p-4 space-y-3 bg-card border-border">
           <h4 className="text-xs font-semibold text-foreground flex items-center gap-1.5">
             <Coins className="h-4 w-4 text-primary" />
-            <span>الخصم والضرائب والعملة</span>
+            <span>{t("financialSummary")}</span>
           </h4>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className="text-[11px] text-muted-foreground">العملة</label>
+              <label className="text-[11px] text-muted-foreground">{t("currencyLabel")}</label>
               <select
                 value={currency}
                 onChange={(e) => {
@@ -262,16 +264,16 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
                 }}
                 className="w-full h-8 rounded-md border border-input bg-card px-2.5 text-xs"
               >
-                <option value="EGP">جنيه مصري (EGP)</option>
-                <option value="USD">دولار أمريكي (USD)</option>
-                <option value="SAR">ريال سعودي (SAR)</option>
-                <option value="AED">درهم إماراتي (AED)</option>
+                <option value="EGP">{t("currencies.EGP")}</option>
+                <option value="USD">{t("currencies.USD")}</option>
+                <option value="SAR">{t("currencies.SAR")}</option>
+                <option value="AED">{t("currencies.AED")}</option>
               </select>
             </div>
 
             <div className="space-y-1">
               <label className="text-[11px] text-muted-foreground">
-                ضريبة القيمة المضافة (VAT %)
+                {t("vatLabel")}
               </label>
               <Input
                 type="number"
@@ -288,7 +290,7 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] text-muted-foreground">نسبة الخصم (%)</label>
+              <label className="text-[11px] text-muted-foreground">{t("discountPercentageLabel")}</label>
               <Input
                 type="number"
                 min="0"
@@ -305,7 +307,7 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
             </div>
 
             <div className="space-y-1">
-              <label className="text-[11px] text-muted-foreground">صلاحية العرض حتى</label>
+              <label className="text-[11px] text-muted-foreground">{t("validUntilLabel")}</label>
               <Input
                 type="date"
                 value={validUntil}
@@ -322,12 +324,12 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
         {/* Totals Summary */}
         <Card className="p-4 bg-muted/40 border-border space-y-2.5">
           <h4 className="text-xs font-semibold text-foreground">
-            ملخص الحسابات المالية
+            {t("financialSummaryTitle")}
           </h4>
 
           <div className="space-y-1.5 text-xs text-muted-foreground pt-1">
             <div className="flex items-center justify-between">
-              <span>المجموع الفرعي (Subtotal):</span>
+              <span>{t("subtotal")}:</span>
               <span className="font-mono font-medium text-foreground">
                 {subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })} {currency}
               </span>
@@ -335,7 +337,7 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
 
             {discountVal > 0 && (
               <div className="flex items-center justify-between text-emerald-600 dark:text-emerald-400">
-                <span>قيمة الخصم:</span>
+                <span>{t("discountTotal")}:</span>
                 <span className="font-mono font-medium">
                   - {discountVal.toLocaleString(undefined, { minimumFractionDigits: 2 })} {currency}
                 </span>
@@ -344,7 +346,7 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
 
             {taxVal > 0 && (
               <div className="flex items-center justify-between">
-                <span>ضريبة القيمة المضافة ({taxPercentage}%):</span>
+                <span>{t("vatTax", { percentage: taxPercentage })}</span>
                 <span className="font-mono font-medium text-foreground">
                   + {taxVal.toLocaleString(undefined, { minimumFractionDigits: 2 })} {currency}
                 </span>
@@ -352,7 +354,7 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
             )}
 
             <div className="pt-2 border-t border-border flex items-center justify-between text-sm font-bold text-foreground">
-              <span>الإجمالي النهائي (Grand Total):</span>
+              <span>{t("grandTotal")}:</span>
               <span className="font-mono text-base text-primary">
                 {grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })} {currency}
               </span>
@@ -365,7 +367,7 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <label className="text-xs font-semibold text-foreground">
-            مدة التوريد / التنفيذ
+            {t("deliveryDurationLabel")}
           </label>
           <Input
             value={deliveryDuration}
@@ -373,27 +375,27 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
               setDeliveryDuration(e.target.value);
               notifyChange({ deliveryDuration: e.target.value });
             }}
-            placeholder="مثال: 30 يوم عمل"
+            placeholder={t("deliveryPlaceholder")}
             className="h-9 text-xs"
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-foreground">شروط الدفع</label>
+          <label className="text-xs font-semibold text-foreground">{t("paymentTermsLabel")}</label>
           <Input
             value={paymentTerms}
             onChange={(e) => {
               setPaymentTerms(e.target.value);
               notifyChange({ paymentTerms: e.target.value });
             }}
-            placeholder="مثال: 50% مقدم، 50% عند التسليم"
+            placeholder={t("paymentPlaceholder")}
             className="h-9 text-xs"
           />
         </div>
 
         <div className="sm:col-span-2 space-y-1.5">
           <label className="text-xs font-semibold text-foreground">
-            الشروط والأحكام العامة للعرض
+            {t("termsConditionsLabel")}
           </label>
           <Textarea
             value={termsAndConditions}
@@ -408,7 +410,7 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
 
         <div className="sm:col-span-2 space-y-1.5">
           <label className="text-xs font-semibold text-foreground">
-            ملاحظات داخلية إضافية
+            {t("notesLabel")}
           </label>
           <Input
             value={notes}
@@ -416,7 +418,7 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
               setNotes(e.target.value);
               notifyChange({ notes: e.target.value });
             }}
-            placeholder="ملاحظات لفريق المبيعات (اختياري)..."
+            placeholder={t("internalNotesPlaceholder")}
             className="h-9 text-xs"
           />
         </div>

@@ -2,6 +2,7 @@
 
 import React, { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Plus, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,8 @@ interface LeadSourcesManagerProps {
 
 export function LeadSourcesManager({ leadSources }: LeadSourcesManagerProps) {
   const router = useRouter();
+  const t = useTranslations("settings");
+  const tCommon = useTranslations("common");
   const [isPending, startTransition] = useTransition();
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -32,7 +35,7 @@ export function LeadSourcesManager({ leadSources }: LeadSourcesManagerProps) {
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!nameAr || !nameEn) {
-      toast.error("يرجى ملء الاسم بالعربية والإنجليزية");
+      toast.error(t("fillBothNames"));
       return;
     }
 
@@ -43,13 +46,13 @@ export function LeadSourcesManager({ leadSources }: LeadSourcesManagerProps) {
       });
 
       if (res.success) {
-        toast.success("تمت إضافة مصدر العملاء بنجاح! 🧭");
+        toast.success(t("leadSourceAdded"));
         setOpenDialog(false);
         setNameAr("");
         setNameEn("");
         router.refresh();
       } else {
-        toast.error(res.error || "فشل إضافة المصدر");
+        toast.error(res.error || t("leadSourceFailed"));
       }
     });
   };
@@ -58,9 +61,9 @@ export function LeadSourcesManager({ leadSources }: LeadSourcesManagerProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-base font-bold text-foreground">مصادر العملاء (Lead Sources)</h2>
+          <h2 className="text-base font-bold text-foreground">{t("leadSourcesTitle")}</h2>
           <p className="text-xs text-muted-foreground">
-            القنوات التسويقية والتوصيات التي تأتي من خلالها الصفقات والعملاء
+            {t("leadSourcesDesc")}
           </p>
         </div>
 
@@ -69,7 +72,7 @@ export function LeadSourcesManager({ leadSources }: LeadSourcesManagerProps) {
             render={
               <Button size="sm" className="gap-1.5">
                 <Plus className="h-4 w-4" />
-                <span>إضافة مصدر</span>
+                <span>{t("addLeadSource")}</span>
               </Button>
             }
           />
@@ -77,28 +80,28 @@ export function LeadSourcesManager({ leadSources }: LeadSourcesManagerProps) {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Compass className="h-5 w-5 text-primary" />
-                <span>إضافة مصدر عملاء جديد</span>
+                <span>{t("addLeadSourceTitle")}</span>
               </DialogTitle>
             </DialogHeader>
 
             <form onSubmit={handleCreate} className="space-y-4 pt-2">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold">اسم المصدر (عربي) *</label>
+                <label className="text-xs font-semibold">{t("sourceNameAr")}</label>
                 <Input
                   value={nameAr}
                   onChange={(e) => setNameAr(e.target.value)}
-                  placeholder="مثال: إعلانات تيك توك"
+                  placeholder={t("sourceNameArPlaceholder")}
                   required
                   className="h-9 text-xs"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold">اسم المصدر (إنجليزي) *</label>
+                <label className="text-xs font-semibold">{t("sourceNameEn")}</label>
                 <Input
                   value={nameEn}
                   onChange={(e) => setNameEn(e.target.value)}
-                  placeholder="e.g. TikTok Ads"
+                  placeholder={t("sourceNameEnPlaceholder")}
                   required
                   className="h-9 text-xs font-mono"
                 />
@@ -111,10 +114,10 @@ export function LeadSourcesManager({ leadSources }: LeadSourcesManagerProps) {
                   size="sm"
                   onClick={() => setOpenDialog(false)}
                 >
-                  إلغاء
+                  {tCommon("cancel")}
                 </Button>
                 <Button type="submit" size="sm" disabled={isPending}>
-                  {isPending ? "جارٍ الحفظ..." : "حفظ المصدر"}
+                  {isPending ? t("saving") : t("addLeadSource")}
                 </Button>
               </div>
             </form>
@@ -133,7 +136,7 @@ export function LeadSourcesManager({ leadSources }: LeadSourcesManagerProps) {
               <p className="text-xs text-muted-foreground font-mono">{ls.name_en}</p>
             </div>
             <Badge variant="outline" className="text-[10px]">
-              مصدر متاح
+              {t("sourceAvailable")}
             </Badge>
           </div>
         ))}

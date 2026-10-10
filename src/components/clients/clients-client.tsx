@@ -40,11 +40,11 @@ export function ClientsClient({ initialData }: ClientsClientProps) {
         if (res.success && res.data) {
           setData(res.data);
         } else {
-          toast.error(res.error || "فشل تحميل العملاء");
+          toast.error(res.error || t("loadFailed"));
         }
       });
     },
-    [query, type]
+    [query, type, t]
   );
 
   useEffect(() => {

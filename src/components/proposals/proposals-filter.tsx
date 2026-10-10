@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { type ProposalStatus } from "@/lib/schemas/proposal";
@@ -16,6 +17,8 @@ export function ProposalsFilter({
   selectedStatus,
   onStatusChange,
 }: ProposalsFilterProps) {
+  const t = useTranslations("proposals.filter");
+  const tStatus = useTranslations("proposals.status");
   const [searchTerm, setSearchTerm] = useState("");
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,11 +28,11 @@ export function ProposalsFilter({
   };
 
   const statusOptions: Array<{ id?: ProposalStatus; label: string }> = [
-    { id: undefined, label: "جميع الحالات" },
-    { id: "DRAFT", label: "مسودة" },
-    { id: "SENT", label: "تم الإرسال" },
-    { id: "ACCEPTED", label: "معتمد ومقبول" },
-    { id: "REJECTED", label: "مرفوض" },
+    { id: undefined, label: t("allStatuses") },
+    { id: "DRAFT", label: tStatus("DRAFT") },
+    { id: "SENT", label: tStatus("SENT") },
+    { id: "ACCEPTED", label: tStatus("ACCEPTED") },
+    { id: "REJECTED", label: tStatus("REJECTED") },
   ];
 
   return (
@@ -40,7 +43,7 @@ export function ProposalsFilter({
         <Input
           value={searchTerm}
           onChange={handleSearchChange}
-          placeholder="بحث بكود العرض (PROP-XXXXX)..."
+          placeholder={t("searchPlaceholder")}
           className="pr-9 h-9 text-xs"
         />
       </div>

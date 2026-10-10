@@ -82,7 +82,7 @@ export default async function ReportsPage() {
           <div className="space-y-3 pt-2">
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-medium">
-                <span>Leads Pool (100%)</span>
+                <span>{t("funnelStages.pool")} (100%)</span>
                 <span>4 (100%)</span>
               </div>
               <div className="w-full bg-[var(--muted)] h-3 rounded-full overflow-hidden">
@@ -92,7 +92,7 @@ export default async function ReportsPage() {
 
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-medium">
-                <span>Contacted & Meetings (75%)</span>
+                <span>{t("funnelStages.contacted")} (75%)</span>
                 <span>3 (75%)</span>
               </div>
               <div className="w-full bg-[var(--muted)] h-3 rounded-full overflow-hidden">
@@ -102,7 +102,7 @@ export default async function ReportsPage() {
 
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-medium">
-                <span>Proposals & Negotiation (50%)</span>
+                <span>{t("funnelStages.proposals")} (50%)</span>
                 <span>2 (50%)</span>
               </div>
               <div className="w-full bg-[var(--muted)] h-3 rounded-full overflow-hidden">
@@ -112,7 +112,7 @@ export default async function ReportsPage() {
 
             <div className="space-y-1">
               <div className="flex justify-between text-xs font-medium">
-                <span>Deals Won (25%)</span>
+                <span>{t("funnelStages.won")} (25%)</span>
                 <span>1 (25%)</span>
               </div>
               <div className="w-full bg-[var(--muted)] h-3 rounded-full overflow-hidden">

@@ -109,7 +109,7 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
             className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mb-1"
           >
             <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
-            <span>الرجوع للعملاء المحتملين</span>
+            <span>{t("backToList")}</span>
           </Link>
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-2xl font-bold text-foreground">{client.name}</h1>
@@ -175,7 +175,7 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
           {/* Quick Contact Card */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold">بيانات التواصل</CardTitle>
+              <CardTitle className="text-sm font-semibold">{t("contactInfo")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               {client.phone ? (
@@ -185,7 +185,7 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
                     <a
                       href={`tel:${client.phone}`}
                       className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
-                      title="اتصال"
+                      title={tCommon("call")}
                     >
                       <Phone className="h-4 w-4" />
                     </a>
@@ -195,7 +195,7 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="p-1.5 rounded-md hover:bg-emerald-100 text-emerald-600"
-                        title="واتساب"
+                        title={tCommon("whatsapp")}
                       >
                         <MessageCircle className="h-4 w-4" />
                       </a>
@@ -203,7 +203,7 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-muted-foreground">لا يوجد رقم هاتف مسجل</p>
+                <p className="text-xs text-muted-foreground">{t("noPhone")}</p>
               )}
 
               {/* Online Links */}
@@ -238,24 +238,28 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
           {/* Details Card */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold">تفاصيل البحث</CardTitle>
+              <CardTitle className="text-sm font-semibold">{t("researchDetails")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2.5 text-xs text-muted-foreground">
               <div className="flex items-center justify-between">
-                <span>المسؤول:</span>
+                <span>{t("owner")}</span>
                 <span className="font-medium text-foreground">
-                  {client.research_owner?.full_name || "غير محدد"}
+                  {client.research_owner?.full_name || "-"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span>تاريخ التسجيل:</span>
+                <span>{t("registeredDate")}</span>
                 <span className="font-medium text-foreground">
-                  {new Date(client.created_at).toLocaleDateString("ar-EG")}
+                  {new Date(client.created_at).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
                 </span>
               </div>
               {client.source && (
                 <div className="flex items-center justify-between">
-                  <span>المصدر:</span>
+                  <span>{t("source")}:</span>
                   <span className="font-medium text-foreground">
                     {client.source.name_ar}
                   </span>
@@ -272,10 +276,10 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-primary" />
-                <span>الفرص والاحتياجات المكتشفة</span>
+                <span>{t("discoveredOpportunities")}</span>
               </CardTitle>
               <span className="text-xs text-muted-foreground">
-                اختر المجالات اللي محتاجها العميل
+                {t("selectFieldsNeeded")}
               </span>
             </CardHeader>
             <CardContent>
@@ -304,7 +308,7 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
           {/* Research Notes & Findings */}
           <Card>
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-semibold">ملاحظات ونتائج البحث</CardTitle>
+              <CardTitle className="text-sm font-semibold">{t("researchNotesAndFindings")}</CardTitle>
               <Button
                 size="sm"
                 variant="outline"
@@ -317,19 +321,19 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
                 ) : (
                   <Save className="h-3.5 w-3.5" />
                 )}
-                <span>حفظ التعديلات</span>
+                <span>{tCommon("save")}</span>
               </Button>
             </CardHeader>
             <CardContent className="space-y-3">
               <Textarea
-                placeholder="سجل كل تفاصيل البحث: معلومات عن الشركة، حجم البيزنس، المشاكل في السستم الحالي، الفرص الممكنة..."
+                placeholder={t("notesDetailedPlaceholder")}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={6}
                 className="resize-y"
               />
               <p className="text-[11px] text-muted-foreground">
-                الملاحظات دي هتتنقل تلقائيًا مع العميل لما يتحول لعميل رسمي 🚀
+                {t("notesTransferNotice")}
               </p>
             </CardContent>
           </Card>
@@ -348,10 +352,10 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
           <div className="space-y-3 py-2 text-sm text-foreground">
             <p>{t("convertConfirm")}</p>
             <div className="p-3 bg-muted rounded-lg text-xs space-y-1">
-              <p className="font-semibold text-foreground">البيانات اللي هتتنقل:</p>
-              <p className="text-muted-foreground">• اسم العميل: {client.name}</p>
-              {client.phone && <p className="text-muted-foreground">• رقم التواصل: {client.phone}</p>}
-              <p className="text-muted-foreground">• كل الفرص والملاحظات المسجلة</p>
+              <p className="font-semibold text-foreground">{t("dataToTransfer")}</p>
+              <p className="text-muted-foreground">{t("clientNamePrefix", { name: client.name })}</p>
+              {client.phone && <p className="text-muted-foreground">{t("clientPhonePrefix", { phone: client.phone })}</p>}
+              <p className="text-muted-foreground">{t("allOpportunitiesTransferred")}</p>
             </div>
           </div>
           <DialogFooter className="gap-2 sm:gap-0">
@@ -369,7 +373,7 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
               className="gap-2 bg-primary text-primary-foreground font-medium"
             >
               <Rocket className="h-4 w-4" />
-              <span>تأكيد التحويل 🚀</span>
+              <span>{t("confirmConversion")}</span>
             </Button>
           </DialogFooter>
         </DialogContent>

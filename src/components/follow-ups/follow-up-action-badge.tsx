@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import {
   Phone,
   Video,
@@ -16,6 +17,7 @@ interface FollowUpActionBadgeProps {
 }
 
 export function FollowUpActionBadge({ action }: FollowUpActionBadgeProps) {
+  const t = useTranslations("followUps.actions");
   const normAction = action.toUpperCase();
 
   switch (normAction) {
@@ -26,7 +28,7 @@ export function FollowUpActionBadge({ action }: FollowUpActionBadgeProps) {
           className="bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20 gap-1 text-xs font-medium"
         >
           <Phone className="h-3 w-3" />
-          <span>اتصال</span>
+          <span>{t("CALL")}</span>
         </Badge>
       );
     case "MEETING":
@@ -36,7 +38,7 @@ export function FollowUpActionBadge({ action }: FollowUpActionBadgeProps) {
           className="bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/20 gap-1 text-xs font-medium"
         >
           <Video className="h-3 w-3" />
-          <span>اجتماع</span>
+          <span>{t("MEETING")}</span>
         </Badge>
       );
     case "WHATSAPP":
@@ -46,7 +48,7 @@ export function FollowUpActionBadge({ action }: FollowUpActionBadgeProps) {
           className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20 gap-1 text-xs font-medium"
         >
           <MessageSquare className="h-3 w-3" />
-          <span>واتساب</span>
+          <span>{t("WHATSAPP")}</span>
         </Badge>
       );
     case "EMAIL":
@@ -56,7 +58,7 @@ export function FollowUpActionBadge({ action }: FollowUpActionBadgeProps) {
           className="bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20 gap-1 text-xs font-medium"
         >
           <Mail className="h-3 w-3" />
-          <span>إيميل</span>
+          <span>{t("EMAIL")}</span>
         </Badge>
       );
     case "VISIT":
@@ -66,7 +68,7 @@ export function FollowUpActionBadge({ action }: FollowUpActionBadgeProps) {
           className="bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/20 gap-1 text-xs font-medium"
         >
           <MapPin className="h-3 w-3" />
-          <span>زيارة ميدانية</span>
+          <span>{t("VISIT")}</span>
         </Badge>
       );
     default:

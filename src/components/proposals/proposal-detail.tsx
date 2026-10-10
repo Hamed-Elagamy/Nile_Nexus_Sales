@@ -3,6 +3,7 @@
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -33,6 +34,8 @@ interface ProposalDetailProps {
 
 export function ProposalDetail({ proposal }: ProposalDetailProps) {
   const router = useRouter();
+  const t = useTranslations("proposals");
+  const tCommon = useTranslations("common");
   const [isPending, startTransition] = useTransition();
 
   const versions = proposal.versions || [];
@@ -55,10 +58,10 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
       });
 
       if (res.success) {
-        toast.success(`تم تحديث حالة عرض السعر إلى: ${newStatus} 🎯`);
+        toast.success(t("statusUpdatedToast", { status: newStatus }));
         router.refresh();
       } else {
-        toast.error(res.error || "فشل تحديث الحالة");
+        toast.error(res.error || t("statusUpdateFailed"));
       }
     });
   };
@@ -86,15 +89,15 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
         delivery_duration: activeVersion.delivery_duration,
         payment_terms: activeVersion.payment_terms,
         terms_and_conditions: activeVersion.terms_and_conditions,
-        notes: `نسخة مستحدثة من الإصدار ${activeVersion.version_number}`,
+        notes: t("newVersionNote", { version: activeVersion.version_number }),
       });
 
       if (res.success && res.data) {
-        toast.success("تم إنشاء إصدار جديد بنجاح! 🚀");
+        toast.success(t("newVersionSuccess"));
         setSelectedVersionId(res.data.id);
         router.refresh();
       } else {
-        toast.error(res.error || "فشل إنشاء الإصدار الجديد");
+        toast.error(res.error || t("newVersionFailed"));
       }
     });
   };
@@ -110,7 +113,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
               className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mb-1"
             >
               <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
-              <span>العودة لقائمة عروض الأسعار</span>
+              <span>{t("backToList")}</span>
             </Link>
             <div className="flex flex-wrap items-center gap-2.5">
               <h1 className="text-2xl font-bold tracking-tight text-foreground font-mono">
@@ -120,7 +123,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
                 <ProposalStatusBadge status={activeVersion.status} />
               )}
               <Badge variant="outline" className="text-xs font-mono">
-                الإصدار v{activeVersion?.version_number || 1}
+                {t("versionBadge", { version: activeVersion?.version_number || 1 })}
               </Badge>
             </div>
           </div>
@@ -135,7 +138,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
                 className="gap-1.5"
               >
                 <Printer className="h-4 w-4" />
-                <span>معاينة وطباعة</span>
+                <span>{t("previewAndPrint")}</span>
               </Button>
             )}
 
@@ -145,10 +148,10 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
               onClick={handleCreateNewVersion}
               disabled={isPending}
               className="gap-1.5"
-              title="إنشاء إصدار جديد بنفس البنود للتعديل عليه"
+              title={t("newVersionTooltip")}
             >
               <CopyPlus className="h-4 w-4" />
-              <span>إصدار جديد (v+)</span>
+              <span>{t("newVersion")}</span>
             </Button>
 
             {/* Lifecycle Transitions */}
@@ -160,7 +163,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
                 className="gap-1.5 bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <CheckCircle2 className="h-4 w-4" />
-                <span>اعتماد للإرسال</span>
+                <span>{t("approveToSend")}</span>
               </Button>
             )}
 
@@ -173,7 +176,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
                   className="gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white"
                 >
                   <Send className="h-4 w-4" />
-                  <span>تأكيد الإرسال للعميل</span>
+                  <span>{t("confirmSent")}</span>
                 </Button>
               )}
 
@@ -186,7 +189,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
                   className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
                   <CheckCircle2 className="h-4 w-4" />
-                  <span>موافقة العميل (مقبول)</span>
+                  <span>{t("clientAccepted")}</span>
                 </Button>
 
                 <Button
@@ -197,7 +200,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
                   className="gap-1.5 text-rose-600 hover:bg-rose-500/10"
                 >
                   <XCircle className="h-4 w-4" />
-                  <span>رفض العرض</span>
+                  <span>{t("rejectProposal")}</span>
                 </Button>
               </>
             )}
@@ -208,7 +211,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
         {versions.length > 1 && (
           <div className="flex items-center gap-2 border-b border-border pb-2 overflow-x-auto">
             <span className="text-xs font-semibold text-muted-foreground whitespace-nowrap">
-              سجل الإصدارات:
+              {t("versionHistory")}
             </span>
             {versions.map((ver) => (
               <button
@@ -231,7 +234,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
           <Card className="p-4 bg-card border-border">
             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
               <Building2 className="h-4 w-4" />
-              <span>العميل</span>
+              <span>{t("clientLabel")}</span>
             </div>
             {proposal.client ? (
               <Link
@@ -241,7 +244,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
                 {proposal.client.name}
               </Link>
             ) : (
-              <span className="text-muted-foreground">غير محدد</span>
+              <span className="text-muted-foreground">{tCommon("notSpecified")}</span>
             )}
             {proposal.client?.phone && (
               <p className="text-xs text-muted-foreground font-mono mt-0.5">
@@ -253,7 +256,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
           <Card className="p-4 bg-card border-border">
             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
               <Briefcase className="h-4 w-4" />
-              <span>الصفقة المرتبطة</span>
+              <span>{t("linkedDealLabel")}</span>
             </div>
             {proposal.deal ? (
               <Link
@@ -263,7 +266,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
                 {proposal.deal.title}
               </Link>
             ) : (
-              <span className="text-muted-foreground">غير محدد</span>
+              <span className="text-muted-foreground">{tCommon("notSpecified")}</span>
             )}
             {proposal.deal?.business_id && (
               <p className="text-xs text-muted-foreground font-mono mt-0.5">
@@ -275,7 +278,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
           <Card className="p-4 bg-card border-border">
             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
               <Clock className="h-4 w-4" />
-              <span>الإجمالي المستحق</span>
+              <span>{t("totalDue")}</span>
             </div>
             <p className="text-xl font-black text-primary font-mono">
               {Number(activeVersion?.grand_total || 0).toLocaleString(undefined, {
@@ -284,7 +287,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
               {activeVersion?.currency || "EGP"}
             </p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              شامل الضرائب والخصومات
+              {t("includesTax")}
             </p>
           </Card>
         </div>
@@ -294,9 +297,9 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
           <Card className="border-border overflow-hidden">
             <CardHeader className="bg-muted/40 border-b border-border py-3">
               <CardTitle className="text-sm font-semibold flex items-center justify-between">
-                <span>بنود وتفاصيل الإصدار v{activeVersion.version_number}</span>
+                <span>{t("itemsHeader", { version: activeVersion.version_number })}</span>
                 <span className="text-xs font-normal text-muted-foreground">
-                  عدد البنود: {activeVersion.items.length}
+                  {t("itemsCount", { count: activeVersion.items.length })}
                 </span>
               </CardTitle>
             </CardHeader>
@@ -305,11 +308,11 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
                 <table className="w-full text-right text-xs">
                   <thead className="bg-muted/20 border-b border-border text-muted-foreground">
                     <tr>
-                      <th className="p-3 w-10 text-center">#</th>
-                      <th className="p-3">وصف البند / الخدمة</th>
-                      <th className="p-3 w-24 text-center">الكمية</th>
-                      <th className="p-3 w-32 text-center">سعر الوحدة</th>
-                      <th className="p-3 w-32 text-left">الإجمالي</th>
+                      <th className="p-3 w-10 text-center">{t("tableNumber")}</th>
+                      <th className="p-3">{t("tableDescription")}</th>
+                      <th className="p-3 w-24 text-center">{t("tableQuantity")}</th>
+                      <th className="p-3 w-32 text-center">{t("tableUnitPrice")}</th>
+                      <th className="p-3 w-32 text-left">{t("tableTotal")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/60">
@@ -351,23 +354,23 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
         {activeVersion && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card className="p-4 space-y-3 bg-card border-border text-xs">
-              <h4 className="font-semibold text-foreground">الشروط التجارية للعرض</h4>
+              <h4 className="font-semibold text-foreground">{t("termsTitle")}</h4>
               <div className="space-y-2 text-muted-foreground">
                 {activeVersion.delivery_duration && (
                   <div>
-                    <span className="font-bold text-foreground">مدة التوريد: </span>
+                    <span className="font-bold text-foreground">{t("deliveryDuration")}{" "}</span>
                     {activeVersion.delivery_duration}
                   </div>
                 )}
                 {activeVersion.payment_terms && (
                   <div>
-                    <span className="font-bold text-foreground">شروط الدفع: </span>
+                    <span className="font-bold text-foreground">{t("paymentTerms")}{" "}</span>
                     {activeVersion.payment_terms}
                   </div>
                 )}
                 {activeVersion.valid_until && (
                   <div>
-                    <span className="font-bold text-foreground">ساري حتى: </span>
+                    <span className="font-bold text-foreground">{t("validUntil")}{" "}</span>
                     {activeVersion.valid_until}
                   </div>
                 )}
@@ -375,10 +378,10 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
             </Card>
 
             <Card className="p-4 space-y-3 bg-muted/40 border-border text-xs">
-              <h4 className="font-semibold text-foreground">ملخص الحسابات</h4>
+              <h4 className="font-semibold text-foreground">{t("summaryTitle")}</h4>
               <div className="space-y-1.5 text-muted-foreground">
                 <div className="flex justify-between">
-                  <span>المجموع الفرعي:</span>
+                  <span>{t("subtotal")}</span>
                   <span className="font-mono text-foreground font-medium">
                     {Number(activeVersion.subtotal).toLocaleString(undefined, {
                       minimumFractionDigits: 2,
@@ -388,7 +391,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
                 </div>
                 {Number(activeVersion.discount_amount) > 0 && (
                   <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
-                    <span>الخصم:</span>
+                    <span>{t("discount")}</span>
                     <span className="font-mono">
                       -{" "}
                       {Number(activeVersion.discount_amount).toLocaleString(undefined, {
@@ -400,7 +403,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
                 )}
                 {Number(activeVersion.tax_amount) > 0 && (
                   <div className="flex justify-between">
-                    <span>ضريبة القيمة المضافة:</span>
+                    <span>{t("vat")}</span>
                     <span className="font-mono text-foreground font-medium">
                       +{" "}
                       {Number(activeVersion.tax_amount).toLocaleString(undefined, {
@@ -411,7 +414,7 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
                   </div>
                 )}
                 <div className="pt-2 border-t border-border flex justify-between text-sm font-bold text-foreground">
-                  <span>الإجمالي النهائي:</span>
+                  <span>{t("grandTotal")}</span>
                   <span className="font-mono text-base text-primary">
                     {Number(activeVersion.grand_total).toLocaleString(undefined, {
                       minimumFractionDigits: 2,

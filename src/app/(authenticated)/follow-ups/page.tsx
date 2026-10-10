@@ -1,4 +1,5 @@
 import React from "react";
+import { getTranslations } from "next-intl/server";
 import { getFollowUps } from "@/lib/actions/follow-ups";
 import { getClients } from "@/lib/actions/clients";
 import { FollowUpsClient } from "@/components/follow-ups/follow-ups-client";
@@ -10,6 +11,7 @@ export const metadata = {
 };
 
 export default async function FollowUpsPage() {
+  const t = await getTranslations("followUps");
   const [followUpsRes, clientsRes] = await Promise.all([
     getFollowUps({ tab: "TODAY", page: 1, pageSize: 20 }),
     getClients({ page: 1, pageSize: 100 }),
@@ -30,10 +32,10 @@ export default async function FollowUpsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            المتابعات اليومية (Follow-ups)
+            {t("pageTitle")}
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            خطة العمل اليومية للمكالمات والاجتماعات ومتابعة العملاء خطوة بخطوة 📞
+            {t("pageSubtitle")}
           </p>
         </div>
 

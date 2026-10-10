@@ -41,10 +41,10 @@ export function TeamMemberCard({
       });
 
       if (res.success) {
-        toast.success(`تم تغيير دور ${member.full_name} بنجاح`);
+        toast.success(t("roleUpdated", { name: member.full_name || member.email }));
         onRefresh?.();
       } else {
-        toast.error(res.error || "فشل تعديل الدور");
+        toast.error(res.error || t("roleUpdateFailed"));
       }
     });
   };
@@ -57,10 +57,10 @@ export function TeamMemberCard({
       });
 
       if (res.success) {
-        toast.success(`تم تحديث حالة الحساب بنجاح`);
+        toast.success(t("statusUpdated"));
         onRefresh?.();
       } else {
-        toast.error(res.error || "فشل تحديث الحالة");
+        toast.error(res.error || t("statusUpdateFailed"));
       }
     });
   };
@@ -70,11 +70,11 @@ export function TeamMemberCard({
       const res = await deleteTeamMember({ user_id: member.id });
 
       if (res.success) {
-        toast.success(res.warning || `تم حذف الحساب بنجاح`);
+        toast.success(res.warning || t("deleteSuccess"));
         setShowDeleteConfirm(false);
         onRefresh?.();
       } else {
-        toast.error(res.error || "فشل حذف المستخدم");
+        toast.error(res.error || t("deleteFailed"));
       }
     });
   };
@@ -128,12 +128,12 @@ export function TeamMemberCard({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-bold text-foreground">
-                {member.full_name || "عضو فريق"}
+                {member.full_name || t("memberFallback")}
               </h3>
               {member.is_active ? (
-                <span className="h-2 w-2 rounded-full bg-emerald-500" title="نشط" />
+                <span className="h-2 w-2 rounded-full bg-emerald-500" title={t("active")} />
               ) : (
-                <span className="h-2 w-2 rounded-full bg-rose-500" title="معطل" />
+                <span className="h-2 w-2 rounded-full bg-rose-500" title={t("inactive")} />
               )}
             </div>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
@@ -192,9 +192,9 @@ export function TeamMemberCard({
             disabled={isPending}
             className="h-7 text-[11px] rounded border border-input bg-card px-2"
           >
-            <option value="SALES">SALES</option>
-            <option value="ADMIN">ADMIN</option>
-            <option value="GM">GM</option>
+            <option value="SALES">{t("roles.SALES")}</option>
+            <option value="ADMIN">{t("roles.ADMIN")}</option>
+            <option value="GM">{t("roles.GM")}</option>
           </select>
         </div>
 

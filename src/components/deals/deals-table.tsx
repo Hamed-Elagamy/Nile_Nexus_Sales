@@ -81,7 +81,7 @@ export function DealsTable({ deals, loading = false }: DealsTableProps) {
           <TableBody>
             {deals.map((deal) => {
               const formattedValue = deal.estimated_value
-                ? `${Number(deal.estimated_value).toLocaleString("ar-EG")} ${deal.currency || "EGP"}`
+                ? `${Number(deal.estimated_value).toLocaleString()} ${deal.currency || "EGP"}`
                 : "-";
 
               return (
@@ -172,7 +172,7 @@ export function DealsTable({ deals, loading = false }: DealsTableProps) {
       <div className="md:hidden space-y-3">
         {deals.map((deal) => {
           const formattedValue = deal.estimated_value
-            ? `${Number(deal.estimated_value).toLocaleString("ar-EG")} ${deal.currency || "EGP"}`
+            ? `${Number(deal.estimated_value).toLocaleString()} ${deal.currency || "EGP"}`
             : "-";
 
           return (
@@ -210,7 +210,7 @@ export function DealsTable({ deals, loading = false }: DealsTableProps) {
                   href={`/deals/${deal.id}`}
                   className="p-1 text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
                 >
-                  <span>عرض التفاصيل</span>
+                  <span>{tDeals("viewDetails")}</span>
                   <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                 </Link>
               </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { Printer, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ProposalWithRelations, ProposalVersionWithItems } from "@/lib/actions/proposals";
@@ -12,23 +13,25 @@ interface ProposalPrintViewProps {
 }
 
 export function ProposalPrintView({ proposal, version, onClose }: ProposalPrintViewProps) {
+  const t = useTranslations("proposals.print");
+
   const handlePrint = () => {
     window.print();
   };
 
-  const formattedDate = new Date(version.created_at).toLocaleDateString("ar-EG", {
+  const formattedDate = new Date(version.created_at).toLocaleDateString(undefined, {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
 
   const formattedValidUntil = version.valid_until
-    ? new Date(version.valid_until).toLocaleDateString("ar-EG", {
+    ? new Date(version.valid_until).toLocaleDateString(undefined, {
         year: "numeric",
         month: "long",
         day: "numeric",
       })
-    : "30 يوماً من تاريخ الإصدار";
+    : t("daysFromIssue");
 
   return (
     <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm overflow-y-auto p-4 sm:p-8 flex justify-center print:p-0 print:static print:bg-white print:text-black">
@@ -38,14 +41,14 @@ export function ProposalPrintView({ proposal, version, onClose }: ProposalPrintV
           <div className="flex items-center gap-2">
             <Button size="sm" onClick={handlePrint} className="gap-1.5 bg-primary text-primary-foreground">
               <Printer className="h-4 w-4" />
-              <span>طباعة / حفظ كـ PDF</span>
+              <span>{t("printButton")}</span>
             </Button>
           </div>
 
           {onClose && (
             <Button size="sm" variant="ghost" onClick={onClose} className="text-muted-foreground">
               <X className="h-4 w-4" />
-              <span>إغلاق المعاينة</span>
+              <span>{t("closePreview")}</span>
             </Button>
           )}
         </div>
@@ -62,26 +65,26 @@ export function ProposalPrintView({ proposal, version, onClose }: ProposalPrintV
               </span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              شركة نايل نيكسس للحلول الرقمية وتطوير الأعمال
+              {t("companySubtitle")}
               <br />
-              القاهرة، جمهورية مصر العربية
+              {t("companyAddress")}
               <br />
-              contact@nilenexus.com | +20 100 000 0000
+              {t("companyContact")}
             </p>
           </div>
 
           <div className="sm:text-left text-right space-y-1">
             <h2 className="text-xl font-bold text-foreground">
-              عرض أسعار تجاري (Quotation)
+              {t("quotationTitle")}
             </h2>
             <p className="text-xs font-mono font-semibold text-primary">
-              رقم العرض: {proposal.business_id} — v{version.version_number}
+              {t("proposalNumber", { id: proposal.business_id, version: version.version_number })}
             </p>
             <p className="text-xs text-muted-foreground">
-              تاريخ الإصدار: {formattedDate}
+              {t("issueDate", { date: formattedDate })}
             </p>
             <p className="text-xs text-muted-foreground">
-              ساري حتى: {formattedValidUntil}
+              {t("validUntilDate", { date: formattedValidUntil })}
             </p>
           </div>
         </div>
@@ -90,29 +93,29 @@ export function ProposalPrintView({ proposal, version, onClose }: ProposalPrintV
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4 rounded-lg bg-muted/40 border border-border/60 text-xs">
           <div className="space-y-1">
             <span className="font-bold text-muted-foreground uppercase tracking-wider text-[10px]">
-              مُوجّه إلى السيد / السادة:
+              {t("addressedTo")}
             </span>
             <p className="font-bold text-sm text-foreground">
-              {proposal.client?.name || "العميل الكريم"}
+              {proposal.client?.name || t("dearClient")}
             </p>
             {proposal.client?.phone && (
-              <p className="text-muted-foreground font-mono">هاتف: {proposal.client.phone}</p>
+              <p className="text-muted-foreground font-mono">{t("phone", { phone: proposal.client.phone })}</p>
             )}
             {proposal.client?.email && (
-              <p className="text-muted-foreground">بريد: {proposal.client.email}</p>
+              <p className="text-muted-foreground">{t("email", { email: proposal.client.email })}</p>
             )}
           </div>
 
           <div className="space-y-1 sm:text-left text-right">
             <span className="font-bold text-muted-foreground uppercase tracking-wider text-[10px]">
-              تفاصيل المشروع:
+              {t("projectDetails")}
             </span>
             <p className="font-bold text-sm text-foreground">
-              {proposal.deal?.title || "عرض خدمات استشارية وتطويرية"}
+              {proposal.deal?.title || t("dealFallback")}
             </p>
             {proposal.deal?.business_id && (
               <p className="text-muted-foreground font-mono">
-                كود الصفقة: {proposal.deal.business_id}
+                {t("dealCode", { code: proposal.deal.business_id })}
               </p>
             )}
           </div>
@@ -124,11 +127,11 @@ export function ProposalPrintView({ proposal, version, onClose }: ProposalPrintV
             <table className="w-full text-right text-xs border border-border/80">
               <thead className="bg-muted/80 text-foreground font-semibold border-b border-border/80">
                 <tr>
-                  <th className="p-3 w-10 text-center">#</th>
-                  <th className="p-3">بيان البند والخدمات المقدمة</th>
-                  <th className="p-3 w-20 text-center">الكمية</th>
-                  <th className="p-3 w-32 text-center">سعر الوحدة</th>
-                  <th className="p-3 w-32 text-left">الإجمالي ({version.currency})</th>
+                  <th className="p-3 w-10 text-center">{t("colNumber")}</th>
+                  <th className="p-3">{t("colDescription")}</th>
+                  <th className="p-3 w-20 text-center">{t("colQuantity")}</th>
+                  <th className="p-3 w-32 text-center">{t("colUnitPrice")}</th>
+                  <th className="p-3 w-32 text-left">{t("colTotal", { currency: version.currency })}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
@@ -161,7 +164,7 @@ export function ProposalPrintView({ proposal, version, onClose }: ProposalPrintV
         <div className="flex justify-end pt-2">
           <div className="w-full sm:w-80 space-y-2 text-xs border border-border/80 rounded-lg p-4 bg-muted/20">
             <div className="flex justify-between text-muted-foreground">
-              <span>المجموع الفرعي (Subtotal):</span>
+              <span>{t("subtotal")}</span>
               <span className="font-mono font-medium text-foreground">
                 {Number(version.subtotal).toLocaleString(undefined, { minimumFractionDigits: 2 })} {version.currency}
               </span>
@@ -169,7 +172,7 @@ export function ProposalPrintView({ proposal, version, onClose }: ProposalPrintV
 
             {Number(version.discount_amount) > 0 && (
               <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-medium">
-                <span>الخصم الممنوح:</span>
+                <span>{t("discountGranted")}</span>
                 <span className="font-mono">
                   - {Number(version.discount_amount).toLocaleString(undefined, { minimumFractionDigits: 2 })} {version.currency}
                 </span>
@@ -178,7 +181,7 @@ export function ProposalPrintView({ proposal, version, onClose }: ProposalPrintV
 
             {Number(version.tax_amount) > 0 && (
               <div className="flex justify-between text-muted-foreground">
-                <span>ضريبة القيمة المضافة (VAT):</span>
+                <span>{t("vat")}</span>
                 <span className="font-mono font-medium text-foreground">
                   + {Number(version.tax_amount).toLocaleString(undefined, { minimumFractionDigits: 2 })} {version.currency}
                 </span>
@@ -186,7 +189,7 @@ export function ProposalPrintView({ proposal, version, onClose }: ProposalPrintV
             )}
 
             <div className="pt-2 border-t border-border flex justify-between text-sm font-bold text-foreground">
-              <span>الإجمالي المستحق (Total):</span>
+              <span>{t("totalDue")}</span>
               <span className="font-mono text-base text-primary">
                 {Number(version.grand_total).toLocaleString(undefined, { minimumFractionDigits: 2 })} {version.currency}
               </span>
@@ -198,21 +201,21 @@ export function ProposalPrintView({ proposal, version, onClose }: ProposalPrintV
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-border/80 text-xs">
           {version.delivery_duration && (
             <div className="space-y-1">
-              <span className="font-bold text-foreground">مدة التوريد والتنفيذ:</span>
+              <span className="font-bold text-foreground">{t("deliveryDuration")}</span>
               <p className="text-muted-foreground leading-relaxed">{version.delivery_duration}</p>
             </div>
           )}
 
           {version.payment_terms && (
             <div className="space-y-1">
-              <span className="font-bold text-foreground">شروط وطريقة الدفع:</span>
+              <span className="font-bold text-foreground">{t("paymentTerms")}</span>
               <p className="text-muted-foreground leading-relaxed">{version.payment_terms}</p>
             </div>
           )}
 
           {version.terms_and_conditions && (
             <div className="sm:col-span-2 space-y-1 pt-2">
-              <span className="font-bold text-foreground">الشروط العامة والتعاقدية:</span>
+              <span className="font-bold text-foreground">{t("generalTerms")}</span>
               <p className="text-muted-foreground whitespace-pre-line leading-relaxed">
                 {version.terms_and_conditions}
               </p>
@@ -224,21 +227,21 @@ export function ProposalPrintView({ proposal, version, onClose }: ProposalPrintV
         <div className="pt-8 border-t border-border/80 grid grid-cols-2 gap-8 text-center text-xs">
           <div className="space-y-12">
             <span className="font-bold text-foreground block">
-              عن شركة نايل نيكسس (مُعدّ العرض)
+              {t("issuerSignature")}
             </span>
             <div className="border-b border-border/80 w-48 mx-auto" />
             <span className="text-[11px] text-muted-foreground block">
-              التوقيع والختم الرسمي
+              {t("officialStamp")}
             </span>
           </div>
 
           <div className="space-y-12">
             <span className="font-bold text-foreground block">
-              موافقة واعتماد العميل (المفوض بالتوقيع)
+              {t("clientSignature")}
             </span>
             <div className="border-b border-border/80 w-48 mx-auto" />
             <span className="text-[11px] text-muted-foreground block">
-              الاسم / التوقيع / التاريخ
+              {t("signPlaceholder")}
             </span>
           </div>
         </div>

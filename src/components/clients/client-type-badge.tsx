@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Building2, User } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,6 +14,7 @@ interface ClientTypeBadgeProps {
 }
 
 export function ClientTypeBadge({ type, label, className }: ClientTypeBadgeProps) {
+  const t = useTranslations("clients");
   const isCompany = type === "COMPANY";
 
   return (
@@ -25,7 +29,7 @@ export function ClientTypeBadge({ type, label, className }: ClientTypeBadgeProps
       )}
     >
       {isCompany ? <Building2 className="h-3 w-3" /> : <User className="h-3 w-3" />}
-      <span>{label || (isCompany ? "شركة" : "فرد")}</span>
+      <span>{label || (isCompany ? t("type.COMPANY") : t("type.INDIVIDUAL"))}</span>
     </Badge>
   );
 }

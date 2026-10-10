@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { CheckCircle2, Inbox } from "lucide-react";
 import { FollowUpsFilter } from "./follow-ups-filter";
@@ -20,6 +21,8 @@ export function FollowUpsClient({
   initialData,
   clients = [],
 }: FollowUpsClientProps) {
+  const t = useTranslations("followUps");
+  const tCommon = useTranslations("common");
   const [isPending, startTransition] = useTransition();
 
   const [data, setData] = useState<FollowUpsDashboardResult>(
@@ -51,11 +54,11 @@ export function FollowUpsClient({
         if (res.success && res.data) {
           setData(res.data);
         } else {
-          toast.error(res.error || "فشل تحميل المتابعات");
+          toast.error(res.error || t("loadFailed"));
         }
       });
     },
-    [currentTab, currentAction]
+    [currentTab, currentAction, t]
   );
 
   const handleTabChange = (newTab: "TODAY" | "OVERDUE" | "UPCOMING" | "COMPLETED" | "ALL") => {
@@ -86,7 +89,7 @@ export function FollowUpsClient({
       {/* Loading state indicator */}
       {isPending && (
         <div className="text-center py-2 text-xs text-muted-foreground animate-pulse">
-          جارٍ تحديث المتابعات...
+          {t("updating")}
         </div>
       )}
 
@@ -99,10 +102,10 @@ export function FollowUpsClient({
                 <CheckCircle2 className="h-8 w-8" />
               </div>
               <h3 className="text-base font-semibold text-foreground">
-                عاش يا بطل! لا توجد أي متابعات متأخرة 🎉
+                {t("empty.overdueTitle")}
               </h3>
               <p className="text-xs text-muted-foreground mt-1 max-w-sm">
-                أنت ماشي على الجدول بالضبط وكل العملاء بيتم متابعتهم في مواعيدهم.
+                {t("empty.overdueDesc")}
               </p>
             </>
           ) : currentTab === "TODAY" ? (
@@ -111,10 +114,10 @@ export function FollowUpsClient({
                 <Inbox className="h-8 w-8" />
               </div>
               <h3 className="text-base font-semibold text-foreground">
-                لا توجد متابعات مجدولة لليوم
+                {t("empty.todayTitle")}
               </h3>
               <p className="text-xs text-muted-foreground mt-1 max-w-sm">
-                يمكنك مراجعة قائمة العملاء أو جدولة اتصالات واجتماعات جديدة الآن.
+                {t("empty.todayDesc")}
               </p>
               <div className="mt-4">
                 <CreateFollowUpDialog clients={clients} onSuccess={handleRefresh} />
@@ -126,10 +129,10 @@ export function FollowUpsClient({
                 <Inbox className="h-8 w-8" />
               </div>
               <h3 className="text-base font-semibold text-foreground">
-                لا توجد متابعات في هذا التبويب
+                {t("empty.generalTitle")}
               </h3>
               <p className="text-xs text-muted-foreground mt-1 max-w-sm">
-                اضغط على الزر أدناه لجدولة متابعة جديدة مع أحد العملاء.
+                {t("empty.generalDesc")}
               </p>
               <div className="mt-4">
                 <CreateFollowUpDialog clients={clients} onSuccess={handleRefresh} />
@@ -154,7 +157,7 @@ export function FollowUpsClient({
       {data.totalPages > 1 && (
         <div className="flex items-center justify-between pt-4 border-t border-border">
           <p className="text-xs text-muted-foreground">
-            صفحة {data.page} من {data.totalPages} (إجمالي {data.total} متابعة)
+            {t("pagination.pageOf", { page: data.page, totalPages: data.totalPages, total: data.total })}
           </p>
 
           <div className="flex items-center gap-2">
@@ -163,14 +166,14 @@ export function FollowUpsClient({
               disabled={data.page <= 1 || isPending}
               className="px-3 py-1 rounded border border-border text-xs disabled:opacity-50 hover:bg-muted"
             >
-              السابق
+              {t("pagination.previous")}
             </button>
             <button
               onClick={() => loadData(currentTab, currentAction, data.page + 1)}
               disabled={data.page >= data.totalPages || isPending}
               className="px-3 py-1 rounded border border-border text-xs disabled:opacity-50 hover:bg-muted"
             >
-              التالي
+              {t("pagination.next")}
             </button>
           </div>
         </div>

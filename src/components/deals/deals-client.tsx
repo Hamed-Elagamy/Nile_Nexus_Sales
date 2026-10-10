@@ -43,11 +43,11 @@ export function DealsClient({ initialData, clients = [] }: DealsClientProps) {
         if (res.success && res.data) {
           setData(res.data);
         } else {
-          toast.error(res.error || "فشل تحميل الصفقات");
+          toast.error(res.error || tDeals("loadFailed"));
         }
       });
     },
-    [query, stage]
+    [query, stage, tDeals]
   );
 
   useEffect(() => {

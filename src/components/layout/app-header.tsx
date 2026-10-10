@@ -58,7 +58,7 @@ export function AppHeader({ user }: AppHeaderProps) {
           {isConfigured && (
             <span className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
               <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>{t("common.save") === "حفظ" ? "Supabase متصل" : "Supabase Connected"}</span>
+              <span>{t("common.supabaseConnected")}</span>
             </span>
           )}
 
@@ -77,7 +77,7 @@ export function AppHeader({ user }: AppHeaderProps) {
             <Link
               href="/settings"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-              title="الملف الشخصي والإعدادات"
+              title={t("common.profileAndSettings")}
             >
               {user.user_metadata?.avatar_url ? (
                 <div className="h-7 w-7 rounded-full overflow-hidden border border-[var(--border)] shrink-0">

@@ -57,13 +57,13 @@ export function LoginForm() {
     setSuccess("");
 
     if (!fullName.trim()) {
-      setError(t("fullName") + " " + t("required", { defaultValue: "مطلوب" }));
+      setError(t("nameRequired"));
       setLoading(false);
       return;
     }
 
     if (password.length < 6) {
-      setError("كلمة المرور يجب أن تكون 6 أحرف على الأقل (Password must be at least 6 characters)");
+      setError(t("passwordMinLength"));
       setLoading(false);
       return;
     }
@@ -194,7 +194,7 @@ export function LoginForm() {
             {/* Sales Role Notice */}
             <div className="flex items-center gap-2 p-2.5 rounded-lg bg-[var(--muted)]/60 border border-[var(--border)] text-xs text-[var(--muted-foreground)]">
               <ShieldCheck className="h-4 w-4 text-[var(--primary)] shrink-0" />
-              <span>حساب جديد بصلاحية مسؤول مبيعات (Sales Rep) — ترقية الصلاحيات تتم حصرياً بواسطة المدير العام.</span>
+              <span>{t("salesRoleNotice")}</span>
             </div>
           </>
         )}

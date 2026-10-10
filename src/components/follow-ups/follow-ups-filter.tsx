@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { AlertCircle, Calendar, CalendarCheck2, Clock, ListFilter } from "lucide-react";
 
 interface FollowUpsFilterProps {
@@ -24,17 +25,20 @@ export function FollowUpsFilter({
   currentAction,
   onActionChange,
 }: FollowUpsFilterProps) {
+  const tTabs = useTranslations("followUps.tabs");
+  const tActions = useTranslations("followUps.actions");
+
   const tabs = [
     {
       id: "TODAY" as const,
-      label: "اليوم",
+      label: tTabs("today"),
       icon: Calendar,
       count: counts.today,
       countClass: "bg-blue-500/10 text-blue-700 dark:text-blue-300",
     },
     {
       id: "OVERDUE" as const,
-      label: "متأخرة",
+      label: tTabs("overdue"),
       icon: AlertCircle,
       count: counts.overdue,
       countClass:
@@ -44,21 +48,21 @@ export function FollowUpsFilter({
     },
     {
       id: "UPCOMING" as const,
-      label: "القادمة",
+      label: tTabs("upcoming"),
       icon: Clock,
       count: counts.upcoming,
       countClass: "bg-muted text-muted-foreground",
     },
     {
       id: "COMPLETED" as const,
-      label: "المكتملة",
+      label: tTabs("completed"),
       icon: CalendarCheck2,
       count: counts.completed,
       countClass: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
     },
     {
       id: "ALL" as const,
-      label: "الكل",
+      label: tTabs("all"),
       icon: ListFilter,
       count: counts.all,
       countClass: "bg-muted text-muted-foreground",
@@ -104,12 +108,12 @@ export function FollowUpsFilter({
           onChange={(e) => onActionChange(e.target.value || undefined)}
           className="h-8 rounded-lg border border-border bg-card px-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary"
         >
-          <option value="">جميع أنواع الإجراءات</option>
-          <option value="CALL">اتصال هاتف</option>
-          <option value="MEETING">اجتماع</option>
-          <option value="WHATSAPP">واتساب</option>
-          <option value="EMAIL">إيميل</option>
-          <option value="VISIT">زيارة ميدانية</option>
+          <option value="">{tTabs("allActions")}</option>
+          <option value="CALL">{tActions("CALL")}</option>
+          <option value="MEETING">{tActions("MEETING")}</option>
+          <option value="WHATSAPP">{tActions("WHATSAPP")}</option>
+          <option value="EMAIL">{tActions("EMAIL")}</option>
+          <option value="VISIT">{tActions("VISIT")}</option>
         </select>
       </div>
     </div>

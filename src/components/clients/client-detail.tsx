@@ -27,6 +27,7 @@ interface ClientDetailProps {
 }
 
 export function ClientDetail({ client }: ClientDetailProps) {
+  const t = useTranslations("clients");
   const tCommon = useTranslations("common");
   const router = useRouter();
 
@@ -62,7 +63,7 @@ export function ClientDetail({ client }: ClientDetailProps) {
       });
 
       if (res.success) {
-        toast.success("تم حفظ تعديلات العميل بنجاح! 👏");
+        toast.success(t("infoUpdatedSuccess"));
         router.refresh();
       } else {
         toast.error(res.error || tCommon("error"));
@@ -80,7 +81,7 @@ export function ClientDetail({ client }: ClientDetailProps) {
             className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mb-1"
           >
             <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
-            <span>الرجوع لدليل العملاء</span>
+            <span>{t("backToList")}</span>
           </Link>
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-2xl font-bold text-foreground">{client.name}</h1>
@@ -102,7 +103,7 @@ export function ClientDetail({ client }: ClientDetailProps) {
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium hover:bg-muted transition-colors"
             >
               <Phone className="h-3.5 w-3.5 text-primary" />
-              <span>اتصال</span>
+              <span>{tCommon("call")}</span>
             </a>
           )}
 
@@ -114,7 +115,7 @@ export function ClientDetail({ client }: ClientDetailProps) {
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 text-xs font-medium hover:opacity-90 transition-opacity"
             >
               <MessageCircle className="h-3.5 w-3.5" />
-              <span>واتساب</span>
+              <span>{tCommon("whatsapp")}</span>
             </a>
           )}
 
@@ -123,7 +124,7 @@ export function ClientDetail({ client }: ClientDetailProps) {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:opacity-95 shadow-xs"
           >
             <Plus className="h-3.5 w-3.5" />
-            <span>صفقة جديدة</span>
+            <span>{t("newDeal")}</span>
           </Link>
         </div>
       </div>
@@ -138,7 +139,7 @@ export function ClientDetail({ client }: ClientDetailProps) {
               : "text-muted-foreground hover:text-foreground hover:bg-muted"
           }`}
         >
-          جهات الاتصال ({client.contacts?.length || 0})
+          {t("contactsTab", { count: client.contacts?.length || 0 })}
         </button>
 
         <button
@@ -149,7 +150,7 @@ export function ClientDetail({ client }: ClientDetailProps) {
               : "text-muted-foreground hover:text-foreground hover:bg-muted"
           }`}
         >
-          الصفقات ({client.deals?.length || 0})
+          {t("dealsTab", { count: client.deals?.length || 0 })}
         </button>
 
         <button
@@ -160,7 +161,7 @@ export function ClientDetail({ client }: ClientDetailProps) {
               : "text-muted-foreground hover:text-foreground hover:bg-muted"
           }`}
         >
-          بيانات العميل
+          {t("clientInfoTab")}
         </button>
       </div>
 
@@ -177,20 +178,20 @@ export function ClientDetail({ client }: ClientDetailProps) {
       {activeTab === "deals" && (
         <Card>
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-base font-bold">الصفقات المرتبطة</CardTitle>
+            <CardTitle className="text-base font-bold">{t("associatedDeals")}</CardTitle>
             <Link
               href={`/deals/new?client_id=${client.id}`}
               className="inline-flex items-center gap-1.5 text-xs text-primary font-medium hover:underline"
             >
               <Plus className="h-3.5 w-3.5" />
-              <span>إنشاء صفقة للعميل</span>
+              <span>{t("createDealForClient")}</span>
             </Link>
           </CardHeader>
           <CardContent>
             {(!client.deals || client.deals.length === 0) ? (
               <div className="text-center py-8 text-muted-foreground text-xs space-y-2">
                 <Briefcase className="h-8 w-8 mx-auto text-muted-foreground/50" />
-                <p>لا توجد صفقات مفتوحة لهذا العميل بعد</p>
+                <p>{t("noDealsForClient")}</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -230,7 +231,7 @@ export function ClientDetail({ client }: ClientDetailProps) {
       {activeTab === "info" && (
         <Card>
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-base font-bold">تعديل بيانات العميل</CardTitle>
+            <CardTitle className="text-base font-bold">{t("editClientInfo")}</CardTitle>
             <Button
               size="sm"
               onClick={handleSaveInfo}
@@ -242,50 +243,50 @@ export function ClientDetail({ client }: ClientDetailProps) {
               ) : (
                 <Save className="h-3.5 w-3.5" />
               )}
-              <span>حفظ التعديلات</span>
+              <span>{tCommon("save")}</span>
             </Button>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-semibold">اسم العميل</label>
+                <label className="text-xs font-semibold">{t("nameCompanyLabel")}</label>
                 <Input value={name} onChange={(e) => setName(e.target.value)} />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold">المجال / النشاط</label>
+                <label className="text-xs font-semibold">{t("industryLabel")}</label>
                 <Input value={industry} onChange={(e) => setIndustry(e.target.value)} />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-semibold">رقم الهاتف</label>
+                <label className="text-xs font-semibold">{t("phoneLabel")}</label>
                 <Input value={phone} dir="ltr" onChange={(e) => setPhone(e.target.value)} />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold">البريد الإلكتروني</label>
+                <label className="text-xs font-semibold">{t("emailLabel")}</label>
                 <Input value={email} dir="ltr" onChange={(e) => setEmail(e.target.value)} />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-semibold">المنطقة</label>
+                <label className="text-xs font-semibold">{t("areaLabel")}</label>
                 <Input value={area} onChange={(e) => setArea(e.target.value)} />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold">الموقع الإلكتروني</label>
+                <label className="text-xs font-semibold">{t("websiteLabel")}</label>
                 <Input value={website} dir="ltr" onChange={(e) => setWebsite(e.target.value)} />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold">العنوان التفصيلي</label>
+              <label className="text-xs font-semibold">{t("detailedAddress")}</label>
               <Input value={address} onChange={(e) => setAddress(e.target.value)} />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold">ملاحظات عامة</label>
+              <label className="text-xs font-semibold">{t("generalNotesLabel")}</label>
               <Textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { Phone, MessageCircle, Mail, Star, User } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,11 +15,14 @@ interface ContactsListProps {
 }
 
 export function ContactsList({ clientId, contacts, onRefresh }: ContactsListProps) {
+  const t = useTranslations("clients");
+  const tCommon = useTranslations("common");
+
   return (
     <Card>
       <CardHeader className="pb-3 flex flex-row items-center justify-between">
         <div className="flex items-center gap-2">
-          <CardTitle className="text-base font-bold">جهات الاتصال</CardTitle>
+          <CardTitle className="text-base font-bold">{t("contactsTitle")}</CardTitle>
           <Badge variant="secondary" className="text-xs">
             {contacts.length}
           </Badge>
@@ -29,7 +33,7 @@ export function ContactsList({ clientId, contacts, onRefresh }: ContactsListProp
         {contacts.length === 0 ? (
           <div className="text-center py-6 text-muted-foreground text-xs space-y-2">
             <User className="h-8 w-8 mx-auto text-muted-foreground/50" />
-            <p>لا توجد جهات اتصال مسجلة بعد</p>
+            <p>{t("noContactsYet")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -60,7 +64,7 @@ export function ContactsList({ clientId, contacts, onRefresh }: ContactsListProp
                             className="text-[10px] bg-primary/10 text-primary border-primary/20 gap-1"
                           >
                             <Star className="h-2.5 w-2.5 fill-primary" />
-                            <span>أساسي</span>
+                            <span>{t("primaryBadge")}</span>
                           </Badge>
                         )}
                       </div>
@@ -79,7 +83,7 @@ export function ContactsList({ clientId, contacts, onRefresh }: ContactsListProp
                         <a
                           href={`tel:${contact.phone}`}
                           className="p-1.5 rounded-lg bg-muted text-foreground hover:bg-muted/80 text-xs flex items-center gap-1"
-                          title="اتصال"
+                          title={tCommon("call")}
                         >
                           <Phone className="h-3.5 w-3.5" />
                           <span dir="ltr" className="font-mono text-[11px]">
@@ -94,7 +98,7 @@ export function ContactsList({ clientId, contacts, onRefresh }: ContactsListProp
                           target="_blank"
                           rel="noopener noreferrer"
                           className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 text-xs flex items-center gap-1"
-                          title="واتساب"
+                          title={tCommon("whatsapp")}
                         >
                           <MessageCircle className="h-3.5 w-3.5" />
                         </a>
@@ -104,7 +108,7 @@ export function ContactsList({ clientId, contacts, onRefresh }: ContactsListProp
                         <a
                           href={`mailto:${contact.email}`}
                           className="p-1.5 rounded-lg bg-muted text-foreground hover:bg-muted/80 text-xs flex items-center gap-1"
-                          title="إيميل"
+                          title={tCommon("email")}
                         >
                           <Mail className="h-3.5 w-3.5" />
                         </a>

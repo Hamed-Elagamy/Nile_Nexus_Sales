@@ -27,6 +27,7 @@ interface DealDetailProps {
 }
 
 export function DealDetail({ deal }: DealDetailProps) {
+  const tDeals = useTranslations("deals");
   const tCommon = useTranslations("common");
   const router = useRouter();
 
@@ -52,9 +53,9 @@ export function DealDetail({ deal }: DealDetailProps) {
       if (res.success) {
         setCurrentStage(targetStage);
         if (targetStage === "WON") {
-          toast.success("عاش يا وحش! 🎉 الصفقة اتقفلت بنجاح وتم تسجيل المكسب!");
+          toast.success(tDeals("wonSuccess"));
         } else {
-          toast.success(`تم تغيير مرحلة الصفقة إلى: ${targetStage}`);
+          toast.success(tDeals("stageUpdated", { stage: tDeals(`stages.${targetStage}`) }));
         }
         router.refresh();
       } else {
@@ -64,8 +65,8 @@ export function DealDetail({ deal }: DealDetailProps) {
   };
 
   const formattedValue = deal.estimated_value
-    ? `${Number(deal.estimated_value).toLocaleString("ar-EG")} ${deal.currency || "EGP"}`
-    : "غير محدد";
+    ? `${Number(deal.estimated_value).toLocaleString()} ${deal.currency || "EGP"}`
+    : tDeals("notSpecified");
 
   return (
     <div className="space-y-6">
@@ -77,7 +78,7 @@ export function DealDetail({ deal }: DealDetailProps) {
             className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors mb-1"
           >
             <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
-            <span>الرجوع للصفقات</span>
+            <span>{tDeals("backToList")}</span>
           </Link>
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-2xl font-bold text-foreground">{deal.title}</h1>
@@ -104,7 +105,7 @@ export function DealDetail({ deal }: DealDetailProps) {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:opacity-95 shadow-xs"
           >
             <Plus className="h-3.5 w-3.5" />
-            <span>عرض سعر جديد</span>
+            <span>{tDeals("newProposal")}</span>
           </Link>
 
           {currentStage !== "WON" && (
@@ -115,7 +116,7 @@ export function DealDetail({ deal }: DealDetailProps) {
               className="gap-1.5 text-xs text-emerald-600 border-emerald-200 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:bg-emerald-950/40"
             >
               <Trophy className="h-3.5 w-3.5" />
-              <span>كسبنا الصفقة 🎉</span>
+              <span>{tDeals("markWon")}</span>
             </Button>
           )}
 
@@ -127,7 +128,7 @@ export function DealDetail({ deal }: DealDetailProps) {
               className="gap-1.5 text-xs text-rose-600 border-rose-200 hover:bg-rose-50 dark:border-rose-800 dark:hover:bg-rose-950/40"
             >
               <XCircle className="h-3.5 w-3.5" />
-              <span>خسارة الصفقة</span>
+              <span>{tDeals("markLost")}</span>
             </Button>
           )}
         </div>
@@ -136,7 +137,7 @@ export function DealDetail({ deal }: DealDetailProps) {
       {/* Stage Stepper Progress Bar */}
       <Card className="p-3">
         <span className="text-xs font-bold text-muted-foreground block mb-2">
-          مراحل الصفقة (اضغط للانتقال السريع):
+          {tDeals("stagesStepper")}
         </span>
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
           {DEAL_STAGES.filter((s) => s !== "LOST" && s !== "LATER").map((st) => {
@@ -151,7 +152,7 @@ export function DealDetail({ deal }: DealDetailProps) {
                     : "bg-muted/40 hover:bg-muted text-muted-foreground border-border"
                 }`}
               >
-                {st}
+                {tDeals(`stages.${st}`)}
               </button>
             );
           })}
@@ -166,12 +167,12 @@ export function DealDetail({ deal }: DealDetailProps) {
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
                 <Coins className="h-4 w-4 text-primary" />
-                <span>البيانات المالية</span>
+                <span>{tDeals("financialData")}</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-xs">
               <div className="flex items-center justify-between p-2.5 bg-muted/40 rounded-lg">
-                <span className="text-muted-foreground">القيمة التقديرية:</span>
+                <span className="text-muted-foreground">{tDeals("estimatedValue")}</span>
                 <span className="font-bold text-sm text-foreground font-mono">
                   {formattedValue}
                 </span>
@@ -179,7 +180,7 @@ export function DealDetail({ deal }: DealDetailProps) {
 
               {deal.won_date && (
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">تاريخ الإغلاق (كسب):</span>
+                  <span className="text-muted-foreground">{tDeals("closeDateWon")}</span>
                   <span className="font-medium text-emerald-600">
                     {deal.won_date}
                   </span>
@@ -190,19 +191,19 @@ export function DealDetail({ deal }: DealDetailProps) {
 
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-semibold">تفاصيل المسؤول</CardTitle>
+              <CardTitle className="text-sm font-semibold">{tDeals("ownerDetails")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-xs text-muted-foreground">
               <div className="flex items-center justify-between">
-                <span>مسؤول المبيعات:</span>
+                <span>{tDeals("salesOwner")}</span>
                 <span className="font-medium text-foreground">
-                  {deal.sales_owner?.full_name || "غير محدد"}
+                  {deal.sales_owner?.full_name || tDeals("notSpecified")}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span>تاريخ الإنشاء:</span>
+                <span>{tDeals("creationDate")}</span>
                 <span className="font-medium text-foreground">
-                  {new Date(deal.created_at).toLocaleDateString("ar-EG")}
+                  {new Date(deal.created_at).toLocaleDateString()}
                 </span>
               </div>
             </CardContent>
@@ -215,7 +216,7 @@ export function DealDetail({ deal }: DealDetailProps) {
           {deal.notes && (
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-semibold">ملاحظات الصفقة</CardTitle>
+                <CardTitle className="text-sm font-semibold">{tDeals("dealNotes")}</CardTitle>
               </CardHeader>
               <CardContent className="text-xs text-foreground whitespace-pre-wrap">
                 {deal.notes}
@@ -228,13 +229,13 @@ export function DealDetail({ deal }: DealDetailProps) {
             <CardHeader className="pb-3 flex flex-row items-center justify-between">
               <CardTitle className="text-base font-bold flex items-center gap-2">
                 <Clock className="h-4 w-4 text-primary" />
-                <span>سجل الأنشطة والمراحل</span>
+                <span>{tDeals("activityLog")}</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
               {(!deal.activities || deal.activities.length === 0) ? (
                 <p className="text-xs text-muted-foreground text-center py-6">
-                  لا توجد أنشطة مسجلة لهذه الصفقة بعد
+                  {tDeals("noActivitiesYet")}
                 </p>
               ) : (
                 <div className="space-y-3">
@@ -248,7 +249,7 @@ export function DealDetail({ deal }: DealDetailProps) {
                           {act.summary}
                         </span>
                         <span className="text-[10px] text-muted-foreground">
-                          {new Date(act.created_at).toLocaleDateString("ar-EG")}
+                          {new Date(act.created_at).toLocaleDateString()}
                         </span>
                       </div>
                       {act.notes && (

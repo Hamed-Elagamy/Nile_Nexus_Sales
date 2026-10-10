@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.4] - 2026-10-10
+
+### Fixed & Enhanced
+- **Comprehensive Application-wide Localization & Content Revision**:
+  - Achieved 100% translation key parity between `messages/ar.json` and `messages/en.json` (779 keys in each, 0 missing).
+  - Eliminated all hardcoded bilingual slash labels and parenthetical text across the application (e.g., `العميل / Client` → dynamic `{t("client")}`, `كتالوج الخدمات (Services)` → `{t("servicesCatalogTitle")}`).
+  - Replaced hardcoded date locales (e.g., `toLocaleDateString("ar-EG")`) with locale-aware formatting (`toLocaleDateString(undefined, ...)`).
+  - Fully localized every module:
+    - **Auth & Header**: Clean role titles (`المدير العام`, `مدير النظام`, `مسؤول المبيعات` / `General Manager`, `Administrator`, `Sales Representative`), translated login form errors and inputs.
+    - **Potential Clients**: Dynamic status badges, opportunity tags, creation wizard, and detail view.
+    - **Clients & Contacts**: Type badges, contact creation and detail cards.
+    - **Deals & Pipeline**: Dynamic deal stage badges without hardcoded Arabic fallbacks, creation dialog, and pipeline kanban board.
+    - **Follow-ups Daily Workspace**: Filter tabs, follow-up cards, action badges, and complete / reschedule / create modals.
+    - **Commercial Proposals**: Creation wizard, proposal builder, status badges, overview cards, and print/PDF view.
+    - **Team & Settings**: Services catalog, lead sources manager, and team member management cards.
+    - **Approvals & Reports**: Approvals request cards, client labels, and sales funnel stages.
+  - Typecheck passed with 0 errors (`npx tsc --noEmit`) and all 60 Vitest tests passing across 13 test suites.
+
 ## [0.9.3] - 2026-10-09
 
 ### Fixed

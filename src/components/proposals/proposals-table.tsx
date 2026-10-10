@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Eye, Building2, Briefcase, FileText } from "lucide-react";
 import { ProposalStatusBadge } from "./proposal-status-badge";
 import type { ProposalWithRelations } from "@/lib/actions/proposals";
@@ -11,6 +12,9 @@ interface ProposalsTableProps {
 }
 
 export function ProposalsTable({ proposals }: ProposalsTableProps) {
+  const t = useTranslations("proposals");
+  const tTable = useTranslations("proposals.table");
+
   if (proposals.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-12 text-center rounded-xl border border-dashed border-border bg-card/50">
@@ -18,10 +22,10 @@ export function ProposalsTable({ proposals }: ProposalsTableProps) {
           <FileText className="h-8 w-8" />
         </div>
         <h3 className="text-base font-semibold text-foreground">
-          لا توجد عروض أسعار مطابقة للبحث
+          {t("emptyTable")}
         </h3>
         <p className="text-xs text-muted-foreground mt-1 max-w-sm">
-          يمكنك إنشاء عرض أسعار جديد وربطه بالعميل والصفقة من الزر بالأعلى.
+          {t("emptyTableSubtitle")}
         </p>
       </div>
     );
@@ -33,20 +37,20 @@ export function ProposalsTable({ proposals }: ProposalsTableProps) {
         <table className="w-full text-right text-xs">
           <thead className="bg-muted/50 border-b border-border text-muted-foreground font-semibold">
             <tr>
-              <th className="p-3.5">كود العرض</th>
-              <th className="p-3.5">العميل</th>
-              <th className="p-3.5">الصفقة المرتبطة</th>
-              <th className="p-3.5 text-center">الإصدار</th>
-              <th className="p-3.5 text-center">الحالة</th>
-              <th className="p-3.5 text-left">القيمة الإجمالية</th>
-              <th className="p-3.5 text-center">تاريخ الإصدار</th>
+              <th className="p-3.5">{tTable("code")}</th>
+              <th className="p-3.5">{tTable("client")}</th>
+              <th className="p-3.5">{tTable("deal")}</th>
+              <th className="p-3.5 text-center">{tTable("version")}</th>
+              <th className="p-3.5 text-center">{tTable("status")}</th>
+              <th className="p-3.5 text-left">{tTable("total")}</th>
+              <th className="p-3.5 text-center">{tTable("issueDate")}</th>
               <th className="p-3.5 text-center w-16"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/60">
             {proposals.map((proposal) => {
               const currentVer = proposal.current_version;
-              const formattedDate = new Date(proposal.created_at).toLocaleDateString("ar-EG", {
+              const formattedDate = new Date(proposal.created_at).toLocaleDateString(undefined, {
                 month: "short",
                 day: "numeric",
               });
@@ -122,7 +126,7 @@ export function ProposalsTable({ proposals }: ProposalsTableProps) {
                     <Link
                       href={`/proposals/${proposal.id}`}
                       className="inline-flex items-center justify-center p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                      title="عرض التفاصيل"
+                      title={t("viewDetails")}
                     >
                       <Eye className="h-3.5 w-3.5" />
                     </Link>

@@ -31,6 +31,7 @@ export function CreateDealDialog({
   onSuccess,
   triggerButton,
 }: CreateDealDialogProps) {
+  const tDeals = useTranslations("deals");
   const tCommon = useTranslations("common");
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -58,12 +59,12 @@ export function CreateDealDialog({
     setFormError(null);
 
     if (!title.trim()) {
-      setFormError("عنوان الصفقة مطلوب");
+      setFormError(tDeals("titleRequired"));
       return;
     }
 
     if (!clientId) {
-      setFormError("يجب اختيار العميل");
+      setFormError(tDeals("clientRequired"));
       return;
     }
 
@@ -83,7 +84,7 @@ export function CreateDealDialog({
         return;
       }
 
-      toast.success("تم إنشاء الصفقة بنجاح! 🚀");
+      toast.success(tDeals("createSuccess"));
       setOpen(false);
       resetForm();
       onSuccess?.();
@@ -99,7 +100,7 @@ export function CreateDealDialog({
           ) : (
             <Button className="gap-2 bg-primary text-primary-foreground font-medium shadow-sm hover:opacity-95">
               <Plus className="h-4 w-4" />
-              <span>صفقة جديدة</span>
+              <span>{tDeals("addNew")}</span>
             </Button>
           )
         }
@@ -108,7 +109,7 @@ export function CreateDealDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold">
             <Briefcase className="h-5 w-5 text-primary" />
-            <span>إنشاء صفقة تجارية جديدة</span>
+            <span>{tDeals("createDialogTitle")}</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -123,10 +124,10 @@ export function CreateDealDialog({
           {/* Title */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-foreground">
-              عنوان الصفقة <span className="text-destructive">*</span>
+              {tDeals("dealTitleLabel")} <span className="text-destructive">*</span>
             </label>
             <Input
-              placeholder="مثال: توريد نظام ERP وسيرفرات"
+              placeholder={tDeals("dealTitlePlaceholder")}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -136,7 +137,7 @@ export function CreateDealDialog({
           {/* Client Selection */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-foreground">
-              العميل <span className="text-destructive">*</span>
+              {tDeals("clientLabel")} <span className="text-destructive">*</span>
             </label>
             {clients.length > 0 ? (
               <select
@@ -145,7 +146,7 @@ export function CreateDealDialog({
                 className="w-full h-10 px-3 rounded-lg border border-border bg-card text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 required
               >
-                <option value="">-- اختر العميل --</option>
+                <option value="">{tDeals("selectClientOption")}</option>
                 {clients.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name} ({c.business_id})
@@ -154,7 +155,7 @@ export function CreateDealDialog({
               </select>
             ) : (
               <Input
-                placeholder="معرف العميل (UUID)"
+                placeholder={tDeals("clientIdPlaceholder")}
                 value={clientId}
                 onChange={(e) => setClientId(e.target.value)}
                 required
@@ -165,7 +166,7 @@ export function CreateDealDialog({
           {/* Stage & Value */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">مرحلة البداية</label>
+              <label className="text-xs font-semibold text-foreground">{tDeals("startingStageLabel")}</label>
               <select
                 value={stage}
                 onChange={(e) => setStage(e.target.value as DealStage)}
@@ -173,14 +174,14 @@ export function CreateDealDialog({
               >
                 {DEAL_STAGES.map((s) => (
                   <option key={s} value={s}>
-                    {s}
+                    {tDeals(`stages.${s}`)}
                   </option>
                 ))}
               </select>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">القيمة المتوقعة (ج.م)</label>
+              <label className="text-xs font-semibold text-foreground">{tDeals("expectedValueLabel")}</label>
               <div className="flex gap-2">
                 <Input
                   type="number"
@@ -204,9 +205,9 @@ export function CreateDealDialog({
 
           {/* Notes */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-foreground">ملاحظات الصفقة</label>
+            <label className="text-xs font-semibold text-foreground">{tDeals("dealNotesLabel")}</label>
             <Textarea
-              placeholder="اكتب أهداف الصفقة ومتطلبات العميل المبدئية..."
+              placeholder={tDeals("dealNotesPlaceholder")}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
