@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { CheckCheck, AlertCircle, CheckCircle, Info } from "lucide-react";
-import { demoNotifications } from "@/lib/demo-data";
+import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
@@ -10,10 +10,37 @@ export const metadata: Metadata = {
   description: "التنبيهات وإشعارات النظام وأحداث الصفقات",
 };
 
+interface NotificationItem {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  is_read: boolean;
+  action_url?: string | null;
+  created_at: string;
+}
+
 export default async function NotificationsPage() {
   const t = await getTranslations("notifications");
   const tCommon = await getTranslations("common");
-  const notifications = demoNotifications;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let notifications: NotificationItem[] = [];
+
+  if (user) {
+    const { data: dbNotifs } = await supabase
+      .from("notifications")
+      .select("id, type, title, body, is_read, action_url, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    notifications = (dbNotifs as unknown as NotificationItem[]) || [];
+  }
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -40,57 +67,66 @@ export default async function NotificationsPage() {
             {t("empty")}
           </div>
         ) : (
-          notifications.map((notif) => (
-            <div
-              key={notif.id}
-              className={`p-4 rounded-xl border transition-all flex items-start gap-4 ${
-                notif.is_read
-                  ? "border-[var(--border)] bg-[var(--card)] opacity-80"
-                  : "border-[var(--primary)]/40 bg-[var(--card)] shadow-xs"
-              }`}
-            >
-              <div className="shrink-0 mt-0.5">
-                {notif.type === "ALERT" ? (
-                  <div className="h-9 w-9 rounded-full bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 flex items-center justify-center">
-                    <AlertCircle className="h-5 w-5" />
-                  </div>
-                ) : notif.type === "SUCCESS" ? (
-                  <div className="h-9 w-9 rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                    <CheckCircle className="h-5 w-5" />
-                  </div>
-                ) : (
-                  <div className="h-9 w-9 rounded-full bg-blue-100 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-                    <Info className="h-5 w-5" />
-                  </div>
-                )}
-              </div>
+          notifications.map((notif) => {
+            const timeStr = new Date(notif.created_at).toLocaleDateString(undefined, {
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            });
 
-              <div className="flex-1 space-y-1">
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-semibold text-sm text-[var(--foreground)]">
-                    {notif.title}
-                  </h3>
-                  <span className="text-xs text-[var(--muted-foreground)] shrink-0">
-                    {notif.timestamp}
-                  </span>
+            return (
+              <div
+                key={notif.id}
+                className={`p-4 rounded-xl border transition-all flex items-start gap-4 ${
+                  notif.is_read
+                    ? "border-[var(--border)] bg-[var(--card)] opacity-80"
+                    : "border-[var(--primary)]/40 bg-[var(--card)] shadow-xs"
+                }`}
+              >
+                <div className="shrink-0 mt-0.5">
+                  {notif.type === "ALERT" ? (
+                    <div className="h-9 w-9 rounded-full bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 flex items-center justify-center">
+                      <AlertCircle className="h-5 w-5" />
+                    </div>
+                  ) : notif.type === "SUCCESS" ? (
+                    <div className="h-9 w-9 rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                      <CheckCircle className="h-5 w-5" />
+                    </div>
+                  ) : (
+                    <div className="h-9 w-9 rounded-full bg-blue-100 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                      <Info className="h-5 w-5" />
+                    </div>
+                  )}
                 </div>
-                <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
-                  {notif.description}
-                </p>
 
-                {notif.link && (
-                  <div className="pt-2">
-                    <Link
-                      href={notif.link}
-                      className="text-xs font-semibold text-[var(--primary)] hover:underline inline-flex items-center gap-1"
-                    >
-                      <span>{tCommon("details")} →</span>
-                    </Link>
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-semibold text-sm text-[var(--foreground)]">
+                      {notif.title}
+                    </h3>
+                    <span className="text-xs text-[var(--muted-foreground)] shrink-0">
+                      {timeStr}
+                    </span>
                   </div>
-                )}
+                  <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
+                    {notif.body}
+                  </p>
+
+                  {notif.action_url && (
+                    <div className="pt-2">
+                      <Link
+                        href={notif.action_url}
+                        className="text-xs font-semibold text-[var(--primary)] hover:underline inline-flex items-center gap-1"
+                      >
+                        <span>{tCommon("details")} →</span>
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

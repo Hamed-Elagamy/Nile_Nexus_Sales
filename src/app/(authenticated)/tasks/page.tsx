@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { CheckSquare, Plus, Clock, AlertCircle } from "lucide-react";
-import { demoTasks, demoProfiles, demoClients, demoDeals } from "@/lib/demo-data";
+import { createClient } from "@/lib/supabase/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -10,10 +10,34 @@ export const metadata: Metadata = {
   description: "متابعة وإدارة المهام وتكليفات فريق المبيعات",
 };
 
+interface TaskItem {
+  id: string;
+  title: string;
+  notes: string | null;
+  priority: "NORMAL" | "IMPORTANT" | "URGENT";
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+  deadline: string | null;
+  assignee?: { id: string; full_name: string } | null;
+  client?: { id: string; name: string } | null;
+  deal?: { id: string; title: string } | null;
+}
+
 export default async function TasksPage() {
   const t = await getTranslations("tasks");
   const tCommon = await getTranslations("common");
-  const tasks = demoTasks;
+
+  const supabase = await createClient();
+  const { data: dbTasks } = await supabase
+    .from("tasks")
+    .select(`
+      id, title, notes, priority, status, deadline,
+      assignee:profiles!assignee_id(id, full_name),
+      client:clients!client_id(id, name),
+      deal:deals!deal_id(id, title)
+    `)
+    .order("deadline", { ascending: true, nullsFirst: false });
+
+  const tasks: TaskItem[] = (dbTasks as unknown as TaskItem[]) || [];
 
   return (
     <div className="space-y-6">
@@ -64,14 +88,16 @@ export default async function TasksPage() {
         </div>
       </div>
 
-      {/* Tasks List */}
+      {/* Tasks List or Empty State */}
       <div className="space-y-3">
-        {tasks.map((task) => {
-          const assignee = demoProfiles.find((p) => p.id === task.assignee_id);
-          const client = demoClients.find((c) => c.id === task.client_id);
-          const deal = demoDeals.find((d) => d.id === task.deal_id);
-
-          return (
+        {tasks.length === 0 ? (
+          <div className="p-12 text-center border border-dashed rounded-2xl bg-[var(--card)] space-y-3">
+            <CheckSquare className="h-10 w-10 text-[var(--muted-foreground)] mx-auto opacity-40" />
+            <h3 className="font-semibold text-base text-[var(--foreground)]">{t("noTasks")}</h3>
+            <p className="text-xs text-[var(--muted-foreground)] max-w-sm mx-auto">{t("noTasksDesc")}</p>
+          </div>
+        ) : (
+          tasks.map((task) => (
             <div
               key={task.id}
               className="p-4 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-[var(--primary)]/40 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
@@ -102,17 +128,17 @@ export default async function TasksPage() {
                 )}
 
                 <div className="flex items-center gap-4 text-xs text-[var(--muted-foreground)] flex-wrap pt-1">
-                  {client && <span>{t("client")}: {client.name}</span>}
-                  {deal && <span>{t("deal")}: {deal.title}</span>}
+                  {task.client && <span>{t("client")}: {task.client.name}</span>}
+                  {task.deal && <span>{t("deal")}: {task.deal.title}</span>}
                   {task.deadline && (
                     <span className="flex items-center gap-1 font-mono">
                       <Clock className="h-3 w-3" />
                       {t("dueDate")}: {new Date(task.deadline).toISOString().split("T")[0]}
                     </span>
                   )}
-                  {assignee && (
+                  {task.assignee && (
                     <span className="text-[var(--primary)] font-medium">
-                      {t("assignedTo")}: {assignee.full_name}
+                      {t("assignedTo")}: {task.assignee.full_name}
                     </span>
                   )}
                 </div>
@@ -127,8 +153,8 @@ export default async function TasksPage() {
                 </Button>
               </div>
             </div>
-          );
-        })}
+          ))
+        )}
       </div>
     </div>
   );

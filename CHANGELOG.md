@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2026-10-10
+
+### Production Release & Demo Data Transition
+- **Production Database Preparation Migration (`008_prepare_production_and_clean_demo_data.sql`)**:
+  - Created transactional SQL migration to clean out all test/sample records (`potential_clients`, `clients`, `deals`, `proposals`, `follow_ups`, `tasks`, `approvals`, `notifications`, `activities`, `audit_logs`).
+  - Purged placeholder seed users (`gm@nilenexus.com`, `admin@nilenexus.com`, `sales@nilenexus.com`).
+  - Strictly preserved real corporate accounts: Mohamed Hamed (`hamedelagamy00@gmail.com`) and Reem Ezz (`ezzreem726@gmail.com`) with confirmed GM role, as well as all registered employees.
+  - Strictly preserved all system configuration: pipeline stages, lead sources, lost reasons, services catalog, feature flags, permissions, and payment terms templates.
+  - Reset all business ID counters (`number_sequences`) to `0` so production records begin sequentially at `00001` (`PC-00001`, `CLIENT-00001`, `DEAL-00001`, `NN-Q-00001`, `TASK-00001`).
+- **Connected All Remaining Pages to Live Supabase Queries**:
+  - `tasks/page.tsx`: Now queries `tasks` directly from Supabase, with a clean translated empty state when no tasks are assigned.
+  - `calendar/page.tsx`: Now queries pending follow-ups and meetings directly from Supabase, computing live agenda stats and displaying a clean empty state.
+  - `approvals/page.tsx`: Now queries `approvals` table live from Supabase, displaying pending discounts and payment exceptions.
+  - `reports/page.tsx`: Computes live closed revenue, open pipeline, average deal size, conversion rate, and sales representative leaderboard directly from database records.
+  - `notifications/page.tsx`: Now queries user notifications directly from Supabase for the authenticated employee.
+  - **Zero** `.tsx` components in the application import or rely on mock demo data.
+- **Translation Parity & Quality Gates**:
+  - 100% key parity maintained: 787 keys in both `messages/ar.json` and `messages/en.json` (0 missing).
+  - TypeScript strict check: 0 errors (`npx tsc --noEmit`).
+  - Vitest test suite: 60/60 tests passing across 13 suites.
+
 ## [0.9.4] - 2026-10-10
 
 ### Fixed & Enhanced

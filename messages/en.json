@@ -668,6 +668,8 @@
     "tomorrow": "Tomorrow",
     "nextThursday": "Next Thursday",
     "nextWeek": "Next Week",
+    "noEvents": "No scheduled appointments or follow-ups yet",
+    "noEventsDesc": "Scheduled appointments, calls, and meetings will automatically appear here.",
     "types": {
       "MEETING": "Meeting",
       "CALL": "Call",
@@ -701,6 +703,8 @@
     "urgentTasks": "Urgent Tasks",
     "inProgressTasks": "In Progress",
     "completedTasks": "Completed",
+    "noTasks": "No tasks yet",
+    "noTasksDesc": "You can add and assign new tasks to sales team members.",
     "priority": {
       "NORMAL": "Normal",
       "IMPORTANT": "Important",
@@ -732,6 +736,8 @@
     "justification": "Business Justification",
     "approvedSuccess": "Request approved successfully ✅",
     "rejectedSuccess": "Request rejected ❌",
+    "noApprovals": "No pending approval requests at this time",
+    "noApprovalsDesc": "Special discount requests and payment exceptions will appear here for GM approval.",
     "status": {
       "PENDING": "Pending",
       "APPROVED": "Approved",
@@ -742,6 +748,8 @@
     "title": "Reports & Analytics",
     "subtitle": "Closed revenue insights, conversion rates, and monthly sales performance",
     "exportExcel": "Export Excel Report",
+    "noReps": "No performance data recorded yet",
+    "noRepsDesc": "Sales representative rankings and win rates will automatically update as deals are won.",
     "closedRevenue": "Closed Won Revenue (Q1)",
     "monthlyTarget": "104% of monthly target",
     "openPipeline": "Active Open Pipeline",
