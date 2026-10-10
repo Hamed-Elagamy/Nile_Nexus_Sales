@@ -62,6 +62,13 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - Added user profile summary card, role badge, language switcher, and logout trigger to drawer
   - Added mobile body scroll lock, ESC key listener, and `pb-24` main content bottom padding
   - Zero TypeScript errors (`tsc --noEmit`) and 60/60 tests passing (100% pass rate)
+- **Phase 14 (Services Catalog & Lead Sources Management for Admin & GM)**:
+  - Added Edit and Delete dialogs for Services Catalog with reference price and currency editing
+  - Added Edit and Delete dialogs for Marketing Lead Sources
+  - Implemented safe deletion with automatic archiving (`is_active = false`) for items in active use
+  - Enforced multi-layer role protection (GM and Admin only) in UI and server actions
+  - Converted Settings page metadata to dynamic locale-aware metadata
+  - Zero TypeScript errors (`tsc --noEmit`) and 60/60 tests passing (100% pass rate)
 
 ## Completed Work
 - **Design System & UI Components**:

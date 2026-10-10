@@ -7,10 +7,13 @@ import { UserProfileForm } from "@/components/settings/user-profile-form";
 import { ServicesCatalog } from "@/components/settings/services-catalog";
 import { LeadSourcesManager } from "@/components/settings/lead-sources-manager";
 
-export const metadata = {
-  title: "الإعدادات العامة والملف الشخصي | Nile Nexus Sales",
-  description: "إعدادات الملف الشخصي والنظام وكتالوج الخدمات ومصادر العملاء",
-};
+export async function generateMetadata() {
+  const t = await getTranslations("settings");
+  return {
+    title: `${t("title")} | Nile Nexus Sales`,
+    description: t("subtitle"),
+  };
+}
 
 export default async function SettingsPage() {
   const t = await getTranslations("settings");
@@ -21,6 +24,7 @@ export default async function SettingsPage() {
   ]);
 
   const profile = profileRes.success && profileRes.data ? profileRes.data : null;
+  const userRole = profile?.role || "SALES";
   const services = servicesRes.success && servicesRes.data ? servicesRes.data : [];
   const leadSources =
     leadSourcesRes.success && leadSourcesRes.data ? leadSourcesRes.data : [];
@@ -43,12 +47,12 @@ export default async function SettingsPage() {
 
       {/* Services Section */}
       <div className="pt-2">
-        <ServicesCatalog services={services} />
+        <ServicesCatalog services={services} userRole={userRole} />
       </div>
 
       {/* Lead Sources Section */}
       <div className="pt-6 border-t border-border">
-        <LeadSourcesManager leadSources={leadSources} />
+        <LeadSourcesManager leadSources={leadSources} userRole={userRole} />
       </div>
     </div>
   );

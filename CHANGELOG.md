@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-10-11
+
+### Added & Enhanced
+- **Services Catalog & Lead Sources Management for Admin and GM Roles**:
+  - **Services Catalog Editing & Deletion**:
+    - Added **Edit Service (تعديل الخدمة)** dialog allowing GM and Admin roles to update Arabic name, English name, reference price, and currency.
+    - Added **Delete Service (حذف الخدمة)** dialog with confirmation. If a service is linked to existing deals or commercial proposals, it is safely soft-deleted/archived (`is_active = false`) to maintain historical financial and contract integrity.
+    - Role-based permissions: Sales representatives receive a clean read-only view, while management controls are reserved for `GM` and `ADMIN` roles.
+  - **Lead Sources Editing & Deletion**:
+    - Added **Edit Lead Source (تعديل المصدر)** dialog to rename marketing channels in Arabic and English.
+    - Added **Delete Lead Source (حذف المصدر)** dialog with confirmation. Unused sources are deleted; sources linked to past clients or deals are safely archived to prevent foreign key errors and preserve pipeline analytics.
+  - **Settings Page Dynamic Metadata**:
+    - Converted static page metadata to locale-aware `generateMetadata` matching the active language.
+  - **Server Actions & Database Security**:
+    - Implemented `deleteService`, `updateLeadSource`, and `deleteLeadSource` with strict multi-layer GM/Admin authorization and database RLS alignment.
+    - 100% synchronized translation keys between `messages/ar.json` and `messages/en.json`.
+
+
 ## [1.1.0] - 2026-10-11
 
 ### Added & Enhanced

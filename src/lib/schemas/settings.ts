@@ -24,3 +24,10 @@ export const createLeadSourceSchema = z.object({
 });
 
 export type CreateLeadSourceInput = z.infer<typeof createLeadSourceSchema>;
+
+export const updateLeadSourceSchema = createLeadSourceSchema.partial().extend({
+  is_active: z.boolean().optional(),
+});
+
+export type UpdateLeadSourceInput = z.infer<typeof updateLeadSourceSchema>;
+

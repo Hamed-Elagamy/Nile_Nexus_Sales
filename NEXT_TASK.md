@@ -16,6 +16,7 @@ Execute Production Database Clean-up & Roll Out to Company Employees:
 - [x] All 22 routes operational with zero 404s
 - [x] UI decoupled from demo-data (0 `.tsx` files importing mock data)
 - [x] Full 14-tab mobile navigation drawer and "More / المزيد" bottom bar trigger operational
+- [x] Services catalog editing & deletion and Lead sources deletion enabled for Admin & GM roles
 - [x] Clean translated empty states implemented for tasks, calendar, approvals, reports, notifications
 - [x] Migration `008_prepare_production_and_clean_demo_data.sql` generated and verified
 - [ ] Run migration 008 in Supabase SQL Editor
