@@ -88,7 +88,14 @@
     "team": "الفريق",
     "reports": "التقارير",
     "notifications": "الإشعارات",
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "more": "المزيد",
+    "menu": "القائمة",
+    "allSections": "جميع الأقسام",
+    "core": "الأساسية",
+    "activities": "الأنشطة والمتابعة",
+    "salesOps": "العروض والموافقات",
+    "management": "الإدارة والتقارير"
   },
   "dashboard": {
     "greeting": "مرحباً بك يا {name} 🚀",

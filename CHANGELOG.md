@@ -2,7 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.0.0] - 2026-10-10
+## [1.1.0] - 2026-10-11
+
+### Added & Enhanced
+- **Full 14-Tab Mobile Navigation Drawer & Bottom Bar "More" (المزيد) Integration**:
+  - Solved the mobile navigation limitation where only 5 tabs were previously visible and the other 9 tabs (`Potential Clients`, `Pipeline`, `Tasks`, `Calendar`, `Proposals`, `Approvals`, `Team`, `Reports`, `Settings`) were inaccessible on smartphones.
+  - **Mobile Slide-Over Navigation Drawer**:
+    - Accessible via the new hamburger menu button (☰) in the mobile top header or the 5th "More / المزيد" bottom bar tab.
+    - Displays all 14 application sections with their corresponding Lucide icons, localized titles, and active route highlight.
+    - Features user profile summary card with avatar, full name, email, and role badge (`GM`, `ADMIN`, `SALES`).
+    - Integrated language switcher (عربي / English) and secure sign-out trigger directly inside the drawer footer.
+    - Native RTL and LTR support: smoothly slides out from right in Arabic and from left in English.
+    - Automatically closes on page navigation, backdrop touch, or `Escape` key press with body scroll lock.
+  - **Enhanced Mobile Bottom Navigation**:
+    - Keeps 4 high-frequency quick-access tabs (`Dashboard`, `Clients`, `Deals`, `Follow-ups`).
+    - Replaced static 5th slot with dynamic "More / المزيد" trigger (`LayoutGrid` icon) with active status dot indicator whenever browsing secondary sections.
+  - **Shared `MobileNavContext`**:
+    - Clean React context managing open/close state between `AppHeader`, `AppSidebar`, and mobile bottom bar without prop drilling.
+  - **Layout & Ergonomics Improvements**:
+    - Added `pb-24 md:pb-6` bottom padding to `<main>` to ensure mobile page content and action buttons are never obscured by the fixed bottom navigation bar.
+    - Synchronized `nav.more`, `nav.menu`, `nav.allSections`, and group keys across `messages/ar.json` and `messages/en.json`.
+
 
 ### Production Release & Demo Data Transition
 - **Production Database Preparation Migration (`008_prepare_production_and_clean_demo_data.sql`)**:

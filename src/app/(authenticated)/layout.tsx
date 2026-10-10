@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { AppHeader } from "@/components/layout/app-header";
+import { MobileNavProvider } from "@/components/layout/mobile-nav-context";
 
 /**
  * Authenticated layout — wraps all protected pages with sidebar + header.
@@ -39,14 +40,16 @@ export default async function AuthenticatedLayout({
   };
 
   return (
-    <div className="min-h-screen flex">
-      <AppSidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <AppHeader user={userWithProfile} />
-        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
-          {children}
-        </main>
+    <MobileNavProvider>
+      <div className="min-h-screen flex">
+        <AppSidebar user={userWithProfile} />
+        <div className="flex-1 flex flex-col min-w-0">
+          <AppHeader user={userWithProfile} />
+          <main className="flex-1 p-4 md:p-6 lg:p-8 pb-24 md:pb-6 overflow-auto">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </MobileNavProvider>
   );
 }

@@ -3,10 +3,11 @@
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Bell, LogOut, Search, CheckCircle2 } from "lucide-react";
+import { Bell, LogOut, Search, CheckCircle2, Menu } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
+import { useMobileNav } from "./mobile-nav-context";
 import type { User } from "@supabase/supabase-js";
 
 interface AppHeaderProps {
@@ -16,6 +17,7 @@ interface AppHeaderProps {
 export function AppHeader({ user }: AppHeaderProps) {
   const t = useTranslations();
   const router = useRouter();
+  const mobileNav = useMobileNav();
 
   const isConfigured = isSupabaseConfigured();
 
@@ -39,15 +41,25 @@ export function AppHeader({ user }: AppHeaderProps) {
 
   return (
     <header className="sticky top-0 z-40 bg-[var(--background)]/80 backdrop-blur-sm border-b border-[var(--border)]">
-      <div className="flex items-center justify-between h-14 px-4 md:px-6">
-        {/* Search */}
-        <div className="flex-1 max-w-md">
-          <div className="relative">
+      <div className="flex items-center justify-between h-14 px-3 sm:px-4 md:px-6 gap-2">
+        {/* Left side: Mobile menu toggle + Search */}
+        <div className="flex items-center gap-2 flex-1 max-w-md min-w-0">
+          <button
+            type="button"
+            onClick={mobileNav.toggle}
+            className="md:hidden p-2 -ms-1 rounded-lg hover:bg-[var(--muted)] text-[var(--foreground)] transition-colors cursor-pointer shrink-0"
+            aria-label={t("nav.menu")}
+            title={t("nav.menu")}
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+
+          <div className="relative flex-1 min-w-0">
             <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted-foreground)]" />
             <input
               type="text"
               placeholder={t("common.search")}
-              className="w-full ps-10 pe-4 py-2 rounded-lg bg-[var(--muted)] text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] transition-colors"
+              className="w-full ps-9 pe-3 py-1.5 sm:py-2 rounded-lg bg-[var(--muted)] text-xs sm:text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] transition-colors"
             />
           </div>
         </div>

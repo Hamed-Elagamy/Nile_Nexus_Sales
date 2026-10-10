@@ -88,7 +88,14 @@
     "team": "Team",
     "reports": "Reports",
     "notifications": "Notifications",
-    "settings": "Settings"
+    "settings": "Settings",
+    "more": "More",
+    "menu": "Menu",
+    "allSections": "All Sections",
+    "core": "Core",
+    "activities": "Activities & Tasks",
+    "salesOps": "Proposals & Approvals",
+    "management": "Management & Insights"
   },
   "dashboard": {
     "greeting": "Welcome back, {name} 🚀",
