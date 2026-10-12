@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient as createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { getUserLocale } from "@/i18n/locale";
 import type { Notification, NotificationCategory } from "@/types/domain";
 
 export interface ActionResult<T = unknown> {
@@ -279,9 +280,9 @@ export async function createNotification(params: {
 }
 
 /**
- * Send a live test notification to the current logged-in user
+ * Send a live test notification to the current logged-in user in their preferred language
  */
-export async function sendTestNotification(): Promise<ActionResult<NotificationItem>> {
+export async function sendTestNotification(targetLocale?: "ar" | "en"): Promise<ActionResult<NotificationItem>> {
   try {
     let userId = "demo-user";
 
@@ -299,12 +300,36 @@ export async function sendTestNotification(): Promise<ActionResult<NotificationI
       }
     }
 
-    const nowStr = new Date().toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    let activeLocale = targetLocale;
+    if (!activeLocale) {
+      try {
+        const userLoc = await getUserLocale();
+        if (userLoc === "en" || userLoc === "ar") {
+          activeLocale = userLoc;
+        }
+      } catch {
+        activeLocale = "ar";
+      }
+    }
+    activeLocale = activeLocale || "ar";
+
+    const isEn = activeLocale === "en";
+    const nowStr = isEn
+      ? new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+      : new Date().toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+    const title = isEn
+      ? "🔔 Real-Time Notification Test | Nile Nexus Sales"
+      : "🔔 تجربة الإشعار اللحظي | Nile Nexus Sales";
+
+    const body = isEn
+      ? `This real-time notification was successfully tested and received at (${nowStr}). The system is operating seamlessly across your devices and smartphone!`
+      : `تم اختبار واستقبال هذا الإشعار اللحظي بنجاح في تمام الساعة (${nowStr}). النظام يعمل بكفاءة تامة على هاتفك وجهازك!`;
 
     return await createNotification({
       userId,
-      title: "🔔 تجربة الإشعار اللحظي | Nile Nexus Sales",
-      body: `تم اختبار واستقبال هذا الإشعار اللحظي بنجاح في تمام الساعة (${nowStr}). النظام يعمل بكفاءة تامة على هاتفك وجهازك!`,
+      title,
+      body,
       category: "UPDATE",
       type: "SUCCESS",
       link: "/notifications",

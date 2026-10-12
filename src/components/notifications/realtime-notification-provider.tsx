@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import {
   getNotifications,
@@ -18,6 +19,7 @@ import {
   requestNotificationPermission,
   showDeviceNotification,
 } from "@/lib/utils/notifications";
+import { formatLocalizedNotification } from "@/lib/utils/localized-notification";
 
 interface NotificationContextValue {
   unreadCount: number;
@@ -27,7 +29,7 @@ interface NotificationContextValue {
   requestPermission: () => Promise<NotificationPermission>;
   markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
-  sendTestNotification: () => Promise<void>;
+  sendTestNotification: (targetLocale?: "ar" | "en") => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -53,6 +55,7 @@ export function RealtimeNotificationProvider({
   children,
 }: RealtimeNotificationProviderProps) {
   const router = useRouter();
+  const locale = useLocale() as "ar" | "en";
   const [unreadCount, setUnreadCount] = useState<number>(initialUnreadCount);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [permission, setPermission] = useState<NotificationPermission>("default");
@@ -86,9 +89,11 @@ export function RealtimeNotificationProvider({
     loadNotifications();
   }, [loadNotifications]);
 
-  // Handle incoming notification
+  // Handle incoming notification with runtime bilingual localization
   const handleIncomingNotification = useCallback(
     (notif: NotificationItem) => {
+      const localized = formatLocalizedNotification(notif, locale);
+
       // 1. Play synthesized chime
       playNotificationSound();
 
@@ -96,17 +101,17 @@ export function RealtimeNotificationProvider({
       vibrateDevice([150, 70, 150]);
 
       // 3. Show native OS notification (Push / Background / Standalone)
-      showDeviceNotification(notif.title, {
-        body: notif.body,
+      showDeviceNotification(localized.title, {
+        body: localized.body,
         url: notif.link || notif.action_url || "/notifications",
       });
 
       // 4. In-App Sonner Toast notification
-      toast(notif.title, {
-        description: notif.body,
+      toast(localized.title, {
+        description: localized.body,
         action: notif.link || notif.action_url
           ? {
-              label: "عرض",
+              label: locale === "en" ? "View" : "عرض",
               onClick: () => router.push(notif.link || notif.action_url || "/notifications"),
             }
           : undefined,
@@ -117,7 +122,7 @@ export function RealtimeNotificationProvider({
       setUnreadCount((prev) => prev + 1);
       setNotifications((prev) => [notif, ...prev.filter((n) => n.id !== notif.id)]);
     },
-    [router]
+    [router, locale]
   );
 
   // Connect Supabase Realtime channel
@@ -200,31 +205,46 @@ export function RealtimeNotificationProvider({
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
     setUnreadCount(0);
     await serverMarkAllAsRead();
-    toast.success("تم تحديد جميع الإشعارات كمقروءة");
-  }, []);
+    toast.success(
+      locale === "en" ? "All notifications marked as read" : "تم تحديد جميع الإشعارات كمقروءة"
+    );
+  }, [locale]);
 
-  // Send test notification
-  const handleSendTestNotification = useCallback(async () => {
-    const res = await serverSendTestNotification();
-    if (res.success && res.data) {
-      handleIncomingNotification(res.data);
-    } else {
-      // In offline/fallback mode, simulate directly
-      const mockItem: NotificationItem = {
-        id: `test-${Date.now()}`,
-        user_id: userId || "demo-user",
-        category: "UPDATE",
-        title: "🔔 تجربة الإشعار اللحظي | Nile Nexus Sales",
-        body: `تم اختبار واستقبال هذا الإشعار اللحظي بنجاح! النظام يعمل بكفاءة تامة على هاتفك وجهازك.`,
-        link: "/notifications",
-        action_url: "/notifications",
-        is_read: false,
-        created_at: new Date().toISOString(),
-        type: "SUCCESS",
-      };
-      handleIncomingNotification(mockItem);
-    }
-  }, [userId, handleIncomingNotification]);
+  // Send test notification in active language
+  const handleSendTestNotification = useCallback(
+    async (targetLocale?: "ar" | "en") => {
+      const activeLoc = targetLocale || locale;
+      const res = await serverSendTestNotification(activeLoc);
+      if (res.success && res.data) {
+        handleIncomingNotification(res.data);
+      } else {
+        // In offline/fallback mode, simulate directly
+        const isEn = activeLoc === "en";
+        const nowStr = isEn
+          ? new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
+          : new Date().toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+
+        const mockItem: NotificationItem = {
+          id: `test-${Date.now()}`,
+          user_id: userId || "demo-user",
+          category: "UPDATE",
+          title: isEn
+            ? "🔔 Real-Time Notification Test | Nile Nexus Sales"
+            : "🔔 تجربة الإشعار اللحظي | Nile Nexus Sales",
+          body: isEn
+            ? `This real-time notification was successfully tested and received at (${nowStr}). The system is operating seamlessly across your devices and smartphone!`
+            : `تم اختبار واستقبال هذا الإشعار اللحظي بنجاح في تمام الساعة (${nowStr}). النظام يعمل بكفاءة تامة على هاتفك وجهازك!`,
+          link: "/notifications",
+          action_url: "/notifications",
+          is_read: false,
+          created_at: new Date().toISOString(),
+          type: "SUCCESS",
+        };
+        handleIncomingNotification(mockItem);
+      }
+    },
+    [userId, locale, handleIncomingNotification]
+  );
 
   return (
     <NotificationContext.Provider

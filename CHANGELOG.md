@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.2] - 2026-10-12
+
+### Fixed & Enhanced
+- **Full Bilingual Notifications System (English & Egyptian Arabic)**:
+  - **Dynamic Runtime Notification Localization**:
+    - Created `src/lib/utils/localized-notification.ts` with `formatLocalizedNotification` engine capable of translating notifications dynamically based on active locale (`ar` or `en`).
+    - Localizes test notifications, urgent follow-up alerts, accepted proposals, approved deals, and new leads seamlessly into English or Arabic.
+    - Added Arabic-to-English numeral and timestamp conversion (`(١٢:٤١:١٤ م)` -> `(12:41:14 PM)`).
+  - **Bilingual Server Action**:
+    - Updated `sendTestNotification(targetLocale?: "ar" | "en")` in `src/lib/actions/notifications.ts` to generate English text when the user's active locale is `en`, and Arabic when `ar`.
+    - Integrated with `getUserLocale()` cookie inspection for automatic server-side language detection.
+  - **Component Synchronization**:
+    - Updated `NotificationsClient` (`/notifications`), `NotificationBell` header popover, and `RealtimeNotificationProvider` to display all notification titles, bodies, toast actions, and timestamps in the active user language.
+    - Updated `public/sw.js` push notification actions and fallback strings to bilingual format (`عرض | View`, `إغلاق | Close`).
+  - **Automated Testing**:
+    - Added unit test suite `src/lib/utils/__tests__/localized-notification.test.ts` (7 tests).
+    - Updated `src/lib/actions/__tests__/notifications.test.ts` with bilingual test notification assertions. Total test count reached 76/76 passing (100%).
+
 ## [1.5.1] - 2026-10-12
 
 ### Fixed & Enhanced

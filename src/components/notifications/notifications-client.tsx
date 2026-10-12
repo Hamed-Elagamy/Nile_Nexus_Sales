@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import {
   CheckCheck,
   AlertCircle,
@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/components/notifications/realtime-notification-provider";
+import { formatLocalizedNotification } from "@/lib/utils/localized-notification";
 import type { NotificationItem } from "@/lib/actions/notifications";
 
 interface NotificationsClientProps {
@@ -27,6 +28,7 @@ interface NotificationsClientProps {
 export function NotificationsClient({ initialNotifications }: NotificationsClientProps) {
   const t = useTranslations("notifications");
   const tCommon = useTranslations("common");
+  const locale = useLocale() as "ar" | "en";
   const {
     notifications,
     unreadCount,
@@ -59,7 +61,7 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
   const handleTest = async () => {
     setIsTesting(true);
     try {
-      await sendTestNotification();
+      await sendTestNotification(locale);
     } finally {
       setIsTesting(false);
     }
@@ -214,12 +216,16 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
           </div>
         ) : (
           filteredList.map((notif) => {
-            const timeStr = new Date(notif.created_at).toLocaleDateString(undefined, {
-              month: "short",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            });
+            const localized = formatLocalizedNotification(notif, locale);
+            const timeStr = new Date(notif.created_at).toLocaleDateString(
+              locale === "en" ? "en-US" : "ar-EG",
+              {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              }
+            );
 
             const isAlert = notif.category === "ACTION_REQUIRED" || notif.type === "ALERT";
             const isSuccess = notif.type === "SUCCESS";
@@ -253,7 +259,7 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <h3 className="font-bold text-sm text-[var(--foreground)] truncate">
-                        {notif.title}
+                        {localized.title}
                       </h3>
                       {!notif.is_read && (
                         <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
@@ -265,7 +271,7 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
                   </div>
 
                   <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
-                    {notif.body}
+                    {localized.body}
                   </p>
 
                   <div className="pt-2 flex items-center justify-between gap-2 border-t border-[var(--border)]/50">

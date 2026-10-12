@@ -60,10 +60,18 @@ describe("Notifications Server Actions", () => {
     expect(res.data!.link).toBe("/deals/123");
   });
 
-  it("triggers test notification correctly", async () => {
+  it("triggers test notification correctly in Arabic by default", async () => {
     const res = await sendTestNotification();
     expect(res.success).toBe(true);
     expect(res.data).toBeDefined();
     expect(res.data!.title).toContain("تجربة الإشعار اللحظي");
+  });
+
+  it("triggers test notification correctly in English when locale is 'en'", async () => {
+    const res = await sendTestNotification("en");
+    expect(res.success).toBe(true);
+    expect(res.data).toBeDefined();
+    expect(res.data!.title).toContain("Real-Time Notification Test");
+    expect(res.data!.body).toContain("This real-time notification was successfully tested");
   });
 });

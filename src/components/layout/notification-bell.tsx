@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import {
   Bell,
   CheckCheck,
@@ -15,10 +15,12 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useNotifications } from "@/components/notifications/realtime-notification-provider";
+import { formatLocalizedNotification } from "@/lib/utils/localized-notification";
 
 export function NotificationBell() {
   const t = useTranslations("notifications");
   const tNav = useTranslations("nav");
+  const locale = useLocale() as "ar" | "en";
   const router = useRouter();
   const {
     unreadCount,
@@ -148,10 +150,14 @@ export function NotificationBell() {
               </div>
             ) : (
               recentNotifications.map((notif) => {
-                const timeStr = new Date(notif.created_at).toLocaleTimeString(undefined, {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
+                const localized = formatLocalizedNotification(notif, locale);
+                const timeStr = new Date(notif.created_at).toLocaleTimeString(
+                  locale === "en" ? "en-US" : "ar-EG",
+                  {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }
+                );
 
                 return (
                   <div
@@ -180,14 +186,14 @@ export function NotificationBell() {
                     <div className="flex-1 min-w-0 space-y-0.5">
                       <div className="flex items-center justify-between gap-1">
                         <h4 className="text-xs font-semibold text-[var(--foreground)] truncate">
-                          {notif.title}
+                          {localized.title}
                         </h4>
                         <span className="text-[10px] text-[var(--muted-foreground)] shrink-0">
                           {timeStr}
                         </span>
                       </div>
                       <p className="text-[11px] text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">
-                        {notif.body}
+                        {localized.body}
                       </p>
                     </div>
 

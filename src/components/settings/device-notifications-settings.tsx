@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import {
   Smartphone,
   BellRing,
@@ -19,6 +19,7 @@ import { triggerPwaInstall } from "@/components/pwa/pwa-install-prompt";
 export function DeviceNotificationsSettings() {
   const t = useTranslations("notifications");
   const tPwa = useTranslations("pwa");
+  const locale = useLocale() as "ar" | "en";
   const {
     permission,
     isRealtimeConnected,
@@ -31,7 +32,7 @@ export function DeviceNotificationsSettings() {
   const handleTest = async () => {
     setIsTesting(true);
     try {
-      await sendTestNotification();
+      await sendTestNotification(locale);
     } finally {
       setIsTesting(false);
     }

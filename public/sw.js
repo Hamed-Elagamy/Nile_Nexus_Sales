@@ -92,13 +92,13 @@ self.addEventListener('push', (event) => {
     try {
       data = event.data.json();
     } catch {
-      data = { title: 'تنبيه مبيعات جديد', body: event.data.text() };
+      data = { title: 'Nile Nexus Sales | Notification', body: event.data.text() };
     }
   }
 
-  const title = data.title || 'Nile Nexus Sales | تنبيه مبيعات';
+  const title = data.title || 'Nile Nexus Sales | Notification';
   const options = {
-    body: data.body || 'لديك تحديث جديد في نظام نايل نيكسس',
+    body: data.body || 'لديك تنبيه جديد / New notification update',
     icon: '/icons/icon-192x192.png',
     badge: '/icons/icon-192x192.png',
     vibrate: [200, 100, 200],
@@ -108,8 +108,8 @@ self.addEventListener('push', (event) => {
       url: data.url || data.link || '/notifications',
     },
     actions: [
-      { action: 'open', title: 'عرض التفاصيل' },
-      { action: 'close', title: 'إغلاق' },
+      { action: 'open', title: data.actionLabel || 'عرض | View' },
+      { action: 'close', title: data.closeLabel || 'إغلاق | Close' },
     ],
   };
 
