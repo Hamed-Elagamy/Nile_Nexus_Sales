@@ -2,6 +2,15 @@
 
 import { useEffect } from "react";
 
+// Capture beforeinstallprompt as early as module evaluation
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeinstallprompt", (e: Event) => {
+    e.preventDefault();
+    (window as unknown as { __pwaInstallPrompt?: Event }).__pwaInstallPrompt = e;
+    window.dispatchEvent(new CustomEvent("pwa-prompt-available"));
+  });
+}
+
 export function ServiceWorkerRegister() {
   useEffect(() => {
     if (typeof window !== "undefined" && "serviceWorker" in navigator) {
