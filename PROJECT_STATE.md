@@ -90,6 +90,14 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - **Feature 4 (Sales Target & Commission Tracker)**: Visual monthly progress bar with preset pills and 4-tier commission simulator on `/dashboard` and `/reports`.
   - **Feature 5 (1-Click Excel / CSV Export with UTF-8 BOM)**: Instant data export for Clients, Deals, Services, and Reports with UTF-8 BOM for crystal-clear Arabic Excel rendering.
   - **Quality Assurance**: Added CSV export unit tests (`export-csv.test.ts`), verified 14/14 test suites and 62/62 tests passing, 0 TypeScript errors, Next.js build clean.
+- **Phase 18 (PWA Mobile Application & Cross-Device Real-Time Notifications)**:
+  - **Progressive Web App (PWA)**: Implemented `src/app/manifest.ts` and `public/manifest.json` with standalone mobile display, theme color `#2563EB`, background `#0B132B`, and full set of crisp Nile Nexus icons (192x192, 512x512, maskable, and apple-touch-icon in `public/icons/`).
+  - **Service Worker (`public/sw.js`)**: Offline asset caching, push event handler, deep-link click focus, and global `ServiceWorkerRegister`.
+  - **In-App Install Prompt (`pwa-install-prompt.tsx`)**: Android 1-click installation banner and iOS Safari 3-step visual guide sheet with drawer and settings integration.
+  - **Cross-Device Real-Time Notifications**: Global `RealtimeNotificationProvider` with Supabase Realtime channel subscription, Web Audio synthesized chime, haptic vibration, and OS push notifications.
+  - **Interactive Notification Bell & Feed**: Dynamic header bell (`NotificationBell`) with live unread badge, popover feed preview, and `/notifications` interactive center with filter tabs.
+  - **Settings Integration**: Dedicated Device & Notifications management card in `/settings`.
+  - **Database & Testing**: Migration `010_enable_realtime_notifications.sql`, 15/15 Vitest suites passing (68/68 tests), Next.js build verified (24/24 routes).
 
 ## Completed Work
 - **Design System & UI Components**:
@@ -129,10 +137,10 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - Live Vercel Production Deployment: `https://nile-nexus-sales.vercel.app`
   - Connected to Supabase Project: `https://zbbivheqcutwflewmtnb.supabase.co`
 - **Tests**:
-  - 62 Vitest unit tests passing across 14 test suites (100% pass rate)
+  - 68 Vitest unit tests passing across 15 test suites (100% pass rate)
 
 ## Database State
-- 9 migrations written + unified deploy script:
+- 10 migrations written + unified deploy script:
   - `001_initial_schema.sql` — all core tables, indexes, triggers, functions
   - `002_rls_policies.sql` — comprehensive RLS for all tables
   - `003_seed_data.sql` — pipeline stages, services, permissions, settings
@@ -142,6 +150,7 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - `007_fix_profiles_rls_and_insert_policy.sql` — profiles INSERT/DELETE RLS policies and user backfill
   - `008_prepare_production_and_clean_demo_data.sql` — cleans test data and resets ID sequences
   - `009_seed_173_services_catalog.sql` — cleans out legacy non-PDF services, enforces uniqueness, and seeds strictly the 173 Nile Nexus services
+  - `010_enable_realtime_notifications.sql` — enables Supabase Realtime publication on notifications with REPLICA IDENTITY FULL and bi-directional column syncing
   - `all_in_one_deploy.sql` — consolidated single-run deployment migration
 
 ## Security State
@@ -152,13 +161,13 @@ Production Deployed — Live on Vercel & Connected to Supabase
 - Dual-mode architecture maintains strict separation between demo mock sessions and live Supabase queries
 
 ## Test Status
-- ✅ Vitest: 62/62 passing across 14 suites
+- ✅ Vitest: 68/68 passing across 15 suites
 - 0 failed
 
 ## Build Status
 - ✅ TypeScript: 0 errors (`tsc --noEmit`)
 - ✅ ESLint: 0 errors, 0 warnings (`eslint`)
-- ✅ Production build: compiled and optimized successfully for all 23 routes (`next build`)
+- ✅ Production build: compiled and optimized successfully for all 24 routes (`next build`)
 - ✅ Vercel Production Deployment: READY at `https://nile-nexus-sales.vercel.app`
 
 ## Known Bugs

@@ -3,10 +3,11 @@
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Bell, LogOut, Search, CheckCircle2, Menu } from "lucide-react";
+import { LogOut, Search, CheckCircle2, Menu } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
+import { NotificationBell } from "./notification-bell";
 import { useMobileNav } from "./mobile-nav-context";
 import type { User } from "@supabase/supabase-js";
 
@@ -76,14 +77,7 @@ export function AppHeader({ user }: AppHeaderProps) {
 
           <LanguageSwitcher />
 
-          <Link
-            href="/notifications"
-            className="p-2 rounded-lg hover:bg-[var(--muted)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors relative"
-            aria-label={t("nav.notifications")}
-          >
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-1.5 end-1.5 h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-          </Link>
+          <NotificationBell />
 
           <div className="hidden md:flex items-center gap-2 ms-2 ps-2 border-s border-[var(--border)]">
             <Link

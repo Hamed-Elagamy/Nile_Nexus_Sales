@@ -6,6 +6,7 @@ import { getCurrentUserProfile } from "@/lib/actions/profile";
 import { UserProfileForm } from "@/components/settings/user-profile-form";
 import { ServicesCatalog } from "@/components/settings/services-catalog";
 import { LeadSourcesManager } from "@/components/settings/lead-sources-manager";
+import { DeviceNotificationsSettings } from "@/components/settings/device-notifications-settings";
 
 export async function generateMetadata() {
   const t = await getTranslations("settings");
@@ -44,6 +45,9 @@ export default async function SettingsPage() {
 
       {/* User Profile Section */}
       {profile && <UserProfileForm profile={profile} />}
+
+      {/* Device Push & Realtime Notifications Settings */}
+      <DeviceNotificationsSettings />
 
       {/* Services Section */}
       <div className="pt-2">

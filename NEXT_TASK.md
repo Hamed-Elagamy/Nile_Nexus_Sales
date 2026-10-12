@@ -13,7 +13,7 @@ Execute Production Database Clean-up & Roll Out to Company Employees:
 
 ## Verification Checklist
 - [x] Application successfully built and optimized with Next.js Turbopack
-- [x] All 23 routes operational with zero 404s
+- [x] All 24 routes operational with zero 404s (including `/manifest.webmanifest`)
 - [x] UI decoupled from demo-data (0 `.tsx` files importing mock data)
 - [x] Full 14-tab mobile navigation drawer and "More / المزيد" bottom bar trigger operational
 - [x] Services catalog editing & deletion and Lead sources deletion enabled for Admin & GM roles
@@ -27,6 +27,12 @@ Execute Production Database Clean-up & Roll Out to Company Employees:
 - [x] 1-Click Deal creation button directly inside Services Catalog rows
 - [x] Sales Target & Commission Tracker with interactive simulation on `/dashboard` and `/reports`
 - [x] 1-Click Excel / CSV Export with UTF-8 BOM across Clients, Deals, Services, and Reports
-- [x] 100% Vitest tests passing (62/62) across 14 test suites and 0 TypeScript compilation errors
-- [ ] Run migration 009 in Supabase SQL Editor to wipe legacy non-PDF services and populate strictly the 173 services
+- [x] PWA standalone mobile app configuration (`manifest.ts`, `manifest.json`, Service Worker `sw.js`, and icons suite)
+- [x] Android 1-click install banner and iOS Safari 3-step visual install guide sheet
+- [x] Cross-device Real-Time notifications (Supabase Realtime, synthesized Web Audio chime, vibration, and OS push)
+- [x] Dynamic header NotificationBell with live unread counter and popover preview
+- [x] Interactive `/notifications` center with device push activation toggle and test chime trigger
+- [x] Migration `010_enable_realtime_notifications.sql` generated
+- [x] 100% Vitest tests passing (68/68) across 15 test suites and 0 TypeScript compilation errors
+- [ ] Run migrations 009 & 010 in Supabase SQL Editor
 - [ ] Onboard company sales representatives

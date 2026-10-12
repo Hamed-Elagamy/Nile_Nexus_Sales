@@ -98,7 +98,8 @@
     "core": "Core",
     "activities": "Activities & Tasks",
     "salesOps": "Proposals & Approvals",
-    "management": "Management & Insights"
+    "management": "Management & Insights",
+    "installApp": "Install App on Phone"
   },
   "servicesPage": {
     "title": "Services Catalog & Pricing",
@@ -821,7 +822,39 @@
     "title": "Notifications Center",
     "subtitle": "Urgent follow-up alerts, proposal updates, and newly assigned clients",
     "markAllRead": "Mark All as Read",
-    "empty": "No new notifications"
+    "markAsRead": "Mark as Read",
+    "empty": "No notifications currently",
+    "unreadBadge": "New",
+    "activateOnThisDevice": "Activate Real-Time Notifications on This Device",
+    "enableBtn": "Enable Now",
+    "enableDevicePushBtn": "Enable Real-Time Device Notifications",
+    "testNotificationTooltip": "Test live audio chime and device notification",
+    "testBtn": "Test Notification",
+    "viewAll": "View All Notifications",
+    "realtimeStatusTitle": "Real-Time Notification Engine",
+    "realtimeConnected": "Connected (Live Realtime)",
+    "pushActiveDesc": "Real-time notifications are active and linked to this device. You will receive alerts with an audio chime and vibration as soon as activity happens.",
+    "pushInactiveDesc": "Device push notifications are not yet enabled in this browser. Click to enable instant screen notifications.",
+    "deviceActive": "Active on This Device ✅",
+    "tabAll": "All",
+    "tabUnread": "Unread",
+    "tabActionRequired": "Action Required 🚨",
+    "tabUpdates": "System Updates"
+  },
+  "pwa": {
+    "bannerTitle": "Nile Nexus Sales App",
+    "bannerSubtitle": "Install the app on your phone for faster access and real-time alerts",
+    "installBtn": "Install",
+    "dismiss": "Close",
+    "iosTitle": "Install on iPhone (iOS)",
+    "iosSubtitle": "Follow these simple steps to install Nile Nexus on your home screen:",
+    "iosStep1": "Tap the Share button",
+    "iosStep1Desc": "Tap the Share icon at the bottom of your Safari browser bar.",
+    "iosStep2": "Add to Home Screen",
+    "iosStep2Desc": "Scroll down the share sheet and tap 'Add to Home Screen'.",
+    "iosStep3": "Confirm Installation",
+    "iosStep3Desc": "Tap 'Add' in the top right corner to run the app as a standalone application.",
+    "understoodBtn": "Got it 👍"
   },
   "team": {
     "title": "Team Members",

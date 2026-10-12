@@ -22,10 +22,12 @@ import {
   X,
   LogOut,
   Tag,
+  Smartphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMobileNav } from "./mobile-nav-context";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
+import { triggerPwaInstall } from "@/components/pwa/pwa-install-prompt";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import type { User } from "@supabase/supabase-js";
@@ -259,6 +261,18 @@ export function AppSidebar({ user }: AppSidebarProps = {}) {
                   </span>
                   <LanguageSwitcher />
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    mobileNav.close();
+                    triggerPwaInstall();
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-primary hover:bg-primary/10 transition-colors border border-primary/20 cursor-pointer"
+                >
+                  <Smartphone className="h-3.5 w-3.5" />
+                  <span>{tNav("installApp")}</span>
+                </button>
 
                 <button
                   type="button"

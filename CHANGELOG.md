@@ -2,7 +2,51 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.4.0] - 2026-10-12
+## [1.5.0] - 2026-10-12
+
+### Added & Enhanced
+- **PWA Mobile Application & Full Standalone Smartphone Experience**:
+  - **Progressive Web App (PWA) Foundation**:
+    - Created Next.js native `src/app/manifest.ts` and static `public/manifest.json` configured for standalone mobile display mode, portrait orientation, theme color `#2563EB`, and splash background `#0B132B`.
+    - Generated full suite of high-resolution Nile Nexus branded application icons in `public/icons/`:
+      - Standard 192x192 and 512x512 PNG icons
+      - Adaptive maskable 192x192 and 512x512 PNG icons
+      - Apple Touch Icon (180x180) for iPhone/iPad home screens
+      - Scalable vector icon (`public/icons/icon.svg` & `public/favicon.svg`)
+    - Configured Apple mobile web app tags (`appleWebApp.capable: true`, `statusBarStyle: "default"`, `viewportFit: "cover"`, touch-callout prevention, and safe-area insets).
+  - **Service Worker (`public/sw.js`) & Client Caching**:
+    - Installed active Service Worker caching application shell and static assets for instant offline mobile startup.
+    - Full push event handling displaying system notifications with title, body, icon, badge, and vibration.
+    - Notification click event listener deep-linking directly to target screens (`/notifications`, `/deals`, `/follow-ups`).
+    - Client registration component `ServiceWorkerRegister` mounted globally.
+  - **Native Installation Prompt & iOS Guided Sheet (`pwa-install-prompt.tsx`)**:
+    - Android / Chromium: Automatically intercepts `beforeinstallprompt` to offer 1-tap native installation banner.
+    - iOS Safari: Sleek 3-step visual instruction sheet explaining Share (⎋) -> Add to Home Screen (⊞) -> Add (إضافة).
+    - Added dedicated "تثبيت التطبيق على الهاتف" triggers in the mobile slide-over navigation drawer and settings page.
+- **Cross-Device Real-Time Notifications Engine**:
+  - **Supabase Realtime Channel Integration**:
+    - Global `RealtimeNotificationProvider` subscribing to Postgres `INSERT` and `UPDATE` changes on `notifications` table for the authenticated user.
+    - Background polling fallback (45s interval) ensuring 100% notification delivery during mobile device sleep/wake cycles.
+  - **Audio & Haptic Feedback**:
+    - Synthesized dual-tone audio chime (587 Hz D5 -> 880 Hz A5) using Web Audio API — 100% offline, zero network latency, zero external audio asset dependencies.
+    - Device vibration patterns (`navigator.vibrate([150, 70, 150])`) on smartphones.
+  - **OS System Notifications**:
+    - Dispatches native system notifications to lock screen and notification shade via Web Notifications API and Service Worker.
+  - **Interactive Notification Bell (`src/components/layout/notification-bell.tsx`)**:
+    - Replaced static header link with dynamic bell showing live unread badge, pulse/ping animations on new alerts, and connection status indicator.
+    - Interactive dropdown popover with quick mark all as read, permission toggle, recent alerts feed, and instant test chime trigger.
+  - **Dedicated Notifications Center (`/notifications`)**:
+    - Interactive client interface with real-time status card (Realtime connected 🟢 / Device Push active ✅).
+    - Filter tabs: All, Unread Only, Action Required (🚨), and System Updates.
+    - Individual mark-as-read and deep action links.
+  - **Settings Integration & Database Migration**:
+    - Added "إعدادات الموبايل والإشعارات الفورية" card in `/settings`.
+    - Authored migration `010_enable_realtime_notifications.sql` adding `notifications` to `supabase_realtime` publication with REPLICA IDENTITY FULL and column aliases.
+- **Comprehensive Verification & Testing**:
+  - Added unit test suite `src/lib/actions/__tests__/notifications.test.ts` (6 tests passing).
+  - 15/15 test suites passing with 68/68 tests (100% pass rate).
+  - TypeScript strict mode 0 errors (`tsc --noEmit`).
+  - Next.js production build verified (`next build` 24/24 routes optimized, including `/manifest.webmanifest`).
 
 ### Added & Enhanced
 - **5 High-Impact Commercial Enhancement Features for Sales Operations**:

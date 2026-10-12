@@ -1,0 +1,45 @@
+{
+  "name": "Nile Nexus Sales | نايل نيكسس للمبيعات",
+  "short_name": "Nile Nexus",
+  "description": "نظام إدارة المبيعات والصفقات وعروض الأسعار المتكامل لشركة نايل نيكسس",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0B132B",
+  "theme_color": "#2563EB",
+  "orientation": "portrait-primary",
+  "dir": "rtl",
+  "lang": "ar",
+  "categories": ["business", "productivity", "finance"],
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
