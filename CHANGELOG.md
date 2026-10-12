@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-10-12
+
+### Added & Enhanced
+- **Full 173 Software Projects Services Catalog & Advanced Filtering UI**:
+  - **Comprehensive 173 Software Services Dataset**:
+    - Extracted and normalized all 173 software project types from the official Nile Nexus pricing list (`Base MVP / Starter Rates`).
+    - Spans mobile apps, web applications, multi-vendor marketplaces, micro-SaaS, enterprise ERP & CRM modules, AI agents, IoT dashboards, logistics, and fintech integrations.
+    - Reference starter prices ranging from 4,000 EGP to 150,000 EGP with currency set to `EGP`.
+    - Every service tagged with sequential `sort_order` (1 to 173), full Arabic title, and English counterpart.
+  - **Production Database Migration (`009_seed_173_services_catalog.sql`)**:
+    - Created idempotent PostgreSQL script with `ON CONFLICT (name_ar)` DO UPDATE upsert logic.
+    - Safely replaces initial 8 placeholder services with all 173 official software products.
+  - **Fallback / Offline Data Parity (`demoServices` in `src/lib/demo-data.ts`)**:
+    - Fully updated with all 173 items, maintaining offline reliability and testing parity.
+  - **Enhanced Services Catalog Management UI (`src/components/settings/services-catalog.tsx`)**:
+    - **Live Instant Search**: Full-text bilingual query across Arabic name, English name, reference price, and service order number (`#`).
+    - **Status Filter**: Fast toggle between All, Active Only, and Inactive Only.
+    - **Multi-Field Sorting**: Order by Default (#), Price (High-to-Low), Price (Low-to-High), Arabic alphabetical (A-Z), and English alphabetical (A-Z).
+    - **Smart Pagination**: Configurable per-page selector (25, 50, 100, or View All) with dynamic page jumping and counter indicators.
+    - **Summary Badges**: Displays total registered services, active count, and real-time filtered results.
+    - Preserved full GM & Admin inline editing, activation toggling, and soft-delete protection.
+  - **Internationalization (i18n)**:
+    - Added complete translation keys across `messages/ar.json` and `messages/en.json`.
+  - **Quality & Verification**:
+    - Passed Next.js production build (`next build`), 0 TypeScript errors (`tsc --noEmit`), and 60/60 passing Vitest unit tests.
+
 ## [1.2.0] - 2026-10-11
 
 ### Added & Enhanced

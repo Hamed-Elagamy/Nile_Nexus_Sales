@@ -74,6 +74,13 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - Generated professional vector PDF with Cairo typography: `docs/Nile_Nexus_Sales_Manual_Guide_AR.pdf`
   - Created in-repo markdown guide: `docs/SALES_REP_MANUAL_AR.md`
   - Automated PDF build pipeline: `scripts/generate-sales-manual-pdf.mjs`
+- **Phase 16 (Full 173 Software Services Catalog Integration & Advanced UI)**:
+  - Extracted, normalized, and integrated all 173 software project types from the official Nile Nexus Pricing document (`Base MVP / Starter Rates` from 4,000 EGP to 150,000 EGP)
+  - Generated database migration `supabase/migrations/009_seed_173_services_catalog.sql` containing all 173 services with exact sort orders (`1` to `173`), Arabic names, English names, and EGP prices
+  - Synchronized offline/demo fallback catalog `demoServices` in `src/lib/demo-data.ts`
+  - Upgraded Services Catalog component (`src/components/settings/services-catalog.tsx`) with live instant search, status filtering, multi-field sorting, configurable pagination (25/50/100/All), and catalog summary badges
+  - Added comprehensive i18n keys to both `messages/ar.json` and `messages/en.json`
+  - Verified 0 TypeScript errors and 100% Vitest tests passing (60/60)
 
 ## Completed Work
 - **Design System & UI Components**:
@@ -116,7 +123,7 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - 60 Vitest unit tests passing across 13 test suites (100% pass rate)
 
 ## Database State
-- 7 migrations written + unified deploy script:
+- 9 migrations written + unified deploy script:
   - `001_initial_schema.sql` — all core tables, indexes, triggers, functions
   - `002_rls_policies.sql` — comprehensive RLS for all tables
   - `003_seed_data.sql` — pipeline stages, services, permissions, settings
@@ -124,6 +131,8 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - `005_fix_user_cascade_delete.sql` — user cascade deletion
   - `006_create_gm_reem_ezz_and_secure_signup.sql` — GM creation and lock public signups to SALES
   - `007_fix_profiles_rls_and_insert_policy.sql` — profiles INSERT/DELETE RLS policies and user backfill
+  - `008_prepare_production_and_clean_demo_data.sql` — cleans test data and resets ID sequences
+  - `009_seed_173_services_catalog.sql` — seeds official 173 Nile Nexus software services & starter rates
   - `all_in_one_deploy.sql` — consolidated single-run deployment migration
 
 ## Security State
