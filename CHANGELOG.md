@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.1] - 2026-10-12
+
+### Fixed & Enhanced
+- **PWA Multiplatform Installation & Middleware Public Access**:
+  - **Middleware Bypass for Service Worker & Manifests**:
+    - Excluded `/sw.js`, `/manifest.webmanifest`, `/manifest.json`, and `/icons/*` from Next.js authentication middleware matcher in `src/middleware.ts`.
+    - Added `/sw.js`, `/manifest.webmanifest`, `/manifest.json`, and `/icons` to `publicPaths` in `src/lib/supabase/middleware.ts` to prevent HTTP 307 temporary redirects to `/login` when browsers or Service Workers fetch manifests and service workers.
+  - **Multi-Platform Installation Experience**:
+    - Added comprehensive interactive tabs for **Windows (PC)**, **Android**, and **iPhone/iOS** in `pwa-install-prompt.tsx` with device auto-detection and 1-click install action.
+    - Updated manifest `orientation` from `portrait-primary` to `any` to support desktop displays, widescreen laptops, and tablets.
+    - Added persistent "تثبيت التطبيق (كمبيوتر وموبايل)" quick-access button directly in `AppHeader` across all devices.
+  - **Cache Invalidation & Auto-Update**:
+    - Bumped Service Worker cache version to `nile-nexus-v2` in `public/sw.js` and added automated purge of legacy caches on activation.
+    - Added `registration.update()` in `ServiceWorkerRegister` on window load to force immediate worker refresh.
+
 ## [1.5.0] - 2026-10-12
 
 ### Added & Enhanced

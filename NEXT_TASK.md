@@ -28,7 +28,10 @@ Execute Production Database Clean-up & Roll Out to Company Employees:
 - [x] Sales Target & Commission Tracker with interactive simulation on `/dashboard` and `/reports`
 - [x] 1-Click Excel / CSV Export with UTF-8 BOM across Clients, Deals, Services, and Reports
 - [x] PWA standalone mobile app configuration (`manifest.ts`, `manifest.json`, Service Worker `sw.js`, and icons suite)
-- [x] Android 1-click install banner and iOS Safari 3-step visual install guide sheet
+- [x] Multi-platform PWA support: Dedicated interactive installation tabs for Windows (PC), Android, and iOS
+- [x] Middleware public whitelisting for `/sw.js`, `/manifest.webmanifest`, `/manifest.json`, and `/icons` to prevent 307 login redirection
+- [x] Immediate Service Worker cache busting (`nile-nexus-v2`) with automated eviction of stale caches
+- [x] Quick-access "تثبيت التطبيق (كمبيوتر وموبايل)" action in `AppHeader` across all screen sizes
 - [x] Cross-device Real-Time notifications (Supabase Realtime, synthesized Web Audio chime, vibration, and OS push)
 - [x] Dynamic header NotificationBell with live unread counter and popover preview
 - [x] Interactive `/notifications` center with device push activation toggle and test chime trigger

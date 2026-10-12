@@ -3,7 +3,7 @@
  * Handles offline caching, PWA installation, and Real-Time Push Notifications
  */
 
-const CACHE_NAME = 'nile-nexus-v1';
+const CACHE_NAME = 'nile-nexus-v2';
 const STATIC_ASSETS = [
   '/',
   '/manifest.webmanifest',
@@ -31,6 +31,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log('[SW] Evicting outdated cache:', key);
             return caches.delete(key);
           }
         })

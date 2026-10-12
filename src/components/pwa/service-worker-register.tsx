@@ -19,6 +19,8 @@ export function ServiceWorkerRegister() {
           .register("/sw.js")
           .then((registration) => {
             console.debug("[PWA] Service Worker registered:", registration.scope);
+            // Proactively check for updates immediately
+            registration.update().catch(() => {});
           })
           .catch((error) => {
             console.debug("[PWA] Service Worker registration failed:", error);

@@ -98,6 +98,12 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - **Interactive Notification Bell & Feed**: Dynamic header bell (`NotificationBell`) with live unread badge, popover feed preview, and `/notifications` interactive center with filter tabs.
   - **Settings Integration**: Dedicated Device & Notifications management card in `/settings`.
   - **Database & Testing**: Migration `010_enable_realtime_notifications.sql`, 15/15 Vitest suites passing (68/68 tests), Next.js build verified (24/24 routes).
+- **Phase 19 (PWA Multi-Platform Support & Middleware Public Whitelisting Fix)**:
+  - **Root Cause Resolution**: Solved middleware HTTP 307 login redirection of `/sw.js` and `/manifest.webmanifest` by updating the matcher regex in `src/middleware.ts` and whitelisting all PWA assets (`/sw.js`, `/manifest.webmanifest`, `/manifest.json`, `/icons`) in `src/lib/supabase/middleware.ts`.
+  - **Multi-Platform Installation Modal**: Enhanced `pwa-install-prompt.tsx` with dedicated interactive tabs for Windows PC, Android, and iOS, with automatic OS detection and 1-click native install support.
+  - **Desktop Quick Access**: Added persistent "تثبيت التطبيق (كمبيوتر وموبايل)" action in `AppHeader` for immediate access on desktop and laptops.
+  - **Manifest & Cache Optimization**: Updated manifest orientation to `any` for responsive desktop support; bumped Service Worker cache to `nile-nexus-v2` with automated purge of stale caches.
+
 
 ## Completed Work
 - **Design System & UI Components**:

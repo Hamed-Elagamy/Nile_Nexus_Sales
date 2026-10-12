@@ -11,7 +11,17 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
-  const publicPaths = ["/login", "/auth/callback", "/auth/reset-password", "/api"];
+  const publicPaths = [
+    "/login",
+    "/auth/callback",
+    "/auth/reset-password",
+    "/api",
+    "/sw.js",
+    "/manifest.webmanifest",
+    "/manifest.json",
+    "/icons",
+    "/favicon.ico",
+  ];
   const isPublicPath = publicPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );

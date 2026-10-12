@@ -3,12 +3,13 @@
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { LogOut, Search, CheckCircle2, Menu } from "lucide-react";
+import { LogOut, Search, CheckCircle2, Menu, Download } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { LanguageSwitcher } from "@/components/shared/language-switcher";
 import { NotificationBell } from "./notification-bell";
 import { useMobileNav } from "./mobile-nav-context";
+import { triggerPwaInstall } from "@/components/pwa/pwa-install-prompt";
 import type { User } from "@supabase/supabase-js";
 
 interface AppHeaderProps {
@@ -74,6 +75,17 @@ export function AppHeader({ user }: AppHeaderProps) {
               <span>{t("common.supabaseConnected")}</span>
             </span>
           )}
+
+          {/* Quick Install Button (Windows PC, Android, iOS) */}
+          <button
+            type="button"
+            onClick={() => triggerPwaInstall()}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-primary bg-primary/10 hover:bg-primary/20 border border-primary/25 transition-all cursor-pointer shadow-2xs"
+            title={t("nav.installApp")}
+          >
+            <Download className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">{t("nav.installApp")}</span>
+          </button>
 
           <LanguageSwitcher />
 
