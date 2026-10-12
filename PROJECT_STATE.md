@@ -132,7 +132,7 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - `006_create_gm_reem_ezz_and_secure_signup.sql` — GM creation and lock public signups to SALES
   - `007_fix_profiles_rls_and_insert_policy.sql` — profiles INSERT/DELETE RLS policies and user backfill
   - `008_prepare_production_and_clean_demo_data.sql` — cleans test data and resets ID sequences
-  - `009_seed_173_services_catalog.sql` — seeds official 173 Nile Nexus software services & starter rates
+  - `009_seed_173_services_catalog.sql` — cleans out legacy non-PDF services, enforces uniqueness, and seeds strictly the 173 Nile Nexus services
   - `all_in_one_deploy.sql` — consolidated single-run deployment migration
 
 ## Security State

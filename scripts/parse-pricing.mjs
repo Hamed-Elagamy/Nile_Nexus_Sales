@@ -36,7 +36,15 @@ while ((match = rowRegex.exec(content)) !== null) {
 }
 
 console.log("Total items parsed:", count);
-const noDash = items.filter(i => !i.rawTitle.includes(" - ") && !i.rawTitle.includes(" – "));
-console.log("Items without dash:", noDash);
-console.log("First 3 items:", items.slice(0, 3));
-console.log("Last 3 items:", items.slice(-3));
+const nameCounts = {};
+items.forEach(i => {
+  nameCounts[i.nameAr] = (nameCounts[i.nameAr] || []).concat(i.num);
+});
+Object.entries(nameCounts).forEach(([name, nums]) => {
+  if (nums.length > 1) {
+    console.log("Duplicate nameAr:", name, "nums:", nums);
+    nums.forEach(n => console.log(items.find(i => i.num === n)));
+  }
+});
+
+

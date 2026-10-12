@@ -23,5 +23,5 @@ Execute Production Database Clean-up & Roll Out to Company Employees:
 - [x] Migration `009_seed_173_services_catalog.sql` generated with all 173 Nile Nexus software services & rates
 - [x] Services Catalog UI enhanced with live instant search, status filtering, multi-field sorting, and pagination
 - [x] 100% Vitest tests passing (60/60) and 0 TypeScript compilation errors
-- [ ] Run migration 009 in Supabase SQL Editor to populate live database with all 173 services
+- [ ] Run migration 009 in Supabase SQL Editor to wipe legacy non-PDF services and populate strictly the 173 services
 - [ ] Onboard company sales representatives

@@ -61,9 +61,46 @@ export async function getServices(): Promise<ActionResult<Service[]>> {
       return { success: false, error: error.message };
     }
 
+    // Filter out unpriced legacy dummy services and any duplicate/legacy sort_order <= 0 records
+    const legacyOldNames = new Set([
+      "تطوير مواقع",
+      "تجارة إلكترونية",
+      "تطبيق موبايل",
+      "نظام ERP",
+      "نظام نقاط البيع",
+      "تكامل أنظمة",
+      "حلول سحابية",
+      "تصميم UI/UX",
+      "صيانة ودعم فني",
+    ]);
+
+    const sanitized = ((data || []) as unknown as Service[]).filter((s) => {
+      if (legacyOldNames.has(s.name_ar)) return false;
+      if (s.name_ar === "برمجيات مخصصة" && !s.internal_reference_price) return false;
+      if (s.sort_order !== undefined && s.sort_order !== null && s.sort_order <= 0) return false;
+      return true;
+    });
+
+    const uniqueMap = new Map<string, Service>();
+    for (const item of sanitized) {
+      const key = `${item.name_ar}::${item.name_en}`;
+      if (!uniqueMap.has(key)) {
+        uniqueMap.set(key, item);
+      } else {
+        const existing = uniqueMap.get(key)!;
+        if ((!existing.sort_order || existing.sort_order === 0) && item.sort_order > 0) {
+          uniqueMap.set(key, item);
+        }
+      }
+    }
+
+    const result = Array.from(uniqueMap.values()).sort(
+      (a, b) => (a.sort_order ?? 9999) - (b.sort_order ?? 9999)
+    );
+
     return {
       success: true,
-      data: (data || []) as unknown as Service[],
+      data: result,
     };
   } catch (err: unknown) {
     return { success: false, error: getErrorMessage(err, "Failed to load services") };

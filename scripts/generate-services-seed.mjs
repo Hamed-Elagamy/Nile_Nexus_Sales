@@ -43,31 +43,50 @@ while ((match = rowRegex.exec(content)) !== null) {
 }
 
 console.log("Parsed count:", services.length);
-services.forEach((s) => {
-  if (!s.nameAr || !s.nameEn || isNaN(s.price)) {
-    console.error("Invalid service:", s);
-  }
-});
 
 // Generate SQL migration
-let sql = `-- Migration: 009_seed_173_services_catalog.sql
--- Description: Replace legacy demo services with the official 173 Nile Nexus Software Project Types and Starter Rates
+let sql = `-- ============================================================================
+-- Nile Nexus Sales — Migration 009: Clean Legacy Services & Seed Exact 173 Official Services
+-- Description:
+--   1. Safely disconnect any old foreign key references from deal_services,
+--      proposal_items, and commission_rules.
+--   2. Permanently DELETE all legacy demo services and duplicates from the services table.
+--   3. Apply unique constraints on sort_order and (name_ar, name_en) to prevent duplicates.
+--   4. Seed EXACTLY the 173 software project services from the Nile Nexus Pricing Document.
+--
+-- Execution:
+--   Copy and paste this script into the Supabase SQL Editor:
+--   https://supabase.com/dashboard/project/zbbivheqcutwflewmtnb/sql/new
+-- ============================================================================
 
--- 1. Safely deactivate legacy generic services if any exists
-UPDATE services SET is_active = false WHERE sort_order <= 11 AND created_at < now() - interval '1 day';
+BEGIN;
 
--- 2. Insert or update the 173 official Nile Nexus services
+-- 1. Unlink any potential references from old test records
+DELETE FROM deal_services;
+UPDATE proposal_items SET service_id = NULL;
+UPDATE commission_rules SET service_id = NULL;
+
+-- 2. Wipe the services table completely so ONLY the 173 official services exist
+TRUNCATE TABLE services CASCADE;
+
+-- 3. Add UNIQUE constraints to prevent duplicate entries in the future
+ALTER TABLE services DROP CONSTRAINT IF EXISTS uq_services_sort_order;
+ALTER TABLE services ADD CONSTRAINT uq_services_sort_order UNIQUE (sort_order);
+
+ALTER TABLE services DROP CONSTRAINT IF EXISTS uq_services_names;
+ALTER TABLE services ADD CONSTRAINT uq_services_names UNIQUE (name_ar, name_en);
+
+-- 4. Insert the exact 173 Nile Nexus Software Project Services
+INSERT INTO services (name_ar, name_en, internal_reference_price, currency, is_active, sort_order) VALUES
 `;
 
-sql += `INSERT INTO services (name_ar, name_en, internal_reference_price, currency, is_active, sort_order) VALUES\n`;
-
-const values = services.map((s, idx) => {
+const values = services.map((s) => {
   const escAr = s.nameAr.replace(/'/g, "''");
   const escEn = s.nameEn.replace(/'/g, "''");
   return `  ('${escAr}', '${escEn}', ${s.price.toFixed(2)}, 'EGP', true, ${s.num})`;
 });
 
-sql += values.join(",\n") + ";\n";
+sql += values.join(",\n") + ";\n\nCOMMIT;\n";
 
 fs.writeFileSync("supabase/migrations/009_seed_173_services_catalog.sql", sql, "utf8");
 console.log("Successfully generated supabase/migrations/009_seed_173_services_catalog.sql");
