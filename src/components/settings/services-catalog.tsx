@@ -17,6 +17,7 @@ import {
   ArrowUpDown,
   Filter,
   RotateCcw,
+  Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -346,6 +347,22 @@ export function ServicesCatalog({ services, userRole = "SALES" }: ServicesCatalo
         )}
       </div>
 
+      {!canManage && (
+        <div className="flex items-center gap-2.5 p-3 rounded-xl border border-blue-500/25 bg-blue-500/5 text-xs text-blue-800 dark:text-blue-300">
+          <Info className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+          <div className="flex-1">
+            <span className="font-bold">{t("salesDirectoryNoticeTitle")}: </span>
+            <span>{t("salesDirectoryNoticeDesc")}</span>
+          </div>
+          <Badge
+            variant="outline"
+            className="text-[10px] bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20 shrink-0 font-medium"
+          >
+            {t("readOnlyBadge")}
+          </Badge>
+        </div>
+      )}
+
       {/* Search, Filter & Sort Controls Bar */}
       <div className="p-3 rounded-xl border border-border bg-card/60 backdrop-blur-sm space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
@@ -511,14 +528,14 @@ export function ServicesCatalog({ services, userRole = "SALES" }: ServicesCatalo
                             variant="outline"
                             className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[11px] font-medium"
                           >
-                            {t("active")}
+                            {t("availableForSale")}
                           </Badge>
                         ) : (
                           <Badge
                             variant="outline"
                             className="bg-rose-500/10 text-rose-600 border-rose-500/20 text-[11px] font-medium"
                           >
-                            {t("inactive")}
+                            {t("unavailableForSale")}
                           </Badge>
                         )}
                       </td>

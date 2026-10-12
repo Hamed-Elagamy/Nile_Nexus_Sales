@@ -23,6 +23,11 @@ All notable changes to this project will be documented in this file.
     - **Smart Pagination**: Configurable per-page selector (25, 50, 100, or View All) with dynamic page jumping and counter indicators.
     - **Summary Badges**: Displays total registered services, active count, and real-time filtered results.
     - Preserved full GM & Admin inline editing, activation toggling, and soft-delete protection.
+  - **Dedicated `/services` Route & Read-Only Access for Sales Representatives**:
+    - Created dedicated `/services` page (`src/app/(authenticated)/services/page.tsx`) and added it to primary navigation in both desktop sidebar and mobile slide-over navigation drawer.
+    - Sales representatives can now easily browse all 173 services, verify real-time availability (`متاحة للتعاقد` vs `غير متاحة حالياً`), and review starter prices in EGP during client discussions.
+    - Strict role permission enforcement: `SALES` role receives a clean read-only directory view with an informative guide banner; all management controls (Add, Edit, Delete, Toggle active) are hidden and protected server-side.
+    - GM and Admin roles retain full editing, adding, and archiving capabilities across both `/services` and `/settings`.
   - **Internationalization (i18n)**:
     - Added complete translation keys across `messages/ar.json` and `messages/en.json`.
   - **Quality & Verification**:

@@ -21,6 +21,7 @@ import {
   LayoutGrid,
   X,
   LogOut,
+  Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMobileNav } from "./mobile-nav-context";
@@ -35,6 +36,7 @@ export const navItems = [
   { key: "clients", href: "/clients", icon: Users },
   { key: "deals", href: "/deals", icon: Briefcase },
   { key: "pipeline", href: "/pipeline", icon: GitBranch },
+  { key: "services", href: "/services", icon: Tag },
   { key: "followUps", href: "/follow-ups", icon: Phone },
   { key: "tasks", href: "/tasks", icon: CheckSquare },
   { key: "calendar", href: "/calendar", icon: Calendar },
@@ -280,10 +282,10 @@ export function AppSidebar({ user }: AppSidebarProps = {}) {
         <div className="flex items-center justify-around">
           {/* 4 Primary Navigation Links */}
           {[
-            navItems[0], // Dashboard
-            navItems[2], // Clients
-            navItems[3], // Deals
-            navItems[5], // Follow-ups
+            navItems.find((n) => n.key === "dashboard")!,
+            navItems.find((n) => n.key === "clients")!,
+            navItems.find((n) => n.key === "deals")!,
+            navItems.find((n) => n.key === "followUps")!,
           ].map((item) => {
             const isActive =
               pathname === item.href ||

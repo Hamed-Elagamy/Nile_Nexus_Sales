@@ -80,6 +80,7 @@
     "clients": "Clients",
     "deals": "Deals",
     "pipeline": "Pipeline",
+    "services": "Services Catalog",
     "followUps": "Follow-ups",
     "tasks": "Tasks",
     "calendar": "Calendar",
@@ -96,6 +97,14 @@
     "activities": "Activities & Tasks",
     "salesOps": "Proposals & Approvals",
     "management": "Management & Insights"
+  },
+  "servicesPage": {
+    "title": "Services Catalog & Pricing",
+    "subtitle": "Software services directory and starter rates approved for sales representatives and management 🏷️",
+    "salesGuideBanner": "Sales Guide: Use this catalog to explore company software solutions (173 services), check availability status, and review starter rates when discussing proposals.",
+    "readOnlyNotice": "Read-only guide — editing and creating services is reserved for General Manager and Admins",
+    "available": "Available for Deals",
+    "unavailable": "Currently Unavailable"
   },
   "dashboard": {
     "greeting": "Welcome back, {name} 🚀",
@@ -903,6 +912,11 @@
     "of": "of",
     "serviceNumber": "#",
     "starterPricePrefix": "Starts from",
+    "availableForSale": "Available for Deals",
+    "unavailableForSale": "Currently Unavailable",
+    "salesDirectoryNoticeTitle": "Sales Representatives Directory",
+    "salesDirectoryNoticeDesc": "Review all 173 company software services, starter rates, and live availability to guide negotiations and client proposals.",
+    "readOnlyBadge": "Read-Only Reference",
     "editLeadSource": "Edit Source",
     "editLeadSourceTitle": "Edit Lead Source Details",
     "leadSourceUpdated": "Lead source updated successfully! 🧭",

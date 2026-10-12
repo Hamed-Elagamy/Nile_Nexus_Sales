@@ -79,6 +79,8 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - Generated database migration `supabase/migrations/009_seed_173_services_catalog.sql` containing all 173 services with exact sort orders (`1` to `173`), Arabic names, English names, and EGP prices
   - Synchronized offline/demo fallback catalog `demoServices` in `src/lib/demo-data.ts`
   - Upgraded Services Catalog component (`src/components/settings/services-catalog.tsx`) with live instant search, status filtering, multi-field sorting, configurable pagination (25/50/100/All), and catalog summary badges
+  - Created dedicated `/services` route (`src/app/(authenticated)/services/page.tsx`) and added it to primary navigation in desktop sidebar and mobile drawer
+  - Configured Sales Representative permissions: read-only access with clear availability indicators (`متاحة للتعاقد` vs `غير متاحة`) and starter prices, while editing, adding, and deleting controls are strictly restricted to GM and Admin
   - Added comprehensive i18n keys to both `messages/ar.json` and `messages/en.json`
   - Verified 0 TypeScript errors and 100% Vitest tests passing (60/60)
 
