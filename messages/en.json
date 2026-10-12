@@ -839,7 +839,15 @@
     "tabAll": "All",
     "tabUnread": "Unread",
     "tabActionRequired": "Action Required 🚨",
-    "tabUpdates": "System Updates"
+    "tabUpdates": "System Updates",
+    "clearAll": "Clear All",
+    "clearConfirmTitle": "Clear All Notifications?",
+    "clearConfirmDesc": "Are you sure you want to permanently clear all notifications from your notifications center?",
+    "clearConfirmBtn": "Yes, Clear All",
+    "deleteSingle": "Delete Notification",
+    "allCleared": "All notifications cleared successfully",
+    "singleDeleted": "Notification deleted successfully",
+    "cancel": "Cancel"
   },
   "pwa": {
     "bannerTitle": "Nile Nexus Sales App",

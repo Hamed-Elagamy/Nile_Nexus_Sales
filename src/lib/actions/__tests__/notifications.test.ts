@@ -4,6 +4,8 @@ import {
   getUnreadNotificationsCount,
   markNotificationAsRead,
   markAllNotificationsAsRead,
+  clearAllNotifications,
+  deleteNotification,
   createNotification,
   sendTestNotification,
 } from "../notifications";
@@ -40,6 +42,16 @@ describe("Notifications Server Actions", () => {
 
   it("marks all notifications as read successfully", async () => {
     const res = await markAllNotificationsAsRead();
+    expect(res.success).toBe(true);
+  });
+
+  it("clears all notifications successfully", async () => {
+    const res = await clearAllNotifications();
+    expect(res.success).toBe(true);
+  });
+
+  it("deletes a single notification successfully", async () => {
+    const res = await deleteNotification("demo-notif-1");
     expect(res.success).toBe(true);
   });
 

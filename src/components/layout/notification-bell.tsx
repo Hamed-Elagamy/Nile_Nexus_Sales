@@ -13,6 +13,7 @@ import {
   Radio,
   ExternalLink,
   Sparkles,
+  Trash2,
 } from "lucide-react";
 import { useNotifications } from "@/components/notifications/realtime-notification-provider";
 import { formatLocalizedNotification } from "@/lib/utils/localized-notification";
@@ -30,6 +31,7 @@ export function NotificationBell() {
     requestPermission,
     markAsRead,
     markAllAsRead,
+    clearAllNotifications,
     sendTestNotification,
   } = useNotifications();
 
@@ -119,6 +121,18 @@ export function NotificationBell() {
                 >
                   <CheckCheck className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline">{t("markAllRead")}</span>
+                </button>
+              )}
+
+              {notifications.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => clearAllNotifications()}
+                  className="text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400 p-1 rounded hover:bg-red-50 dark:hover:bg-red-950/40 flex items-center gap-1 transition-colors cursor-pointer"
+                  title={t("clearAll")}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">{t("clearAll")}</span>
                 </button>
               )}
             </div>

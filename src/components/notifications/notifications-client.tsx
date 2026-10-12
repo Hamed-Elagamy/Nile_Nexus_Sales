@@ -15,6 +15,7 @@ import {
   Filter,
   Check,
   ExternalLink,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNotifications } from "@/components/notifications/realtime-notification-provider";
@@ -37,11 +38,15 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
     requestPermission,
     markAsRead,
     markAllAsRead,
+    clearAllNotifications,
+    deleteNotification,
     sendTestNotification,
   } = useNotifications();
 
   const [activeTab, setActiveTab] = useState<"ALL" | "ACTION_REQUIRED" | "UPDATE" | "UNREAD">("ALL");
   const [isTesting, setIsTesting] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
+  const [showConfirmClear, setShowConfirmClear] = useState(false);
 
   // Use provider notifications if loaded, else fallback to initial
   const displayList = notifications.length > 0 ? notifications : initialNotifications;
@@ -64,6 +69,16 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
       await sendTestNotification(locale);
     } finally {
       setIsTesting(false);
+    }
+  };
+
+  const handleConfirmClear = async () => {
+    setIsClearing(true);
+    try {
+      await clearAllNotifications();
+      setShowConfirmClear(false);
+    } finally {
+      setIsClearing(false);
     }
   };
 
@@ -106,6 +121,19 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
             >
               <CheckCheck className="h-4 w-4" />
               <span>{t("markAllRead")}</span>
+            </Button>
+          )}
+
+          {displayList.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowConfirmClear(true)}
+              disabled={isClearing}
+              className="flex items-center gap-1.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 border-red-200 dark:border-red-900/50 cursor-pointer"
+            >
+              <Trash2 className="h-4 w-4" />
+              <span>{t("clearAll")}</span>
             </Button>
           )}
         </div>
@@ -290,16 +318,28 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
                       )}
                     </div>
 
-                    {!notif.is_read && (
+                    <div className="flex items-center gap-2">
+                      {!notif.is_read && (
+                        <button
+                          type="button"
+                          onClick={() => markAsRead(notif.id)}
+                          className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] flex items-center gap-1 px-2 py-1 rounded hover:bg-[var(--muted)] transition-colors cursor-pointer"
+                        >
+                          <Check className="h-3 w-3" />
+                          <span>{t("markAsRead")}</span>
+                        </button>
+                      )}
+
                       <button
                         type="button"
-                        onClick={() => markAsRead(notif.id)}
-                        className="text-[11px] text-[var(--muted-foreground)] hover:text-[var(--foreground)] flex items-center gap-1 px-2 py-1 rounded hover:bg-[var(--muted)] transition-colors cursor-pointer"
+                        onClick={() => deleteNotification(notif.id)}
+                        className="text-[11px] text-red-500 hover:text-red-700 dark:hover:text-red-400 flex items-center gap-1 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer"
+                        title={t("deleteSingle")}
                       >
-                        <Check className="h-3 w-3" />
-                        <span>{t("markAsRead")}</span>
+                        <Trash2 className="h-3 w-3" />
+                        <span>{t("deleteSingle")}</span>
                       </button>
-                    )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -307,6 +347,46 @@ export function NotificationsClient({ initialNotifications }: NotificationsClien
           })
         )}
       </div>
+
+      {/* Confirmation Modal for Clear All Notifications */}
+      {showConfirmClear && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
+              <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-950/50 flex items-center justify-center shrink-0">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <h3 className="font-bold text-base text-[var(--foreground)]">
+                {t("clearConfirmTitle")}
+              </h3>
+            </div>
+
+            <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
+              {t("clearConfirmDesc")}
+            </p>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowConfirmClear(false)}
+                disabled={isClearing}
+              >
+                {t("cancel")}
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleConfirmClear}
+                disabled={isClearing}
+                className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+              >
+                {t("clearConfirmBtn")}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

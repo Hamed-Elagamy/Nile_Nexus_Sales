@@ -839,7 +839,15 @@
     "tabAll": "الكل",
     "tabUnread": "غير مقروءة",
     "tabActionRequired": "تتطلب إجراء 🚨",
-    "tabUpdates": "تحديثات النظام"
+    "tabUpdates": "تحديثات النظام",
+    "clearAll": "مسح الكل",
+    "clearConfirmTitle": "مسح جميع الإشعارات؟",
+    "clearConfirmDesc": "هل أنت متأكد من مسح جميع الإشعارات من مركز التنبيهات نهائياً؟",
+    "clearConfirmBtn": "نعم، مسح الكل",
+    "deleteSingle": "حذف الإشعار",
+    "allCleared": "تم مسح جميع الإشعارات بنجاح",
+    "singleDeleted": "تم حذف الإشعار بنجاح",
+    "cancel": "إلغاء"
   },
   "pwa": {
     "bannerTitle": "تطبيق Nile Nexus Sales",

@@ -11,6 +11,8 @@ import {
   markNotificationAsRead as serverMarkAsRead,
   markAllNotificationsAsRead as serverMarkAllAsRead,
   sendTestNotification as serverSendTestNotification,
+  clearAllNotifications as serverClearAllNotifications,
+  deleteNotification as serverDeleteNotification,
   type NotificationItem,
 } from "@/lib/actions/notifications";
 import {
@@ -29,6 +31,8 @@ interface NotificationContextValue {
   requestPermission: () => Promise<NotificationPermission>;
   markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
+  clearAllNotifications: () => Promise<void>;
+  deleteNotification: (id: string) => Promise<void>;
   sendTestNotification: (targetLocale?: "ar" | "en") => Promise<void>;
   refresh: () => Promise<void>;
 }
@@ -210,6 +214,34 @@ export function RealtimeNotificationProvider({
     );
   }, [locale]);
 
+  // Clear all notifications
+  const handleClearAll = useCallback(async () => {
+    setNotifications([]);
+    setUnreadCount(0);
+    await serverClearAllNotifications();
+    toast.success(
+      locale === "en" ? "All notifications cleared successfully" : "تم مسح جميع الإشعارات بنجاح"
+    );
+  }, [locale]);
+
+  // Delete a single notification
+  const handleDeleteNotification = useCallback(
+    async (id: string) => {
+      setNotifications((prev) => {
+        const target = prev.find((n) => n.id === id);
+        if (target && !target.is_read) {
+          setUnreadCount((cnt) => Math.max(0, cnt - 1));
+        }
+        return prev.filter((n) => n.id !== id);
+      });
+      await serverDeleteNotification(id);
+      toast.success(
+        locale === "en" ? "Notification deleted" : "تم حذف الإشعار بنجاح"
+      );
+    },
+    [locale]
+  );
+
   // Send test notification in active language
   const handleSendTestNotification = useCallback(
     async (targetLocale?: "ar" | "en") => {
@@ -256,6 +288,8 @@ export function RealtimeNotificationProvider({
         requestPermission: handleRequestPermission,
         markAsRead: handleMarkAsRead,
         markAllAsRead: handleMarkAllAsRead,
+        clearAllNotifications: handleClearAll,
+        deleteNotification: handleDeleteNotification,
         sendTestNotification: handleSendTestNotification,
         refresh: loadNotifications,
       }}

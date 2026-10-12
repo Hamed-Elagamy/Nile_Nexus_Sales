@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.3] - 2026-10-12
+
+### Added & Enhanced
+- **Clear & Delete Actions in Notification Center & Header**:
+  - **Clear All with Confirmation Dialog**:
+    - Added "Clear All / مسح الكل" button to Notifications Center (`/notifications`) with a safe confirmation modal dialog to prevent accidental data loss.
+    - Added quick "Clear All / مسح الكل" action inside the `NotificationBell` header popover when notifications exist.
+  - **Individual Notification Deletion**:
+    - Added individual delete button (`Trash2`) on every notification card in `/notifications` to easily dismiss/delete single notifications.
+  - **Server Actions & Database RLS**:
+    - Implemented `clearAllNotifications()` and `deleteNotification(id: string)` server actions in `src/lib/actions/notifications.ts` utilizing Supabase RLS delete policies (`user_id = auth.uid()`) with offline demo fallback and cache revalidation.
+  - **Realtime Context & Instant State Updates**:
+    - Connected `clearAllNotifications` and `deleteNotification` to `RealtimeNotificationProvider` with immediate optimistic UI updates, unread count decrementing, and localized Sonner toast notifications.
+  - **Bilingual Support & Testing**:
+    - Added complete English and Egyptian Arabic translation keys in `messages/en.json` and `messages/ar.json`.
+    - Added automated unit tests in `src/lib/actions/__tests__/notifications.test.ts` bringing total test suite to 16/16 test files and 78/78 passing tests (100%).
+
 ## [1.5.2] - 2026-10-12
 
 ### Fixed & Enhanced

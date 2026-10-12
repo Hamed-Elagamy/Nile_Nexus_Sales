@@ -208,6 +208,73 @@ export async function markAllNotificationsAsRead(): Promise<ActionResult> {
 }
 
 /**
+ * Clear (delete) all notifications for current user
+ */
+export async function clearAllNotifications(): Promise<ActionResult> {
+  try {
+    if (!isSupabaseConfigured()) {
+      return { success: true };
+    }
+
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return { success: false, error: "Unauthorized" };
+
+    const { error } = await supabase
+      .from("notifications")
+      .delete()
+      .eq("user_id", user.id);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath("/notifications");
+    return { success: true };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Error clearing all notifications";
+    return { success: false, error: msg };
+  }
+}
+
+/**
+ * Delete a specific notification by ID
+ */
+export async function deleteNotification(id: string): Promise<ActionResult> {
+  try {
+    if (!isSupabaseConfigured()) {
+      return { success: true };
+    }
+
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return { success: false, error: "Unauthorized" };
+
+    const { error } = await supabase
+      .from("notifications")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", user.id);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath("/notifications");
+    return { success: true };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Error deleting notification";
+    return { success: false, error: msg };
+  }
+}
+
+/**
  * Insert a new notification for a specific user
  */
 export async function createNotification(params: {
