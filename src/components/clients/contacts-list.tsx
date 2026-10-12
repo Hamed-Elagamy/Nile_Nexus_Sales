@@ -6,6 +6,7 @@ import { Phone, MessageCircle, Mail, Star, User } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AddContactDialog } from "./add-contact-dialog";
+import { WhatsAppQuickDialog } from "@/components/shared/whatsapp-quick-dialog";
 import type { Contact } from "@/types/domain";
 
 interface ContactsListProps {
@@ -92,16 +93,21 @@ export function ContactsList({ clientId, contacts, onRefresh }: ContactsListProp
                         </a>
                       )}
 
-                      {whatsappUrl && (
-                        <a
-                          href={whatsappUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 text-xs flex items-center gap-1"
-                          title={tCommon("whatsapp")}
-                        >
-                          <MessageCircle className="h-3.5 w-3.5" />
-                        </a>
+                      {(contact.whatsapp || contact.phone) && (
+                        <WhatsAppQuickDialog
+                          phone={contact.whatsapp || contact.phone || ""}
+                          recipientName={contact.name}
+                          contextType="client"
+                          trigger={
+                            <button
+                              type="button"
+                              className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 text-xs flex items-center gap-1"
+                              title={tCommon("whatsapp")}
+                            >
+                              <MessageCircle className="h-3.5 w-3.5" />
+                            </button>
+                          }
+                        />
                       )}
 
                       {contact.email && (

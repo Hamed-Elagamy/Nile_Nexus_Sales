@@ -32,6 +32,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PotentialClientStatusBadge } from "./status-badge";
 import { OpportunityBadges } from "./opportunity-badges";
+import { WhatsAppQuickDialog } from "@/components/shared/whatsapp-quick-dialog";
 import type { PotentialClientWithRelations } from "@/lib/actions/potential-clients";
 import type { PotentialClientStatusType } from "@/lib/schemas/potential-client";
 
@@ -146,16 +147,21 @@ export function PotentialClientsTable({
                             >
                               <Phone className="h-3.5 w-3.5" />
                             </a>
-                            {whatsappUrl && (
-                              <a
-                                href={whatsappUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-1 rounded hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700"
-                                title={tCommon("whatsapp")}
-                              >
-                                <MessageCircle className="h-3.5 w-3.5" />
-                              </a>
+                            {client.phone && (
+                              <WhatsAppQuickDialog
+                                phone={client.phone}
+                                recipientName={client.name}
+                                contextType="lead"
+                                trigger={
+                                  <button
+                                    type="button"
+                                    className="p-1 rounded hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700"
+                                    title={tCommon("whatsapp")}
+                                  >
+                                    <MessageCircle className="h-3.5 w-3.5" />
+                                  </button>
+                                }
+                              />
                             )}
                           </div>
                         </>
@@ -300,16 +306,21 @@ export function PotentialClientsTable({
                       <span dir="ltr">{client.phone}</span>
                     </a>
                   )}
-                  {whatsappUrl && (
-                    <a
-                      href={whatsappUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 text-xs flex items-center gap-1"
-                    >
-                      <MessageCircle className="h-3.5 w-3.5" />
-                      <span>{tCommon("whatsapp")}</span>
-                    </a>
+                  {client.phone && (
+                    <WhatsAppQuickDialog
+                      phone={client.phone}
+                      recipientName={client.name}
+                      contextType="lead"
+                      trigger={
+                        <button
+                          type="button"
+                          className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 text-xs flex items-center gap-1"
+                        >
+                          <MessageCircle className="h-3.5 w-3.5" />
+                          <span>{tCommon("whatsapp")}</span>
+                        </button>
+                      }
+                    />
                   )}
                 </div>
 

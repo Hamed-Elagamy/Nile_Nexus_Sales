@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { FollowUpActionBadge } from "./follow-up-action-badge";
 import { CompleteFollowUpDialog } from "./complete-follow-up-dialog";
 import { RescheduleFollowUpDialog } from "./reschedule-follow-up-dialog";
+import { WhatsAppQuickDialog } from "@/components/shared/whatsapp-quick-dialog";
 import type { FollowUpWithRelations } from "@/lib/actions/follow-ups";
 
 interface FollowUpCardProps {
@@ -145,16 +146,12 @@ export function FollowUpCard({ followUp, onRefresh, isOverdue = false }: FollowU
                 </a>
               )}
 
-              {whatsappUrl && (
-                <a
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-1.5 rounded-md border border-border bg-card text-muted-foreground hover:text-emerald-600 hover:border-emerald-500/30 transition-colors"
-                  title={tCard("whatsappAction")}
-                >
-                  <MessageSquare className="h-3.5 w-3.5" />
-                </a>
+              {followUp.client?.phone && (
+                <WhatsAppQuickDialog
+                  phone={followUp.client.phone}
+                  recipientName={followUp.client.name}
+                  contextType="follow_up"
+                />
               )}
             </div>
 

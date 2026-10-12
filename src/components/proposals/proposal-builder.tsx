@@ -1,13 +1,21 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Plus, Trash2, Calculator, Coins } from "lucide-react";
+import { Plus, Trash2, Calculator, Coins, Tag, Search, X } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import type { ProposalItemInput } from "@/lib/schemas/proposal";
+import type { Service } from "@/types/domain";
 
 export interface ProposalBuilderState {
   items: ProposalItemInput[];
@@ -25,9 +33,10 @@ export interface ProposalBuilderState {
 interface ProposalBuilderProps {
   initialState?: Partial<ProposalBuilderState>;
   onChange: (state: ProposalBuilderState) => void;
+  services?: Service[];
 }
 
-export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps) {
+export function ProposalBuilder({ initialState, onChange, services = [] }: ProposalBuilderProps) {
   const t = useTranslations("proposals");
 
   const [items, setItems] = useState<ProposalItemInput[]>(
@@ -64,6 +73,55 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
   );
   const [validUntil, setValidUntil] = useState(initialState?.validUntil || "");
   const [notes, setNotes] = useState(initialState?.notes || "");
+
+  // Service Catalog Picker State
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  const [catalogSearch, setCatalogSearch] = useState("");
+
+  const filteredCatalogServices = useMemo(() => {
+    if (!services || services.length === 0) return [];
+    const query = catalogSearch.trim().toLowerCase();
+    return services.filter((s) => {
+      if (!s.is_active) return false;
+      if (!query) return true;
+      return (
+        s.name_ar.toLowerCase().includes(query) ||
+        (s.name_en && s.name_en.toLowerCase().includes(query)) ||
+        (s.internal_reference_price && String(s.internal_reference_price).includes(query))
+      );
+    });
+  }, [services, catalogSearch]);
+
+  const handleSelectService = (service: Service) => {
+    const unitPrice = Number(service.internal_reference_price) || 0;
+    let newItems: ProposalItemInput[];
+
+    if (items.length === 1 && !items[0].description_ar.trim() && (items[0].unit_price === 0 || !items[0].unit_price)) {
+      newItems = [
+        {
+          description_ar: service.name_ar,
+          quantity: 1,
+          unit_price: unitPrice,
+          sort_order: 0,
+        },
+      ];
+    } else {
+      newItems = [
+        ...items,
+        {
+          description_ar: service.name_ar,
+          quantity: 1,
+          unit_price: unitPrice,
+          sort_order: items.length,
+        },
+      ];
+    }
+
+    setItems(newItems);
+    notifyChange({ items: newItems });
+    toast.success(t("serviceAddedToProposal", { name: service.name_ar }));
+    setCatalogOpen(false);
+  };
 
   const notifyChange = (updated: Partial<ProposalBuilderState>) => {
     onChange({
@@ -141,16 +199,30 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
             <Calculator className="h-4 w-4 text-primary" />
             <span>{t("lineItemsTitle")}</span>
           </h3>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleAddItem}
-            className="text-xs h-8 gap-1.5"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            <span>{t("addItem")}</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            {services && services.length > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setCatalogOpen(true)}
+                className="text-xs h-8 gap-1.5 border-primary/40 text-primary hover:bg-primary/10 font-medium"
+              >
+                <Tag className="h-3.5 w-3.5" />
+                <span>{t("addFromCatalog")}</span>
+              </Button>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleAddItem}
+              className="text-xs h-8 gap-1.5"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>{t("addItem")}</span>
+            </Button>
+          </div>
         </div>
 
         <div className="border border-border rounded-lg overflow-hidden bg-card">
@@ -423,6 +495,94 @@ export function ProposalBuilder({ initialState, onChange }: ProposalBuilderProps
           />
         </div>
       </div>
+
+      {/* Service Catalog Picker Dialog */}
+      <Dialog open={catalogOpen} onOpenChange={setCatalogOpen}>
+        <DialogContent className="sm:max-w-2xl max-h-[85vh] flex flex-col p-5">
+          <DialogHeader className="pb-3 border-b border-border">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-base font-bold text-foreground flex items-center gap-2">
+                <Tag className="h-4 w-4 text-primary" />
+                <span>{t("catalogModalTitle")}</span>
+              </DialogTitle>
+              <span className="text-xs text-muted-foreground font-mono bg-muted/60 px-2.5 py-0.5 rounded-full">
+                {t("serviceCatalogCount", { count: filteredCatalogServices.length })}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+              {t("catalogModalDesc")}
+            </p>
+          </DialogHeader>
+
+          {/* Search Box */}
+          <div className="relative my-3">
+            <Search className="absolute right-3 rtl:right-3 ltr:left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <Input
+              value={catalogSearch}
+              onChange={(e) => setCatalogSearch(e.target.value)}
+              placeholder={t("searchServicesPlaceholder")}
+              className="pr-9 rtl:pr-9 ltr:pl-9 text-xs h-9 bg-card"
+              autoFocus
+            />
+            {catalogSearch && (
+              <button
+                type="button"
+                onClick={() => setCatalogSearch("")}
+                className="absolute left-3 rtl:left-3 ltr:right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Services List */}
+          <div className="flex-1 overflow-y-auto space-y-2 pr-1 max-h-[50vh] divide-y divide-border/30">
+            {filteredCatalogServices.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground text-xs">
+                {t("noServicesFound")}
+              </div>
+            ) : (
+              filteredCatalogServices.map((service) => (
+                <div
+                  key={service.id}
+                  className="pt-2 first:pt-0 flex items-center justify-between gap-3 p-2.5 rounded-lg border border-border/60 hover:border-primary/50 bg-card hover:bg-muted/30 transition-all text-xs"
+                >
+                  <div className="space-y-1 flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-semibold">
+                        #{service.sort_order}
+                      </span>
+                      <h4 className="font-semibold text-foreground truncate">
+                        {service.name_ar}
+                      </h4>
+                    </div>
+                    {service.name_en && (
+                      <p className="text-[11px] text-muted-foreground truncate">
+                        {service.name_en}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="font-mono font-bold text-foreground whitespace-nowrap bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 rounded-md text-xs border border-emerald-500/20">
+                      {Number(service.internal_reference_price || 0).toLocaleString()} {service.currency || "EGP"}
+                    </span>
+                    <Button
+                      type="button"
+                      size="xs"
+                      onClick={() => handleSelectService(service)}
+                      className="gap-1 h-7 text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+                    >
+                      <Plus className="h-3 w-3" />
+                      <span>{t("addToProposal")}</span>
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

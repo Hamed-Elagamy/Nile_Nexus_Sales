@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ClientTypeBadge } from "./client-type-badge";
 import { ContactsList } from "./contacts-list";
+import { WhatsAppQuickDialog } from "@/components/shared/whatsapp-quick-dialog";
 import { updateClient, type ClientWithRelations } from "@/lib/actions/clients";
 
 interface ClientDetailProps {
@@ -107,16 +108,21 @@ export function ClientDetail({ client }: ClientDetailProps) {
             </a>
           )}
 
-          {whatsappUrl && (
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 text-xs font-medium hover:opacity-90 transition-opacity"
-            >
-              <MessageCircle className="h-3.5 w-3.5" />
-              <span>{tCommon("whatsapp")}</span>
-            </a>
+          {phone && (
+            <WhatsAppQuickDialog
+              phone={phone}
+              recipientName={client.name}
+              contextType="client"
+              trigger={
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 text-xs font-medium hover:opacity-90 transition-opacity"
+                >
+                  <MessageCircle className="h-3.5 w-3.5" />
+                  <span>{tCommon("whatsapp")}</span>
+                </button>
+              }
+            />
           )}
 
           <Link

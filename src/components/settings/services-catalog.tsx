@@ -18,6 +18,8 @@ import {
   Filter,
   RotateCcw,
   Info,
+  Briefcase,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +31,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { CreateDealDialog } from "@/components/deals/create-deal-dialog";
+import { exportToCsv } from "@/lib/utils/export-csv";
 import {
   createService,
   updateService,
@@ -39,9 +43,14 @@ import type { Service } from "@/types/domain";
 interface ServicesCatalogProps {
   services: Service[];
   userRole?: string;
+  clients?: Array<{ id: string; name: string; business_id: string }>;
 }
 
-export function ServicesCatalog({ services, userRole = "SALES" }: ServicesCatalogProps) {
+export function ServicesCatalog({
+  services,
+  userRole = "SALES",
+  clients = [],
+}: ServicesCatalogProps) {
   const t = useTranslations("settings");
   const tCommon = useTranslations("common");
   const router = useRouter();
@@ -242,6 +251,25 @@ export function ServicesCatalog({ services, userRole = "SALES" }: ServicesCatalo
 
   const isFiltered = searchQuery.trim() !== "" || statusFilter !== "all" || sortBy !== "order";
 
+  const handleExportCsv = () => {
+    exportToCsv(
+      `Nile_Nexus_Services_Catalog_${new Date().toISOString().slice(0, 10)}`,
+      [
+        { header: "#", key: "sort_order" },
+        { header: "اسم الخدمة (عربي)", key: "name_ar" },
+        { header: "Service Name (EN)", key: "name_en" },
+        { header: "السعر الاسترشادي", key: "internal_reference_price" },
+        { header: "العملة", key: "currency" },
+        {
+          header: "الحالة",
+          formatter: (row: Service) => (row.is_active ? "متاحة للتعاقد" : "غير متاحة"),
+        },
+      ],
+      filteredServices
+    );
+    toast.success(t("exportSuccess"));
+  };
+
   return (
     <div className="space-y-4">
       {/* Top Header */}
@@ -261,16 +289,28 @@ export function ServicesCatalog({ services, userRole = "SALES" }: ServicesCatalo
           </p>
         </div>
 
-        {canManage && (
-          <Dialog open={openCreateDialog} onOpenChange={setOpenCreateDialog}>
-            <DialogTrigger
-              render={
-                <Button size="sm" className="gap-1.5 cursor-pointer self-start sm:self-auto">
-                  <Plus className="h-4 w-4" />
-                  <span>{t("addService")}</span>
-                </Button>
-              }
-            />
+        <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleExportCsv}
+            className="gap-1.5 cursor-pointer text-xs h-9"
+          >
+            <Download className="h-3.5 w-3.5" />
+            <span>{t("exportExcel")}</span>
+          </Button>
+
+          {canManage && (
+            <Dialog open={openCreateDialog} onOpenChange={setOpenCreateDialog}>
+              <DialogTrigger
+                render={
+                  <Button size="sm" className="gap-1.5 cursor-pointer">
+                    <Plus className="h-4 w-4" />
+                    <span>{t("addService")}</span>
+                  </Button>
+                }
+              />
             <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
@@ -345,6 +385,7 @@ export function ServicesCatalog({ services, userRole = "SALES" }: ServicesCatalo
             </DialogContent>
           </Dialog>
         )}
+        </div>
       </div>
 
       {!canManage && (
@@ -467,13 +508,13 @@ export function ServicesCatalog({ services, userRole = "SALES" }: ServicesCatalo
                 <th className="p-3 text-start">{t("serviceColNameEn")}</th>
                 <th className="p-3 text-start">{t("serviceColPrice")}</th>
                 <th className="p-3 text-center w-24">{t("serviceColStatus")}</th>
-                {canManage && <th className="p-3 text-end w-44">{tCommon("actions")}</th>}
+                <th className="p-3 text-end min-w-[140px]">{tCommon("actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
               {paginatedServices.length === 0 ? (
                 <tr>
-                  <td colSpan={canManage ? 6 : 5} className="py-12 text-center text-muted-foreground">
+                  <td colSpan={6} className="py-12 text-center text-muted-foreground">
                     <div className="flex flex-col items-center justify-center gap-2">
                       <Tag className="h-8 w-8 text-muted-foreground/40" />
                       <p className="font-medium text-foreground">{t("noServicesFound")}</p>
@@ -539,44 +580,66 @@ export function ServicesCatalog({ services, userRole = "SALES" }: ServicesCatalo
                           </Badge>
                         )}
                       </td>
-                      {canManage && (
-                        <td className="p-3 text-end">
-                          <div className="flex items-center justify-end gap-1">
-                            <Button
-                              size="xs"
-                              variant="ghost"
-                              onClick={() => handleOpenEdit(s)}
-                              disabled={isPending}
-                              className="h-7 px-2 text-xs text-primary hover:bg-primary/10 gap-1 cursor-pointer"
-                              title={t("editService")}
-                            >
-                              <Pencil className="h-3 w-3" />
-                              <span className="hidden sm:inline">{tCommon("edit")}</span>
-                            </Button>
+                      <td className="p-3 text-end">
+                        <div className="flex items-center justify-end gap-1.5">
+                          {s.is_active && (
+                            <CreateDealDialog
+                              clients={clients}
+                              defaultTitle={s.name_ar}
+                              defaultEstimatedValue={s.internal_reference_price || ""}
+                              defaultCurrency={s.currency || "EGP"}
+                              triggerButton={
+                                <Button
+                                  size="xs"
+                                  variant="outline"
+                                  className="h-7 px-2 text-[11px] border-primary/30 text-primary hover:bg-primary/10 gap-1 cursor-pointer font-medium"
+                                  title={t("createDealWithService")}
+                                >
+                                  <Briefcase className="h-3 w-3" />
+                                  <span>{t("createDealBtn")}</span>
+                                </Button>
+                              }
+                            />
+                          )}
 
-                            <Button
-                              size="xs"
-                              variant="ghost"
-                              onClick={() => handleToggleActive(s)}
-                              disabled={isPending}
-                              className="h-7 px-2 text-xs text-muted-foreground hover:bg-muted cursor-pointer"
-                            >
-                              {s.is_active ? t("deactivate") : t("activate")}
-                            </Button>
+                          {canManage && (
+                            <>
+                              <Button
+                                size="xs"
+                                variant="ghost"
+                                onClick={() => handleOpenEdit(s)}
+                                disabled={isPending}
+                                className="h-7 px-2 text-xs text-primary hover:bg-primary/10 gap-1 cursor-pointer"
+                                title={t("editService")}
+                              >
+                                <Pencil className="h-3 w-3" />
+                                <span className="hidden sm:inline">{tCommon("edit")}</span>
+                              </Button>
 
-                            <Button
-                              size="xs"
-                              variant="ghost"
-                              onClick={() => setDeletingService(s)}
-                              disabled={isPending}
-                              className="h-7 px-2 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer"
-                              title={t("deleteService")}
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </td>
-                      )}
+                              <Button
+                                size="xs"
+                                variant="ghost"
+                                onClick={() => handleToggleActive(s)}
+                                disabled={isPending}
+                                className="h-7 px-2 text-xs text-muted-foreground hover:bg-muted cursor-pointer"
+                              >
+                                {s.is_active ? t("deactivate") : t("activate")}
+                              </Button>
+
+                              <Button
+                                size="xs"
+                                variant="ghost"
+                                onClick={() => setDeletingService(s)}
+                                disabled={isPending}
+                                className="h-7 px-2 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer"
+                                title={t("deleteService")}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   );
                 })

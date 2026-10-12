@@ -3,9 +3,12 @@
 import React, { useState, useTransition, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ClientsFilter } from "./clients-filter";
 import { ClientsTable } from "./clients-table";
 import { CreateClientDialog } from "./create-client-dialog";
+import { exportToCsv } from "@/lib/utils/export-csv";
 import {
   getClients,
   type PaginatedClientsResult,
@@ -18,6 +21,7 @@ interface ClientsClientProps {
 
 export function ClientsClient({ initialData }: ClientsClientProps) {
   const t = useTranslations("clients");
+  const tCommon = useTranslations("common");
   const [isPending, startTransition] = useTransition();
 
   const [data, setData] = useState<PaginatedClientsResult>(
@@ -59,6 +63,38 @@ export function ClientsClient({ initialData }: ClientsClientProps) {
     setType("ALL");
   };
 
+  const handleExportCsv = () => {
+    if (!data.items || data.items.length === 0) {
+      toast.error(tCommon("noData"));
+      return;
+    }
+    exportToCsv(
+      `Nile_Nexus_Clients_${new Date().toISOString().slice(0, 10)}`,
+      [
+        { header: "كود العميل / Business ID", key: "business_id" },
+        { header: "اسم العميل / Client Name", key: "name" },
+        {
+          header: "النوع / Type",
+          formatter: (row) => (row.type === "COMPANY" ? "شركة / Company" : "فرد / Individual"),
+        },
+        { header: "رقم الهاتف / Phone", key: "phone" },
+        { header: "البريد الإلكتروني / Email", key: "email" },
+        { header: "المنطقة / Area", key: "area" },
+        { header: "مجال العمل / Industry", key: "industry" },
+        {
+          header: "عدد الصفقات / Deals Count",
+          formatter: (row) => row.deals?.length || 0,
+        },
+        {
+          header: "عدد جهات الاتصال / Contacts Count",
+          formatter: (row) => row.contacts?.length || 0,
+        },
+      ],
+      data.items
+    );
+    toast.success(tCommon("exportSuccess"));
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -77,7 +113,20 @@ export function ClientsClient({ initialData }: ClientsClientProps) {
           </p>
         </div>
 
-        <CreateClientDialog onSuccess={() => loadData(query, type, 1)} />
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleExportCsv}
+            className="gap-1.5 cursor-pointer text-xs h-9"
+          >
+            <Download className="h-3.5 w-3.5" />
+            <span>{tCommon("exportExcel")}</span>
+          </Button>
+
+          <CreateClientDialog onSuccess={() => loadData(query, type, 1)} />
+        </div>
       </div>
 
       {/* Filter and Search Bar */}

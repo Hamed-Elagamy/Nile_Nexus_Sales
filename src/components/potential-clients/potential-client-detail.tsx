@@ -29,6 +29,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { PotentialClientStatusBadge } from "./status-badge";
+import { WhatsAppQuickDialog } from "@/components/shared/whatsapp-quick-dialog";
 import {
   updatePotentialClient,
   updatePotentialClientStatus,
@@ -189,16 +190,21 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
                     >
                       <Phone className="h-4 w-4" />
                     </a>
-                    {whatsappUrl && (
-                      <a
-                        href={whatsappUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-1.5 rounded-md hover:bg-emerald-100 text-emerald-600"
-                        title={tCommon("whatsapp")}
-                      >
-                        <MessageCircle className="h-4 w-4" />
-                      </a>
+                    {client.phone && (
+                      <WhatsAppQuickDialog
+                        phone={client.phone}
+                        recipientName={client.name}
+                        contextType="lead"
+                        trigger={
+                          <button
+                            type="button"
+                            className="p-1.5 rounded-md hover:bg-emerald-100 text-emerald-600"
+                            title={tCommon("whatsapp")}
+                          >
+                            <MessageCircle className="h-4 w-4" />
+                          </button>
+                        }
+                      />
                     )}
                   </div>
                 </div>

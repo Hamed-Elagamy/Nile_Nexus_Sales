@@ -4,10 +4,12 @@ import React, { useState, useTransition, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Kanban } from "lucide-react";
+import { Kanban, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { DealsFilter } from "./deals-filter";
 import { DealsTable } from "./deals-table";
 import { CreateDealDialog } from "./create-deal-dialog";
+import { exportToCsv } from "@/lib/utils/export-csv";
 import {
   getDeals,
   type PaginatedDealsResult,
@@ -21,6 +23,7 @@ interface DealsClientProps {
 
 export function DealsClient({ initialData, clients = [] }: DealsClientProps) {
   const tDeals = useTranslations("deals");
+  const tCommon = useTranslations("common");
   const [isPending, startTransition] = useTransition();
 
   const [data, setData] = useState<PaginatedDealsResult>(
@@ -62,6 +65,37 @@ export function DealsClient({ initialData, clients = [] }: DealsClientProps) {
     setStage("ALL");
   };
 
+  const handleExportCsv = () => {
+    if (!data.items || data.items.length === 0) {
+      toast.error(tCommon("noData"));
+      return;
+    }
+    exportToCsv(
+      `Nile_Nexus_Deals_${new Date().toISOString().slice(0, 10)}`,
+      [
+        { header: "كود الصفقة / Business ID", key: "business_id" },
+        { header: "عنوان الصفقة / Deal Title", key: "title" },
+        {
+          header: "العميل / Client",
+          formatter: (row) => row.client?.name || "",
+        },
+        {
+          header: "المرحلة / Stage",
+          formatter: (row) => row.stage,
+        },
+        { header: "القيمة التقديرية / Estimated Value", key: "estimated_value" },
+        { header: "القيمة النهائية / Final Value", key: "final_value" },
+        { header: "العملة / Currency", key: "currency" },
+        {
+          header: "المسؤول / Owner",
+          formatter: (row) => row.sales_owner?.full_name || "",
+        },
+      ],
+      data.items
+    );
+    toast.success(tCommon("exportSuccess"));
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -80,10 +114,21 @@ export function DealsClient({ initialData, clients = [] }: DealsClientProps) {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleExportCsv}
+            className="gap-1.5 cursor-pointer text-xs h-9"
+          >
+            <Download className="h-3.5 w-3.5" />
+            <span>{tCommon("exportExcel")}</span>
+          </Button>
+
           <Link
             href="/pipeline"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium hover:bg-muted transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium hover:bg-muted transition-colors h-9"
           >
             <Kanban className="h-3.5 w-3.5" />
             <span>{tDeals("pipelineKanban")}</span>

@@ -16,6 +16,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { getDashboardMetrics } from "@/lib/actions/dashboard";
 import { DealStageBadge } from "@/components/deals/deal-stage-badge";
+import { SalesTargetCommissionTracker } from "@/components/dashboard/sales-target-commission-tracker";
 
 import { createClient } from "@/lib/supabase/server";
 
@@ -183,6 +184,13 @@ export default async function DashboardPage() {
           </Card>
         </Link>
       </div>
+
+      {/* Sales Target & Commission Tracker */}
+      <SalesTargetCommissionTracker
+        currentWonRevenue={metrics?.wonDealsValue || 0}
+        openPipelineValue={metrics?.totalPipelineValue || 0}
+        wonDealsCount={metrics?.wonDealsCount || 0}
+      />
 
       {/* Two Column Layout: Recent Deals & Live Activities */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

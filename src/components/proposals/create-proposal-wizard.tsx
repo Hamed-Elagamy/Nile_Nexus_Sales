@@ -14,6 +14,8 @@ import {
 } from "./proposal-builder";
 import { createProposal } from "@/lib/actions/proposals";
 
+import type { Service } from "@/types/domain";
+
 interface ClientOption {
   id: string;
   name: string;
@@ -30,9 +32,10 @@ interface DealOption {
 interface CreateProposalWizardProps {
   clients: ClientOption[];
   deals: DealOption[];
+  services?: Service[];
 }
 
-export function CreateProposalWizard({ clients, deals }: CreateProposalWizardProps) {
+export function CreateProposalWizard({ clients, deals, services = [] }: CreateProposalWizardProps) {
   const t = useTranslations("proposals");
   const tCommon = useTranslations("common");
   const router = useRouter();
@@ -205,6 +208,7 @@ export function CreateProposalWizard({ clients, deals }: CreateProposalWizardPro
       <ProposalBuilder
         initialState={builderState}
         onChange={(newState) => setBuilderState(newState)}
+        services={services}
       />
     </form>
   );

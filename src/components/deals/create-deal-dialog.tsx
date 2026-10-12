@@ -21,6 +21,9 @@ import { DEAL_STAGES, type DealStage } from "@/lib/schemas/deal";
 interface CreateDealDialogProps {
   clients?: Array<{ id: string; name: string; business_id: string }>;
   defaultClientId?: string;
+  defaultTitle?: string;
+  defaultEstimatedValue?: string | number;
+  defaultCurrency?: string;
   onSuccess?: () => void;
   triggerButton?: React.ReactNode;
 }
@@ -28,6 +31,9 @@ interface CreateDealDialogProps {
 export function CreateDealDialog({
   clients = [],
   defaultClientId,
+  defaultTitle = "",
+  defaultEstimatedValue = "",
+  defaultCurrency = "EGP",
   onSuccess,
   triggerButton,
 }: CreateDealDialogProps) {
@@ -36,20 +42,22 @@ export function CreateDealDialog({
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(defaultTitle);
   const [clientId, setClientId] = useState(defaultClientId || "");
   const [stage, setStage] = useState<DealStage>("NEW");
-  const [estimatedValue, setEstimatedValue] = useState("");
-  const [currency, setCurrency] = useState("EGP");
+  const [estimatedValue, setEstimatedValue] = useState(
+    defaultEstimatedValue ? String(defaultEstimatedValue) : ""
+  );
+  const [currency, setCurrency] = useState(defaultCurrency);
   const [notes, setNotes] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
   const resetForm = () => {
-    setTitle("");
+    setTitle(defaultTitle);
     setClientId(defaultClientId || "");
     setStage("NEW");
-    setEstimatedValue("");
-    setCurrency("EGP");
+    setEstimatedValue(defaultEstimatedValue ? String(defaultEstimatedValue) : "");
+    setCurrency(defaultCurrency);
     setNotes("");
     setFormError(null);
   };

@@ -1,6 +1,7 @@
 import React from "react";
 import { getClients } from "@/lib/actions/clients";
 import { getDeals } from "@/lib/actions/deals";
+import { getServices } from "@/lib/actions/settings";
 import { CreateProposalWizard } from "@/components/proposals/create-proposal-wizard";
 
 export const metadata = {
@@ -9,9 +10,10 @@ export const metadata = {
 };
 
 export default async function NewProposalPage() {
-  const [clientsRes, dealsRes] = await Promise.all([
+  const [clientsRes, dealsRes, servicesRes] = await Promise.all([
     getClients({ page: 1, pageSize: 100 }),
     getDeals({ page: 1, pageSize: 100 }),
+    getServices(),
   ]);
 
   const clients = clientsRes.success && clientsRes.data
@@ -31,5 +33,7 @@ export default async function NewProposalPage() {
       }))
     : [];
 
-  return <CreateProposalWizard clients={clients} deals={deals} />;
+  const services = servicesRes.success && servicesRes.data ? servicesRes.data : [];
+
+  return <CreateProposalWizard clients={clients} deals={deals} services={services} />;
 }

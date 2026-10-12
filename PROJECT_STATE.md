@@ -83,6 +83,13 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - Configured Sales Representative permissions: read-only access with clear availability indicators (`متاحة للتعاقد` vs `غير متاحة`) and starter prices, while editing, adding, and deleting controls are strictly restricted to GM and Admin
   - Added comprehensive i18n keys to both `messages/ar.json` and `messages/en.json`
   - Verified 0 TypeScript errors and 100% Vitest tests passing (60/60)
+- **Phase 17 (5 High-Impact Commercial Enhancement Features for Sales Operations)**:
+  - **Feature 1 (Proposal Service Picker)**: Embedded 173 Services Catalog modal picker inside `/proposals/new` with instant search and 1-click line item populator.
+  - **Feature 2 (1-Click WhatsApp Smart Templates)**: Built Egyptian Arabic sales templates modal (`whatsapp-quick-dialog.tsx`) with 5 tailored messages across follow-ups, clients, and leads.
+  - **Feature 3 (1-Click Deal from Services Catalog)**: Added `+ صفقة` direct action on active services in `/services` pre-filling title and estimated value.
+  - **Feature 4 (Sales Target & Commission Tracker)**: Visual monthly progress bar with preset pills and 4-tier commission simulator on `/dashboard` and `/reports`.
+  - **Feature 5 (1-Click Excel / CSV Export with UTF-8 BOM)**: Instant data export for Clients, Deals, Services, and Reports with UTF-8 BOM for crystal-clear Arabic Excel rendering.
+  - **Quality Assurance**: Added CSV export unit tests (`export-csv.test.ts`), verified 14/14 test suites and 62/62 tests passing, 0 TypeScript errors, Next.js build clean.
 
 ## Completed Work
 - **Design System & UI Components**:
@@ -122,7 +129,7 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - Live Vercel Production Deployment: `https://nile-nexus-sales.vercel.app`
   - Connected to Supabase Project: `https://zbbivheqcutwflewmtnb.supabase.co`
 - **Tests**:
-  - 60 Vitest unit tests passing across 13 test suites (100% pass rate)
+  - 62 Vitest unit tests passing across 14 test suites (100% pass rate)
 
 ## Database State
 - 9 migrations written + unified deploy script:
@@ -145,13 +152,13 @@ Production Deployed — Live on Vercel & Connected to Supabase
 - Dual-mode architecture maintains strict separation between demo mock sessions and live Supabase queries
 
 ## Test Status
-- ✅ Vitest: 60/60 passing across 13 suites
+- ✅ Vitest: 62/62 passing across 14 suites
 - 0 failed
 
 ## Build Status
 - ✅ TypeScript: 0 errors (`tsc --noEmit`)
 - ✅ ESLint: 0 errors, 0 warnings (`eslint`)
-- ✅ Production build: compiled and optimized successfully for all 21 routes (`next build`)
+- ✅ Production build: compiled and optimized successfully for all 23 routes (`next build`)
 - ✅ Vercel Production Deployment: READY at `https://nile-nexus-sales.vercel.app`
 
 ## Known Bugs

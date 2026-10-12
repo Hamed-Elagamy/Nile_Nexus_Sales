@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClientTypeBadge } from "./client-type-badge";
+import { WhatsAppQuickDialog } from "@/components/shared/whatsapp-quick-dialog";
 import type { ClientWithRelations } from "@/lib/actions/clients";
 
 interface ClientsTableProps {
@@ -156,16 +157,21 @@ export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
                             >
                               <Phone className="h-3.5 w-3.5" />
                             </a>
-                            {whatsappUrl && (
-                              <a
-                                href={whatsappUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-1 rounded hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700"
-                                title={t("quickActions.whatsapp")}
-                              >
-                                <MessageCircle className="h-3.5 w-3.5" />
-                              </a>
+                            {phone && (
+                              <WhatsAppQuickDialog
+                                phone={phone}
+                                recipientName={primaryContact?.name || client.name}
+                                contextType="client"
+                                trigger={
+                                  <button
+                                    type="button"
+                                    className="p-1 rounded hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700"
+                                    title={t("quickActions.whatsapp")}
+                                  >
+                                    <MessageCircle className="h-3.5 w-3.5" />
+                                  </button>
+                                }
+                              />
                             )}
                           </div>
                         </>
@@ -270,16 +276,21 @@ export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
                       <span dir="ltr">{phone}</span>
                     </a>
                   )}
-                  {whatsappUrl && (
-                    <a
-                      href={whatsappUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 text-xs flex items-center gap-1"
-                    >
-                      <MessageCircle className="h-3.5 w-3.5" />
-                      <span>{t("quickActions.whatsapp")}</span>
-                    </a>
+                  {phone && (
+                    <WhatsAppQuickDialog
+                      phone={phone}
+                      recipientName={primaryContact?.name || client.name}
+                      contextType="client"
+                      trigger={
+                        <button
+                          type="button"
+                          className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 text-xs flex items-center gap-1"
+                        >
+                          <MessageCircle className="h-3.5 w-3.5" />
+                          <span>{t("quickActions.whatsapp")}</span>
+                        </button>
+                      }
+                    />
                   )}
                 </div>
 

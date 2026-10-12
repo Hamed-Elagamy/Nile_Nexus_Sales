@@ -3,6 +3,7 @@ import { Tag } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getServices } from "@/lib/actions/settings";
 import { getCurrentUserProfile } from "@/lib/actions/profile";
+import { getClients } from "@/lib/actions/clients";
 import { ServicesCatalog } from "@/components/settings/services-catalog";
 
 export async function generateMetadata() {
@@ -15,14 +16,23 @@ export async function generateMetadata() {
 
 export default async function ServicesPage() {
   const t = await getTranslations("servicesPage");
-  const [profileRes, servicesRes] = await Promise.all([
+  const [profileRes, servicesRes, clientsRes] = await Promise.all([
     getCurrentUserProfile(),
     getServices(),
+    getClients({ page: 1, pageSize: 200 }),
   ]);
 
   const profile = profileRes.success && profileRes.data ? profileRes.data : null;
   const userRole = profile?.role || "SALES";
   const services = servicesRes.success && servicesRes.data ? servicesRes.data : [];
+  const clients =
+    clientsRes.success && clientsRes.data
+      ? clientsRes.data.items.map((c) => ({
+          id: c.id,
+          name: c.name,
+          business_id: c.business_id,
+        }))
+      : [];
 
   return (
     <div className="space-y-6">
@@ -38,7 +48,7 @@ export default async function ServicesPage() {
       </div>
 
       {/* Services Catalog with Role-Enforced Controls */}
-      <ServicesCatalog services={services} userRole={userRole} />
+      <ServicesCatalog services={services} userRole={userRole} clients={clients} />
     </div>
   );
 }

@@ -1,8 +1,9 @@
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { TrendingUp, Award, Download, BarChart2 } from "lucide-react";
+import { TrendingUp, Award, BarChart2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { Button } from "@/components/ui/button";
+import { SalesTargetCommissionTracker } from "@/components/dashboard/sales-target-commission-tracker";
+import { ReportsExportButton } from "@/components/reports/reports-export-button";
 
 export const metadata: Metadata = {
   title: "التقارير والتحليلات | Nile Nexus Sales",
@@ -65,10 +66,11 @@ export default async function ReportsPage() {
             {t("subtitle")}
           </p>
         </div>
-        <Button variant="outline" className="flex items-center gap-2">
-          <Download className="h-4 w-4" />
-          <span>{t("exportExcel")}</span>
-        </Button>
+        <ReportsExportButton
+          repsPerformance={repsPerformance}
+          closedRevenue={closedRevenue}
+          openPipeline={openPipeline}
+        />
       </div>
 
       {/* KPI Highlights */}
@@ -105,6 +107,13 @@ export default async function ReportsPage() {
           <span className="text-xs text-[var(--muted-foreground)]">{t("conversionDesc")}</span>
         </div>
       </div>
+
+      {/* Sales Target & Commission Tracker */}
+      <SalesTargetCommissionTracker
+        currentWonRevenue={closedRevenue}
+        openPipelineValue={openPipeline}
+        wonDealsCount={wonDeals.length}
+      />
 
       {/* Sales Funnel Analysis & Reps Leaderboard */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

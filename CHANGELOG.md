@@ -2,7 +2,43 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.3.0] - 2026-10-12
+## [1.4.0] - 2026-10-12
+
+### Added & Enhanced
+- **5 High-Impact Commercial Enhancement Features for Sales Operations**:
+  - **1. Proposal Service Picker (`/proposals/new`)**:
+    - Integrated the 173 Services Catalog directly into the commercial proposal builder.
+    - Added a `+ إضافة من كتالوج الخدمات` action button and responsive modal picker in `ProposalBuilder`.
+    - Real-time search by service name or code with live pricing preview.
+    - 1-click line item insertion or replacement automatically populating service name, description, unit price in EGP, and calculating line totals and taxes.
+  - **2. 1-Click WhatsApp Smart Templates (`src/components/shared/whatsapp-quick-dialog.tsx`)**:
+    - Professional Egyptian Arabic business communication templates tailored for sales reps:
+      - *تعريف بالشركة واستكشاف الاحتياج* (Initial introduction & discovery)
+      - *متابعة عرض السعر / الاقتراح التجاري* (Proposal & quote follow-up)
+      - *تأكيد موعد العرض التوضيحي أو الاجتماع* (Demo / meeting confirmation)
+      - *تذكير لطيف بالمتابعة السابقة* (Gentle touchpoint reminder)
+      - *ترحيب وتأكيد التعاقد الناجح* (Deal won & welcome onboarding)
+    - Auto-injects recipient contact name, salesperson signature, and message length counter.
+    - Includes interactive editable textarea, copy-to-clipboard, and instant WhatsApp Web / App launcher (`https://wa.me/20...`).
+    - Unified across `follow-up-card.tsx`, `client-detail.tsx`, `clients-table.tsx`, `contacts-list.tsx`, `potential-client-detail.tsx`, and `potential-clients-table.tsx`.
+  - **3. 1-Click Deal Creation from Services Catalog (`/services`)**:
+    - Added a `+ صفقة` direct action button on every active service card/row for all team members (Sales Representatives, Admin, and GM).
+    - Opens the deal creation dialog pre-filled with the service title as deal name, the catalog reference rate as estimated value, and currency set to `EGP`.
+    - Enables reps to transition from client discovery directly into pipeline creation in seconds.
+  - **4. Sales Target & Commission Tracker (`/dashboard` & `/reports`)**:
+    - Interactive monthly revenue progress card with customizable target and quick-select presets (150K, 250K, 500K, 1M EGP).
+    - Dynamic gradient progress bar with achievement percentage, milestone badges, and motivating Egyptian Arabic coaching guidance.
+    - Commission simulator calculating earned commission on closed won revenue and expected pipeline commission (50% projected conversion) across 3%, 5%, 7%, and 10% commission tiers.
+    - Embedded seamlessly into both the Executive Dashboard and the Analytics Reports center.
+  - **5. 1-Click Excel / CSV Export with UTF-8 BOM (`src/lib/utils/export-csv.ts`)**:
+    - Client-side export utility prepending `\uFEFF` UTF-8 Byte Order Mark ensuring 100% flawless Arabic character rendering in Microsoft Excel (preventing mojibake/garbled text).
+    - Integrated across Clients (`/clients`), Deals (`/deals`), Services Catalog (`/services`), and Reports (`/reports`).
+- **Comprehensive Quality & Testing Verification**:
+  - Full Vitest unit test coverage for the CSV export utility (`src/lib/__tests__/export-csv.test.ts`) validating UTF-8 BOM byte sequence (`0xEF, 0xBB, 0xBF`), row formatting, and quotes escaping.
+  - 14/14 test suites passing with 62/62 tests (100% pass rate).
+  - TypeScript strict mode verified (`tsc --noEmit` 0 errors).
+  - Next.js production build verified (`next build` 23/23 routes compiled and statically optimized).
+  - 100% translation key parity between `messages/ar.json` and `messages/en.json`.
 
 ### Added & Enhanced
 - **Full 173 Software Projects Services Catalog & Advanced Filtering UI**:
