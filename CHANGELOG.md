@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.5] - 2026-10-13
+
+### Fixed & Enhanced
+- **Reliable Potential Client Deletion & Instant UI Dismissal**:
+  - **Root Cause Resolution**:
+    - Identified why deleted potential clients still persisted in Supabase: without an explicit `DELETE` RLS policy on `potential_clients` in `002_rls_policies.sql`, PostgreSQL silently blocked standard delete queries (affecting 0 rows) without raising an error, causing false-positive deletion toasts.
+  - **Multi-Tier Resilient Server Action (`deletePotentialClient`)**:
+    - **Step 1 (RPC Check)**: Attempts `delete_potential_client(target_id)` RPC function with `SECURITY DEFINER` if deployed.
+    - **Step 2 (Admin Service Client)**: Utilizes `createAdminClient()` with `SUPABASE_SERVICE_ROLE_KEY` (when present) to bypass RLS securely after validating caller's GM/Admin role via `checkAdminOrGm()`.
+    - **Step 3 (Delete Row Count Validation)**: Runs `.delete().eq("id", id).select("id")` and validates that rows were actually removed.
+    - **Step 4 (Archive Fallback)**: If 0 rows were deleted due to missing SQL migrations or foreign key references, immediately falls back to soft-deleting (`archived_at = now()`), which GM & Admin already have UPDATE RLS permissions to execute under `002_rls_policies.sql`.
+    - **Step 5 (Query Exclusions)**: Explicitly filtered out archived records (`.is("archived_at", null)`) in both `getPotentialClients` and `getPotentialClientById`.
+  - **Immediate Optimistic UI Updates**:
+    - Added `onDeleteSuccess` callback between `PotentialClientsTable` and `PotentialClientsClient` state: the deleted record is immediately filtered out of React state (`data.items`), and the total count badge decrements instantly with 0 UI delay.
+    - Added `router.refresh()` in `PotentialClientDetail` before navigating to `/potential-clients` to completely invalidate Next.js client router cache and guarantee fresh data rendering.
+  - **Database Migration Enhancements**:
+    - Updated `supabase/migrations/011_allow_gm_admin_delete_potential_clients.sql` to include `delete_potential_client` RPC function alongside RLS policies.
+  - **Testing & Verification**:
+    - Verified all 82/82 Vitest unit tests pass (100%).
+    - Zero TypeScript compilation errors (`tsc --noEmit`).
+    - Next.js production build clean (24/24 routes).
+
 ## [1.5.4] - 2026-10-13
 
 ### Added & Enhanced

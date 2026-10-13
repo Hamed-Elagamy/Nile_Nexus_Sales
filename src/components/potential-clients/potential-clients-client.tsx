@@ -70,6 +70,15 @@ export function PotentialClientsClient({ initialData, userRole = "SALES" }: Pote
     });
   };
 
+  const handleDeleteSuccess = (id: string) => {
+    setData((prev) => ({
+      ...prev,
+      items: prev.items.filter((item) => item.id !== id),
+      total: Math.max(0, prev.total - 1),
+    }));
+    loadData(query, status, data.page);
+  };
+
   const handleReset = () => {
     setQuery("");
     setStatus("ALL");
@@ -112,6 +121,7 @@ export function PotentialClientsClient({ initialData, userRole = "SALES" }: Pote
         userRole={userRole}
         onStatusChange={handleStatusChange}
         onRefresh={() => loadData(query, status, data.page)}
+        onDeleteSuccess={handleDeleteSuccess}
       />
     </div>
   );

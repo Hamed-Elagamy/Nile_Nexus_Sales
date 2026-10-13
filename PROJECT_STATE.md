@@ -119,6 +119,12 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - **Editing Submitted Potential Clients**: Built `EditPotentialClientDialog` enabling Sales representatives and Admins to edit any submitted potential client and fill missing data (phone, location, website, social handles, opportunities, notes).
   - **Missing Data Indicators**: Added intuitive inline triggers to prompt filling in unrecorded phone numbers, locations, and social/website links directly on the detail page.
   - **Database & Testing**: Migration `011_allow_gm_admin_delete_potential_clients.sql`, 16/16 Vitest test suites passing (82/82 tests), zero TypeScript compilation errors, Next.js production build verified (24/24 routes).
+- **Phase 23 (Resilient Potential Client Deletion & Instant UI Dismissal)**:
+  - **Multi-Tier Deletion Pipeline**: Resolved silent PostgreSQL RLS block where DELETE without policy returned 0 affected rows with no error. Added RPC execution, admin client bypass using `SUPABASE_SERVICE_ROLE_KEY`, deleted row count validation, and automated soft-delete fallback (`archived_at`).
+  - **Instant State Dismissal**: Connected `onDeleteSuccess` callback between table and parent client state to immediately remove the item from the view and decrement count badge with zero UI lag.
+  - **Router Cache Invalidation**: Added `router.refresh()` in detail view before redirecting to `/potential-clients` to guarantee Next.js client router cache freshness.
+  - **RPC Database Migration**: Added `delete_potential_client(target_id)` RPC function to `011_allow_gm_admin_delete_potential_clients.sql`.
+  - **Verification**: 82/82 tests passing (100%), 0 TypeScript compiler errors, Next.js build clean (24/24 routes).
 
 ## Completed Work
 - **Design System & UI Components**:

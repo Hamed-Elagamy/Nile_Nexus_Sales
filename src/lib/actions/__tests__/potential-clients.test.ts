@@ -29,7 +29,20 @@ vi.mock("@/lib/supabase/server", () => ({
       getUser: vi.fn(async () => ({ data: { user: mockUser } })),
     },
     from: mockFrom,
-    rpc: vi.fn(async () => ({ data: "PC-00042", error: null })),
+    rpc: vi.fn(async (name) => {
+      if (name === "delete_potential_client") return { data: true, error: null };
+      return { data: "PC-00042", error: null };
+    }),
+  })),
+}));
+
+vi.mock("@/lib/supabase/admin", () => ({
+  createAdminClient: vi.fn(async () => ({
+    auth: {
+      getUser: vi.fn(async () => ({ data: { user: mockUser } })),
+    },
+    from: mockFrom,
+    rpc: vi.fn(async () => ({ data: true, error: null })),
   })),
 }));
 

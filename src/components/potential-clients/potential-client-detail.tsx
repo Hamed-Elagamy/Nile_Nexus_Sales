@@ -112,6 +112,7 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
       const res = await deletePotentialClient(currentClient.id);
       if (res.success) {
         toast.success(t("deletedSuccess"));
+        router.refresh();
         router.push("/potential-clients");
       } else {
         toast.error(res.error || t("deleteFailed"));

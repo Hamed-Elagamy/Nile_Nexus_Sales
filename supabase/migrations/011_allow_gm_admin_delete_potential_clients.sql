@@ -36,3 +36,23 @@ CREATE POLICY pco_insert ON potential_client_opportunities FOR INSERT
   WITH CHECK (
     auth.uid() IS NOT NULL
   );
+
+-- ============================================================================
+-- RPC: Secure Hard-Delete Function for GM and Admin
+-- ============================================================================
+CREATE OR REPLACE FUNCTION delete_potential_client(target_id UUID)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF NOT is_admin_or_gm() THEN
+    RAISE EXCEPTION 'Only GM or Admin can delete potential clients';
+  END IF;
+
+  DELETE FROM potential_client_opportunities WHERE potential_client_id = target_id;
+  DELETE FROM potential_clients WHERE id = target_id;
+  RETURN TRUE;
+END;
+$$;

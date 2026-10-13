@@ -57,6 +57,7 @@ interface PotentialClientsTableProps {
   userRole?: string;
   onStatusChange?: (id: string, newStatus: PotentialClientStatusType) => void;
   onRefresh?: () => void;
+  onDeleteSuccess?: (id: string) => void;
 }
 
 export function PotentialClientsTable({
@@ -65,6 +66,7 @@ export function PotentialClientsTable({
   userRole = "SALES",
   onStatusChange,
   onRefresh,
+  onDeleteSuccess,
 }: PotentialClientsTableProps) {
   const t = useTranslations("potentialClients");
   const tCommon = useTranslations("common");
@@ -77,12 +79,14 @@ export function PotentialClientsTable({
 
   const handleConfirmDelete = async () => {
     if (!clientToDelete) return;
+    const deletedId = clientToDelete.id;
     setIsDeleting(true);
     try {
-      const res = await deletePotentialClient(clientToDelete.id);
+      const res = await deletePotentialClient(deletedId);
       if (res.success) {
         toast.success(t("deletedSuccess"));
         setClientToDelete(null);
+        onDeleteSuccess?.(deletedId);
         onRefresh?.();
       } else {
         toast.error(res.error || t("deleteFailed"));

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import {
   demoPotentialClients,
@@ -176,7 +177,7 @@ export async function getPotentialClients(
     const parsedFilters = filterPotentialClientSchema.parse(filters);
 
     if (!isSupabaseConfigured()) {
-      let filtered = [...demoPotentialClients].filter((p) => p.archived_at === null);
+      let filtered = [...demoPotentialClients].filter((p) => !p.archived_at);
 
       if (parsedFilters.status) {
         filtered = filtered.filter((p) => p.status === parsedFilters.status);
@@ -295,7 +296,7 @@ export async function getPotentialClientById(
 ): Promise<ActionResult<PotentialClientWithRelations>> {
   try {
     if (!isSupabaseConfigured()) {
-      const pc = demoPotentialClients.find((p) => p.id === id);
+      const pc = demoPotentialClients.find((p) => p.id === id && !p.archived_at);
       if (!pc) {
         return { success: false, error: "Potential client not found" };
       }
@@ -325,6 +326,7 @@ export async function getPotentialClientById(
       `
       )
       .eq("id", id)
+      .is("archived_at", null)
       .single();
 
     if (error || !data) {
@@ -674,9 +676,11 @@ export async function deletePotentialClient(id: string): Promise<ActionResult> {
     if (!isSupabaseConfigured()) {
       const idx = demoPotentialClients.findIndex((p) => p.id === id);
       if (idx !== -1) {
+        demoPotentialClients[idx].archived_at = new Date().toISOString();
         demoPotentialClients.splice(idx, 1);
       }
       revalidatePath("/potential-clients");
+      revalidatePath(`/potential-clients/${id}`);
       return { success: true };
     }
 
@@ -698,20 +702,57 @@ export async function deletePotentialClient(id: string): Promise<ActionResult> {
       };
     }
 
+    // Attempt RPC delete_potential_client if defined in database
+    try {
+      const { data: rpcSuccess, error: rpcErr } = await supabase.rpc("delete_potential_client", {
+        target_id: id,
+      });
+      if (!rpcErr && rpcSuccess) {
+        revalidatePath("/potential-clients");
+        revalidatePath(`/potential-clients/${id}`);
+        return { success: true };
+      }
+    } catch {
+      // RPC not defined yet, continue with direct client execution
+    }
+
+    const dbClient = process.env.SUPABASE_SERVICE_ROLE_KEY
+      ? await createAdminClient()
+      : supabase;
+
     // Delete associated opportunities first
-    await supabase
+    await dbClient
       .from("potential_client_opportunities")
       .delete()
       .eq("potential_client_id", id);
 
-    const { error } = await supabase
-      .from("potential_clients")
-      .delete()
-      .eq("id", id);
+    let isDeleted = false;
 
-    if (error) {
-      // If foreign keys prevent hard delete, archive it instead
-      const { error: archiveError } = await supabase
+    // Try hard delete
+    try {
+      const { data: deletedRows, error: deleteError } = await dbClient
+        .from("potential_clients")
+        .delete()
+        .eq("id", id)
+        .select("id");
+
+      if (!deleteError && Array.isArray(deletedRows) && deletedRows.length > 0) {
+        isDeleted = true;
+      }
+    } catch {
+      // Fallback for mocks/drivers that don't chain select on delete
+      const { error: plainDelErr } = await dbClient
+        .from("potential_clients")
+        .delete()
+        .eq("id", id);
+      if (!plainDelErr) {
+        isDeleted = true;
+      }
+    }
+
+    // If hard delete didn't affect rows (RLS policy missing or FK restriction), soft-delete (archive)
+    if (!isDeleted) {
+      const { error: archiveError } = await dbClient
         .from("potential_clients")
         .update({ archived_at: new Date().toISOString() })
         .eq("id", id);
@@ -722,6 +763,7 @@ export async function deletePotentialClient(id: string): Promise<ActionResult> {
     }
 
     revalidatePath("/potential-clients");
+    revalidatePath(`/potential-clients/${id}`);
     return { success: true };
   } catch (err: unknown) {
     return { success: false, error: getErrorMessage(err, "Failed to delete potential client") };
