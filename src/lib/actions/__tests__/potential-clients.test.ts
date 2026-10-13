@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   createPotentialClient,
+  updatePotentialClient,
   updatePotentialClientStatus,
+  deletePotentialClient,
   checkDuplicatePotentialClient,
 } from "../potential-clients";
 import type { PotentialClientStatusType } from "@/lib/schemas/potential-client";
@@ -143,4 +145,95 @@ describe("Potential Clients Server Actions", () => {
       expect(result.success).toBe(true);
     });
   });
+
+  describe("updatePotentialClient", () => {
+    it("allows editing existing potential client to complete missing contact details", async () => {
+      const updatedClient = {
+        id: "pc-1",
+        name: "Acme Updated",
+        phone: "+201099998888",
+        area: "Maadi, Cairo",
+        website: "https://acme.com",
+        status: "RESEARCHING",
+      };
+
+      mockUpdate.mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          select: vi.fn().mockReturnValue({
+            single: vi.fn().mockResolvedValue({ data: updatedClient, error: null }),
+          }),
+        }),
+      });
+
+      mockDelete.mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      });
+
+      const result = await updatePotentialClient("pc-1", {
+        name: "Acme Updated",
+        phone: "+201099998888",
+        area: "Maadi, Cairo",
+        website: "https://acme.com",
+        opportunities: ["WEBSITE", "ERP_SYSTEM"],
+      });
+
+      expect(result.success).toBe(true);
+      if (result.success && result.data) {
+        expect(result.data.name).toBe("Acme Updated");
+        expect(result.data.phone).toBe("+201099998888");
+        expect(result.data.area).toBe("Maadi, Cairo");
+      }
+    });
+  });
+
+  describe("deletePotentialClient (Role-Enforced)", () => {
+    it("strictly blocks Sales representative from deleting potential client", async () => {
+      // Mock profile returning SALES role
+      mockSelect.mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({ data: { role: "SALES" }, error: null }),
+        }),
+      });
+
+      const result = await deletePotentialClient("pc-1");
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain("GM");
+    });
+
+    it("allows GM to delete potential client", async () => {
+      // Mock profile returning GM role
+      mockSelect.mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({ data: { role: "GM" }, error: null }),
+        }),
+      });
+
+      mockDelete.mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      });
+
+      const result = await deletePotentialClient("pc-1");
+
+      expect(result.success).toBe(true);
+    });
+
+    it("allows Admin to delete potential client", async () => {
+      // Mock profile returning ADMIN role
+      mockSelect.mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue({ data: { role: "ADMIN" }, error: null }),
+        }),
+      });
+
+      mockDelete.mockReturnValue({
+        eq: vi.fn().mockResolvedValue({ error: null }),
+      });
+
+      const result = await deletePotentialClient("pc-1");
+
+      expect(result.success).toBe(true);
+    });
+  });
 });
+

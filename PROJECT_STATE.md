@@ -114,6 +114,11 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - **Full Backend & RLS Support**: Server actions `clearAllNotifications()` and `deleteNotification(id: string)` with Supabase RLS deletes, cache revalidation, and optimistic state updates.
   - **Bilingual Translations**: 100% Arabic and English dictionary synchronization for all dialogs, buttons, and notifications toasts.
   - **Verification**: 16/16 Vitest test suites passing (78/78 tests), 0 TypeScript errors, Next.js production build clean.
+- **Phase 22 (Potential Clients Role-Restricted Deletion & Missing Data Editing)**:
+  - **Role-Restricted Deletion**: Restricted deleting potential clients to General Manager (`GM`) and System Administrator (`ADMIN`) only, with server-side authorization enforcement and frontend omission for Sales reps.
+  - **Editing Submitted Potential Clients**: Built `EditPotentialClientDialog` enabling Sales representatives and Admins to edit any submitted potential client and fill missing data (phone, location, website, social handles, opportunities, notes).
+  - **Missing Data Indicators**: Added intuitive inline triggers to prompt filling in unrecorded phone numbers, locations, and social/website links directly on the detail page.
+  - **Database & Testing**: Migration `011_allow_gm_admin_delete_potential_clients.sql`, 16/16 Vitest test suites passing (82/82 tests), zero TypeScript compilation errors, Next.js production build verified (24/24 routes).
 
 ## Completed Work
 - **Design System & UI Components**:

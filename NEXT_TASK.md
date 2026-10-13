@@ -37,6 +37,8 @@ Execute Production Database Clean-up & Roll Out to Company Employees:
 - [x] Interactive `/notifications` center with device push activation toggle and test chime trigger
 - [x] Full bilingual notifications system (English and Egyptian Arabic) with runtime localization and numeral/time normalization
 - [x] Clear All notifications button with confirmation modal and individual notification delete actions
-- [x] 100% Vitest tests passing (78/78) across 16 test suites and 0 TypeScript compilation errors
-- [ ] Run migrations 009 & 010 in Supabase SQL Editor
+- [x] Potential clients role-restricted deletion (GM & Admin only) with confirmation dialogs
+- [x] Potential clients editing modal and missing data quick triggers for Sales representatives
+- [x] 100% Vitest tests passing (82/82) across 16 test suites and 0 TypeScript compilation errors
+- [ ] Run migrations 009, 010, & 011 in Supabase SQL Editor
 - [ ] Onboard company sales representatives

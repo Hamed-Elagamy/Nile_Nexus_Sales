@@ -16,9 +16,10 @@ import type { PotentialClientStatusType } from "@/lib/schemas/potential-client";
 
 interface PotentialClientsClientProps {
   initialData?: PaginatedResult<PotentialClientWithRelations>;
+  userRole?: string;
 }
 
-export function PotentialClientsClient({ initialData }: PotentialClientsClientProps) {
+export function PotentialClientsClient({ initialData, userRole = "SALES" }: PotentialClientsClientProps) {
   const t = useTranslations("potentialClients");
   const [isPending, startTransition] = useTransition();
 
@@ -108,6 +109,7 @@ export function PotentialClientsClient({ initialData }: PotentialClientsClientPr
       <PotentialClientsTable
         clients={data.items}
         loading={isPending}
+        userRole={userRole}
         onStatusChange={handleStatusChange}
         onRefresh={() => loadData(query, status, data.page)}
       />

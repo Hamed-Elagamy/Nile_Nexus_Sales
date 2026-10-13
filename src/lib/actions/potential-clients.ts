@@ -500,6 +500,8 @@ export async function updatePotentialClient(
       if (validated.area !== undefined) pc.area = validated.area;
       if (validated.phone !== undefined) pc.phone = validated.phone;
       if (validated.website !== undefined) pc.website = validated.website;
+      if (validated.instagram !== undefined) pc.instagram = validated.instagram;
+      if (validated.facebook !== undefined) pc.facebook = validated.facebook;
       if (validated.notes !== undefined) pc.notes = validated.notes;
       if (validated.status !== undefined) pc.status = validated.status;
       pc.updated_at = new Date().toISOString();
@@ -654,14 +656,26 @@ export async function updatePotentialClientStatus(
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function checkAdminOrGm(supabase: any, userId: string): Promise<boolean> {
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", userId)
+    .single();
+  return profile?.role === "GM" || profile?.role === "ADMIN";
+}
+
 /**
- * Soft delete (archive) potential client
+ * Delete a potential client (strictly restricted to GM & ADMIN)
  */
-export async function archivePotentialClient(id: string): Promise<ActionResult> {
+export async function deletePotentialClient(id: string): Promise<ActionResult> {
   try {
     if (!isSupabaseConfigured()) {
-      const pc = demoPotentialClients.find((p) => p.id === id);
-      if (pc) pc.archived_at = new Date().toISOString();
+      const idx = demoPotentialClients.findIndex((p) => p.id === id);
+      if (idx !== -1) {
+        demoPotentialClients.splice(idx, 1);
+      }
       revalidatePath("/potential-clients");
       return { success: true };
     }
@@ -676,18 +690,48 @@ export async function archivePotentialClient(id: string): Promise<ActionResult> 
       return { success: false, error: "Authentication required" };
     }
 
+    const canDelete = await checkAdminOrGm(supabase, user.id);
+    if (!canDelete) {
+      return {
+        success: false,
+        error: "حذف العميل المحتمل متاح فقط للمدير العام (GM) والمشرف (Admin)",
+      };
+    }
+
+    // Delete associated opportunities first
+    await supabase
+      .from("potential_client_opportunities")
+      .delete()
+      .eq("potential_client_id", id);
+
     const { error } = await supabase
       .from("potential_clients")
-      .update({ archived_at: new Date().toISOString() })
+      .delete()
       .eq("id", id);
 
     if (error) {
-      return { success: false, error: error.message };
+      // If foreign keys prevent hard delete, archive it instead
+      const { error: archiveError } = await supabase
+        .from("potential_clients")
+        .update({ archived_at: new Date().toISOString() })
+        .eq("id", id);
+
+      if (archiveError) {
+        return { success: false, error: archiveError.message };
+      }
     }
 
     revalidatePath("/potential-clients");
     return { success: true };
   } catch (err: unknown) {
-    return { success: false, error: getErrorMessage(err, "Failed to archive potential client") };
+    return { success: false, error: getErrorMessage(err, "Failed to delete potential client") };
   }
 }
+
+/**
+ * Soft delete (archive) potential client (restricted to GM & ADMIN)
+ */
+export async function archivePotentialClient(id: string): Promise<ActionResult> {
+  return deletePotentialClient(id);
+}
+

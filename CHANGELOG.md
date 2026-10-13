@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.4] - 2026-10-13
+
+### Added & Enhanced
+- **Potential Clients Role-Enforced Deletion & Missing Data Editing**:
+  - **Strict Role-Enforced Deletion (GM & Admin Only)**:
+    - Implemented `deletePotentialClient(id: string)` in `src/lib/actions/potential-clients.ts` verifying that the caller's role is `GM` or `ADMIN`.
+    - Sales representatives (`SALES`) are strictly prohibited from deleting potential clients (delete action and buttons are completely hidden in table and detail views, and server action rejects requests with a clear Arabic/English error).
+    - Added safe deletion confirmation dialog with permanent deletion warnings across both table actions and detail view.
+  - **Editing Submitted Potential Clients (Sales Representatives & All Roles)**:
+    - Built `EditPotentialClientDialog` component (`src/components/potential-clients/edit-potential-client-dialog.tsx`) allowing Sales reps, Admin, and GM to update existing potential client records.
+    - Enables completing missing contact numbers, area/governorate, website, social media handles (Instagram, Facebook), opportunity indicators, and research notes.
+    - Added quick "+ Add Phone / + إضافة هاتف", "+ Add Area", and "+ Add Website/Socials" action triggers on empty fields directly inside the detail view.
+    - Added "تعديل البيانات / Edit Details" quick action in both desktop table dropdown menu and mobile card views.
+  - **Database Migration & RLS**:
+    - Created `supabase/migrations/011_allow_gm_admin_delete_potential_clients.sql` enforcing RLS `pc_delete` policy for `is_admin_or_gm()`, and `pc_update` policy for all authenticated users (`auth.uid() IS NOT NULL`).
+  - **Automated Testing & Full Verification**:
+    - Expanded unit test suite `src/lib/actions/__tests__/potential-clients.test.ts` to verify role rejection on SALES, role approval on GM and ADMIN, and missing data editing. Total tests passed: 82/82 across 16/16 test files (100%).
+    - Zero TypeScript compilation errors (`tsc --noEmit`). Production Next.js build clean (24/24 routes).
+
 ## [1.5.3] - 2026-10-12
 
 ### Added & Enhanced

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
@@ -11,6 +11,9 @@ import {
   MoreVertical,
   CheckCircle2,
   Clock,
+  Pencil,
+  Trash2,
+  Loader2,
 } from "lucide-react";
 import {
   Table,
@@ -27,18 +30,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 import { PotentialClientStatusBadge } from "./status-badge";
 import { OpportunityBadges } from "./opportunity-badges";
 import { WhatsAppQuickDialog } from "@/components/shared/whatsapp-quick-dialog";
-import type { PotentialClientWithRelations } from "@/lib/actions/potential-clients";
+import { EditPotentialClientDialog } from "./edit-potential-client-dialog";
+import {
+  deletePotentialClient,
+  type PotentialClientWithRelations,
+} from "@/lib/actions/potential-clients";
 import type { PotentialClientStatusType } from "@/lib/schemas/potential-client";
 
 interface PotentialClientsTableProps {
   clients: PotentialClientWithRelations[];
   loading?: boolean;
+  userRole?: string;
   onStatusChange?: (id: string, newStatus: PotentialClientStatusType) => void;
   onRefresh?: () => void;
 }
@@ -46,10 +62,37 @@ interface PotentialClientsTableProps {
 export function PotentialClientsTable({
   clients,
   loading = false,
+  userRole = "SALES",
   onStatusChange,
+  onRefresh,
 }: PotentialClientsTableProps) {
   const t = useTranslations("potentialClients");
   const tCommon = useTranslations("common");
+
+  const [clientToEdit, setClientToEdit] = useState<PotentialClientWithRelations | null>(null);
+  const [clientToDelete, setClientToDelete] = useState<PotentialClientWithRelations | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const canDelete = userRole === "GM" || userRole === "ADMIN";
+
+  const handleConfirmDelete = async () => {
+    if (!clientToDelete) return;
+    setIsDeleting(true);
+    try {
+      const res = await deletePotentialClient(clientToDelete.id);
+      if (res.success) {
+        toast.success(t("deletedSuccess"));
+        setClientToDelete(null);
+        onRefresh?.();
+      } else {
+        toast.error(res.error || t("deleteFailed"));
+      }
+    } catch {
+      toast.error(t("deleteFailed"));
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -211,6 +254,14 @@ export function PotentialClientsTable({
                           }
                         />
 
+                        <DropdownMenuItem
+                          onClick={() => setClientToEdit(client)}
+                          className="flex items-center gap-2 cursor-pointer"
+                        >
+                          <Pencil className="h-4 w-4 text-primary" />
+                          <span>{t("edit")}</span>
+                        </DropdownMenuItem>
+
                         {onStatusChange && client.status !== "RESEARCHING" && (
                           <DropdownMenuItem
                             onClick={() => onStatusChange(client.id, "RESEARCHING")}
@@ -244,6 +295,19 @@ export function PotentialClientsTable({
                             </Link>
                           }
                         />
+
+                        {canDelete && (
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => setClientToDelete(client)}
+                              className="flex items-center gap-2 cursor-pointer text-red-600 dark:text-red-400 focus:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span>{t("delete")}</span>
+                            </DropdownMenuItem>
+                          </>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -324,17 +388,94 @@ export function PotentialClientsTable({
                   )}
                 </div>
 
-                <Link
-                  href={`/potential-clients/${client.id}`}
-                  className="p-1.5 text-muted-foreground hover:text-foreground"
-                >
-                  <ChevronRight className="h-5 w-5 rtl:rotate-180" />
-                </Link>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setClientToEdit(client)}
+                    className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground text-xs"
+                    title={t("edit")}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
+
+                  {canDelete && (
+                    <button
+                      type="button"
+                      onClick={() => setClientToDelete(client)}
+                      className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 text-red-500 hover:text-red-700 text-xs"
+                      title={t("delete")}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+
+                  <Link
+                    href={`/potential-clients/${client.id}`}
+                    className="p-1.5 text-muted-foreground hover:text-foreground"
+                  >
+                    <ChevronRight className="h-5 w-5 rtl:rotate-180" />
+                  </Link>
+                </div>
               </div>
             </Card>
           );
         })}
       </div>
+
+      {/* Edit Potential Client Dialog */}
+      {clientToEdit && (
+        <EditPotentialClientDialog
+          client={clientToEdit}
+          open={!!clientToEdit}
+          onOpenChange={(open) => !open && setClientToEdit(null)}
+          onSuccess={() => {
+            setClientToEdit(null);
+            onRefresh?.();
+          }}
+        />
+      )}
+
+      {/* Delete Confirmation Dialog (GM & ADMIN only) */}
+      <Dialog open={!!clientToDelete} onOpenChange={(open) => !open && setClientToDelete(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
+              <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-950/50 flex items-center justify-center shrink-0">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <DialogTitle className="text-base font-bold text-foreground">
+                {t("deleteTitle")}
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+
+          <p className="text-sm text-muted-foreground leading-relaxed py-2">
+            {clientToDelete && t("deleteConfirm", { name: clientToDelete.name })}
+          </p>
+
+          <DialogFooter className="gap-2 sm:gap-0 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setClientToDelete(null)}
+              disabled={isDeleting}
+            >
+              {tCommon("cancel")}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+            >
+              {isDeleting && <Loader2 className="h-4 w-4 animate-spin me-1.5" />}
+              <span>{t("delete")}</span>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
+

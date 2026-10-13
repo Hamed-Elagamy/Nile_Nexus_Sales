@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getPotentialClientById } from "@/lib/actions/potential-clients";
+import { getCurrentUserProfile } from "@/lib/actions/profile";
 import { PotentialClientDetail } from "@/components/potential-clients/potential-client-detail";
 
 interface PageProps {
@@ -19,11 +20,17 @@ export async function generateMetadata({ params }: PageProps) {
 
 export default async function PotentialClientDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const res = await getPotentialClientById(id);
+  const [res, profileRes] = await Promise.all([
+    getPotentialClientById(id),
+    getCurrentUserProfile(),
+  ]);
 
   if (!res.success || !res.data) {
     notFound();
   }
 
-  return <PotentialClientDetail client={res.data} />;
+  const userRole = profileRes.success && profileRes.data ? profileRes.data.role : "SALES";
+
+  return <PotentialClientDetail client={res.data} userRole={userRole} />;
 }
+

@@ -17,6 +17,8 @@ import {
   Loader2,
   CheckCircle2,
   Rocket,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -30,9 +32,11 @@ import {
 } from "@/components/ui/dialog";
 import { PotentialClientStatusBadge } from "./status-badge";
 import { WhatsAppQuickDialog } from "@/components/shared/whatsapp-quick-dialog";
+import { EditPotentialClientDialog } from "./edit-potential-client-dialog";
 import {
   updatePotentialClient,
   updatePotentialClientStatus,
+  deletePotentialClient,
   type PotentialClientWithRelations,
 } from "@/lib/actions/potential-clients";
 import {
@@ -43,32 +47,39 @@ import {
 
 interface PotentialClientDetailProps {
   client: PotentialClientWithRelations;
+  userRole?: string;
 }
 
-export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
+export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialClientDetailProps) {
   const t = useTranslations("potentialClients");
   const tCommon = useTranslations("common");
   const router = useRouter();
 
+  const [currentClient, setCurrentClient] = useState<PotentialClientWithRelations>(client);
   const [isPending, startTransition] = useTransition();
   const [currentStatus, setCurrentStatus] = useState<PotentialClientStatusType>(
-    client.status as PotentialClientStatusType
+    currentClient.status as PotentialClientStatusType
   );
-  const [notes, setNotes] = useState(client.notes || "");
+  const [notes, setNotes] = useState(currentClient.notes || "");
   const [opportunities, setOpportunities] = useState<OpportunityIndicatorType[]>(
-    (client.opportunities as OpportunityIndicatorType[]) || []
+    (currentClient.opportunities as OpportunityIndicatorType[]) || []
   );
 
   const [convertModalOpen, setConvertModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const cleanPhone = client.phone?.replace(/[^0-9]/g, "");
+  const canDelete = userRole === "GM" || userRole === "ADMIN";
+
+  const cleanPhone = currentClient.phone?.replace(/[^0-9]/g, "");
   const whatsappUrl = cleanPhone
     ? `https://wa.me/${cleanPhone.startsWith("0") ? "2" + cleanPhone : cleanPhone}`
     : null;
 
   const handleStatusChange = (newStatus: PotentialClientStatusType) => {
     startTransition(async () => {
-      const res = await updatePotentialClientStatus(client.id, newStatus);
+      const res = await updatePotentialClientStatus(currentClient.id, newStatus);
       if (res.success) {
         setCurrentStatus(newStatus);
         toast.success(t("statusUpdated"));
@@ -81,17 +92,35 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
 
   const handleSaveNotes = () => {
     startTransition(async () => {
-      const res = await updatePotentialClient(client.id, {
+      const res = await updatePotentialClient(currentClient.id, {
         notes,
         opportunities,
       });
-      if (res.success) {
+      if (res.success && res.data) {
+        setCurrentClient(res.data);
         toast.success(t("updatedSuccess"));
         router.refresh();
       } else {
         toast.error(res.error || tCommon("error"));
       }
     });
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const res = await deletePotentialClient(currentClient.id);
+      if (res.success) {
+        toast.success(t("deletedSuccess"));
+        router.push("/potential-clients");
+      } else {
+        toast.error(res.error || t("deleteFailed"));
+      }
+    } catch {
+      toast.error(t("deleteFailed"));
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const toggleOpportunity = (opp: OpportunityIndicatorType) => {
@@ -113,22 +142,53 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
             <span>{t("backToList")}</span>
           </Link>
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-bold text-foreground">{client.name}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{currentClient.name}</h1>
             <span className="font-mono text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
-              {client.business_id}
+              {currentClient.business_id}
             </span>
             <PotentialClientStatusBadge
               status={currentStatus}
               label={t(`status.${currentStatus}`)}
             />
           </div>
-          {client.area && (
-            <p className="text-sm text-muted-foreground">{client.area}</p>
+          {currentClient.area ? (
+            <p className="text-sm text-muted-foreground">{currentClient.area}</p>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setEditModalOpen(true)}
+              className="text-xs text-primary hover:underline flex items-center gap-1 cursor-pointer"
+            >
+              <span>+ {t("addArea")}</span>
+            </button>
           )}
         </div>
 
         {/* Workflow Action Buttons */}
         <div className="flex items-center gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setEditModalOpen(true)}
+            className="gap-1.5 text-xs border-primary/30 text-primary hover:bg-primary/5 cursor-pointer"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+            <span>{t("edit")}</span>
+          </Button>
+
+          {canDelete && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setDeleteConfirmOpen(true)}
+              disabled={isDeleting}
+              className="gap-1.5 text-xs text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-950/40 cursor-pointer"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              <span>{t("delete")}</span>
+            </Button>
+          )}
+
           {currentStatus !== "RESEARCHING" && currentStatus !== "CONVERTED" && (
             <Button
               variant="outline"
@@ -175,30 +235,39 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
         <div className="space-y-6">
           {/* Quick Contact Card */}
           <Card>
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-3 flex flex-row items-center justify-between">
               <CardTitle className="text-sm font-semibold">{t("contactInfo")}</CardTitle>
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                onClick={() => setEditModalOpen(true)}
+                className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                title={t("edit")}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-              {client.phone ? (
+              {currentClient.phone ? (
                 <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted/50 border border-border/50">
-                  <span className="font-mono text-xs" dir="ltr">{client.phone}</span>
+                  <span className="font-mono text-xs" dir="ltr">{currentClient.phone}</span>
                   <div className="flex items-center gap-1.5">
                     <a
-                      href={`tel:${client.phone}`}
+                      href={`tel:${currentClient.phone}`}
                       className="p-1.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground"
                       title={tCommon("call")}
                     >
                       <Phone className="h-4 w-4" />
                     </a>
-                    {client.phone && (
+                    {currentClient.phone && (
                       <WhatsAppQuickDialog
-                        phone={client.phone}
-                        recipientName={client.name}
+                        phone={currentClient.phone}
+                        recipientName={currentClient.name}
                         contextType="lead"
                         trigger={
                           <button
                             type="button"
-                            className="p-1.5 rounded-md hover:bg-emerald-100 text-emerald-600"
+                            className="p-1.5 rounded-md hover:bg-emerald-100 text-emerald-600 cursor-pointer"
                             title={tCommon("whatsapp")}
                           >
                             <MessageCircle className="h-4 w-4" />
@@ -209,33 +278,56 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
                   </div>
                 </div>
               ) : (
-                <p className="text-xs text-muted-foreground">{t("noPhone")}</p>
+                <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/20 flex items-center justify-between gap-2">
+                  <div className="space-y-0.5">
+                    <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">{t("noPhone")}</p>
+                    <p className="text-[11px] text-muted-foreground">{t("missingData")}</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setEditModalOpen(true)}
+                    className="h-7 text-xs font-semibold text-primary border-primary/30 hover:bg-primary/5"
+                  >
+                    + {t("addPhone")}
+                  </Button>
+                </div>
               )}
 
               {/* Online Links */}
               <div className="space-y-2 pt-1">
-                {client.website && (
+                {currentClient.website && (
                   <a
-                    href={client.website.startsWith("http") ? client.website : `https://${client.website}`}
+                    href={currentClient.website.startsWith("http") ? currentClient.website : `https://${currentClient.website}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 text-xs text-primary hover:underline"
                   >
                     <Globe className="h-3.5 w-3.5" />
-                    <span className="truncate">{client.website}</span>
+                    <span className="truncate">{currentClient.website}</span>
                   </a>
                 )}
-                {client.instagram && (
+                {currentClient.instagram && (
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Share2 className="h-3.5 w-3.5" />
-                    <span className="truncate">{client.instagram}</span>
+                    <span className="truncate">{currentClient.instagram}</span>
                   </div>
                 )}
-                {client.facebook && (
+                {currentClient.facebook && (
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Share2 className="h-3.5 w-3.5" />
-                    <span className="truncate">{client.facebook}</span>
+                    <span className="truncate">{currentClient.facebook}</span>
                   </div>
+                )}
+                {!currentClient.website && !currentClient.instagram && !currentClient.facebook && (
+                  <button
+                    type="button"
+                    onClick={() => setEditModalOpen(true)}
+                    className="text-xs text-primary hover:underline flex items-center gap-1.5 pt-1 cursor-pointer"
+                  >
+                    <Globe className="h-3.5 w-3.5" />
+                    <span>+ {t("addWebsite")} / {t("addSocials")}</span>
+                  </button>
                 )}
               </div>
             </CardContent>
@@ -250,24 +342,24 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
               <div className="flex items-center justify-between">
                 <span>{t("owner")}</span>
                 <span className="font-medium text-foreground">
-                  {client.research_owner?.full_name || "-"}
+                  {currentClient.research_owner?.full_name || "-"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span>{t("registeredDate")}</span>
                 <span className="font-medium text-foreground">
-                  {new Date(client.created_at).toLocaleDateString(undefined, {
+                  {new Date(currentClient.created_at).toLocaleDateString(undefined, {
                     year: "numeric",
                     month: "short",
                     day: "numeric",
                   })}
                 </span>
               </div>
-              {client.source && (
+              {currentClient.source && (
                 <div className="flex items-center justify-between">
                   <span>{t("source")}:</span>
                   <span className="font-medium text-foreground">
-                    {client.source.name_ar}
+                    {currentClient.source.name_ar}
                   </span>
                 </div>
               )}
@@ -384,6 +476,61 @@ export function PotentialClientDetail({ client }: PotentialClientDetailProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Potential Client Details Dialog (All roles: Sales, Admin, GM) */}
+      <EditPotentialClientDialog
+        client={currentClient}
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        onSuccess={(updated) => {
+          setCurrentClient(updated);
+          setNotes(updated.notes || "");
+          setOpportunities((updated.opportunities as OpportunityIndicatorType[]) || []);
+          router.refresh();
+        }}
+      />
+
+      {/* Delete Confirmation Dialog (GM & ADMIN only) */}
+      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3 text-red-600 dark:text-red-400">
+              <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-950/50 flex items-center justify-center shrink-0">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <DialogTitle className="text-base font-bold text-foreground">
+                {t("deleteTitle")}
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+
+          <p className="text-sm text-muted-foreground leading-relaxed py-2">
+            {t("deleteConfirm", { name: currentClient.name })}
+          </p>
+
+          <DialogFooter className="gap-2 sm:gap-0 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteConfirmOpen(false)}
+              disabled={isDeleting}
+            >
+              {tCommon("cancel")}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+            >
+              {isDeleting && <Loader2 className="h-4 w-4 animate-spin me-1.5" />}
+              <span>{t("delete")}</span>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
