@@ -159,10 +159,7 @@ export function formatLocalizedNotification(
 
     // --- New Pipeline Opportunity ---
     if (rawTitle.includes("فرصة جديدة بالبايبلاين") || rawTitle.includes("صفقة جديدة بالبايبلاين")) {
-      let enBody = "A new deal opportunity has been added to the sales pipeline.";
-      if (rawBody.includes("تبارك") || rawBody.includes("كريم فهمي")) {
-        enBody = "New deal added: Cloud Platform Suite for Tabarak Corp by Karim Fahmy.";
-      }
+      let enBody = "A new deal opportunity has been added to the sales pipeline and assigned for follow-up.";
       return {
         title: "💼 New Pipeline Opportunity",
         body: enBody,
@@ -224,7 +221,7 @@ export function formatLocalizedNotification(
     if (rawTitle.includes("New Pipeline Opportunity") || rawTitle.includes("Pipeline Opportunity")) {
       return {
         title: "💼 فرصة جديدة بالبايبلاين",
-        body: "تمت إضافة صفقة جديدة: باقة المنصة السحابية لشركة تبارك بواسطة كريم فهمي.",
+        body: "تمت إضافة صفقة جديدة إلى خط المبيعات وتعيينها للمتابعة التجارية.",
       };
     }
 

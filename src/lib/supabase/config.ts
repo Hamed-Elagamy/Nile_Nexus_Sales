@@ -35,11 +35,11 @@ export const FALLBACK_SUPABASE_ANON_KEY =
 
 export const DEMO_USERS = {
   gm: {
-    id: "00000000-0000-0000-0000-000000000001",
-    email: "gm@nilenexus.com",
+    id: "01ffbb15-b64b-4efe-a77e-2d5ae5d4a18a",
+    email: "hamedelagamy00@gmail.com",
     role: "GM" as const,
     user_metadata: {
-      full_name: "أحمد الشناوي",
+      full_name: "محمد حامد",
       role: "GM",
     },
     app_metadata: {},
@@ -47,11 +47,11 @@ export const DEMO_USERS = {
     created_at: new Date().toISOString(),
   },
   admin: {
-    id: "00000000-0000-0000-0000-000000000002",
-    email: "admin@nilenexus.com",
+    id: "bd1ce4e9-0445-4179-b770-4b65b2bf2f50",
+    email: "fnesma54@gmail.com",
     role: "ADMIN" as const,
     user_metadata: {
-      full_name: "سارة عبد الرحمن",
+      full_name: "نسمة فتحي",
       role: "ADMIN",
     },
     app_metadata: {},
@@ -59,11 +59,11 @@ export const DEMO_USERS = {
     created_at: new Date().toISOString(),
   },
   sales: {
-    id: "00000000-0000-0000-0000-000000000003",
-    email: "sales@nilenexus.com",
+    id: "5e3931d2-b134-4c6a-bbfe-70314715cf12",
+    email: "ofawzy952@gmail.com",
     role: "SALES" as const,
     user_metadata: {
-      full_name: "كريم فهمي",
+      full_name: "عمر الباجوري",
       role: "SALES",
     },
     app_metadata: {},
@@ -71,3 +71,4 @@ export const DEMO_USERS = {
     created_at: new Date().toISOString(),
   },
 };
+

@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.3] - 2026-10-18
+
+### Changed & Cleaned
+- **Production Demo Data Eradication**:
+  - Purged all hardcoded demo simulation records (`demoPotentialClients`, `demoClients`, `demoContacts`, `demoDeals`, `demoFollowUps`, `demoProposals`, `demoTasks`, `demoApprovals`, `demoNotifications`) from `src/lib/demo-data.ts`, setting them to clean zero-length arrays (`[]`).
+  - Purged fake hardcoded deals and metrics from `src/components/layout/live-activity-ticker.tsx`, replacing them with authentic enterprise notices covering CRM features, 173 services catalog, WhatsApp outreach, project estimator, and encrypted data security in Arabic & English.
+  - Reset `src/components/sales/project-estimator-dialog.tsx` preselected demo modules (from 4 hardcoded modules to empty `[]`) and project name to empty string `""`, ensuring new estimations start cleanly at 0 modules, 0 EGP direct cost, and 0 workdays.
+  - Cleared fake sales representative names ("كريم فهمي", "مصطفى كمال", "أحمد الشناوي") and fake numbers (495,000 EGP) from `src/components/sales/commission-quota-simulator.tsx`.
+  - Converted `src/app/(authenticated)/targets/page.tsx` to an async Server Component querying real active team profiles and closed won deals directly from Supabase.
+  - Linked fallback state to all 6 real company team members (Mohamed Hamed, Reem Ezz, Nesma Fathy, Omar El Bagoury, Riham ELSayed, Zeinab Ahmed) with real UUIDs, correct role permissions, and clean `0` won amounts.
+  - Replaced demo metrics in `src/lib/actions/dashboard.ts` fallback with clean zeroed production counters and empty activity/deal lists.
+  - Updated fallback `DEMO_USERS` in `src/lib/supabase/config.ts` to reference actual employee accounts instead of fake demo identities.
+  - Purged demo names from `src/lib/utils/localized-notification.ts` templates.
+
 ## [1.7.2] - 2026-10-18
 
 ### Fixed

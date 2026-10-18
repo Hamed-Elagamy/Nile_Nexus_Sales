@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -14,7 +14,7 @@ import { sounds } from "@/lib/utils/confetti-sound";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { useTranslations, useLocale } from "next-intl";
 
-interface SalesRepPerformance {
+export interface SalesRepPerformance {
   id: string;
   name_ar: string;
   name_en: string;
@@ -26,21 +26,40 @@ interface SalesRepPerformance {
   avatar_en: string;
 }
 
-const INITIAL_REPS: SalesRepPerformance[] = [
-  { id: "1", name_ar: "كريم فهمي", name_en: "Karim Fahmy", role_ar: "مسؤول مبيعات أول", role_en: "Senior Sales Exec", quota: 450000, won: 495000, avatar_ar: "ك.ف", avatar_en: "KF" },
-  { id: "2", name_ar: "مصطفى كمال", name_en: "Mostafa Kamal", role_ar: "مسؤول حسابات", role_en: "Account Executive", quota: 400000, won: 340000, avatar_ar: "م.ك", avatar_en: "MK" },
-  { id: "3", name_ar: "أحمد الشناوي", name_en: "Ahmed El-Shennawy", role_ar: "مدير مبيعات", role_en: "Sales Director", quota: 650000, won: 710000, avatar_ar: "أ.ش", avatar_en: "AS" },
-];
+interface CommissionQuotaSimulatorProps {
+  initialReps?: SalesRepPerformance[];
+}
 
-export function CommissionQuotaSimulator() {
+export function CommissionQuotaSimulator({ initialReps }: CommissionQuotaSimulatorProps) {
   const t = useTranslations("targets");
   const locale = useLocale();
   const isEn = locale === "en";
   const currencyUnit = isEn ? "EGP" : "ج.م";
 
-  const [selectedRepId, setSelectedRepId] = useState<string>("1");
-  const [quota, setQuota] = useState<number>(450000);
-  const [wonAmount, setWonAmount] = useState<number>(495000);
+  const reps = useMemo(() => {
+    if (initialReps && initialReps.length > 0) return initialReps;
+    return [
+      { id: "1", name_ar: "محمد حامد", name_en: "Mohamed Hamed", role_ar: "المدير العام", role_en: "General Manager", quota: 250000, won: 0, avatar_ar: "م.ح", avatar_en: "MH" },
+      { id: "2", name_ar: "ريم عز", name_en: "Reem Ezz", role_ar: "المدير العام", role_en: "General Manager", quota: 250000, won: 0, avatar_ar: "ر.ع", avatar_en: "RE" },
+      { id: "3", name_ar: "نسمة فتحي", name_en: "Nesma Fathy", role_ar: "مدير النظام", role_en: "System Administrator", quota: 200000, won: 0, avatar_ar: "ن.ف", avatar_en: "NF" },
+      { id: "4", name_ar: "عمر الباجوري", name_en: "Omar El Bagoury", role_ar: "مسؤول مبيعات", role_en: "Sales Representative", quota: 200000, won: 0, avatar_ar: "ع.ب", avatar_en: "OB" },
+      { id: "5", name_ar: "ريهام السيد", name_en: "Riham ELSayed", role_ar: "مسؤول مبيعات", role_en: "Sales Representative", quota: 200000, won: 0, avatar_ar: "ر.س", avatar_en: "RE" },
+      { id: "6", name_ar: "زينب أحمد", name_en: "Zeinab Ahmed", role_ar: "مسؤول مبيعات", role_en: "Sales Representative", quota: 200000, won: 0, avatar_ar: "ز.أ", avatar_en: "ZA" },
+    ];
+  }, [initialReps]);
+
+  const [selectedRepId, setSelectedRepId] = useState<string>(reps[0]?.id || "1");
+  const [quota, setQuota] = useState<number>(reps[0]?.quota || 250000);
+  const [wonAmount, setWonAmount] = useState<number>(reps[0]?.won || 0);
+
+  useEffect(() => {
+    if (reps && reps.length > 0) {
+      const active = reps.find((r) => r.id === selectedRepId) || reps[0];
+      setSelectedRepId(active.id);
+      setQuota(active.quota);
+      setWonAmount(active.won);
+    }
+  }, [reps]);
 
   // Month progress
   const today = new Date();
@@ -156,7 +175,7 @@ export function CommissionQuotaSimulator() {
       {/* Rep Selection Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1">
         <span className="text-xs font-semibold text-muted-foreground shrink-0 me-1">{t("selectRep")}</span>
-        {INITIAL_REPS.map((rep) => {
+        {reps.map((rep) => {
           const isSelected = rep.id === selectedRepId;
           const repRate = Math.round((rep.won / rep.quota) * 100);
           return (

@@ -74,12 +74,7 @@ export function ProjectEstimatorDialog({ open, onOpenChange }: ProjectEstimatorD
   const currencyUnit = isEn ? "EGP" : "ج.م";
 
   const [projectName, setProjectName] = useState("");
-  const [selectedModuleIds, setSelectedModuleIds] = useState<string[]>([
-    "web_app",
-    "admin_portal",
-    "auth_rbac",
-    "reports_export",
-  ]);
+  const [selectedModuleIds, setSelectedModuleIds] = useState<string[]>([]);
   const [marginPercent, setMarginPercent] = useState<number>(35); // 35% margin
   const [maintenanceMonths, setMaintenanceMonths] = useState<number>(3);
   const [copied, setCopied] = useState(false);
