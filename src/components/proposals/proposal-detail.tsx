@@ -15,12 +15,16 @@ import {
   CheckCircle2,
   XCircle,
   CopyPlus,
+  ExternalLink,
+  Share2,
+  Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ProposalStatusBadge } from "./proposal-status-badge";
 import { ProposalPrintView } from "./proposal-print-view";
+import { MultiTierPackageMatrix } from "./multi-tier-package-matrix";
 import {
   updateProposalVersionStatus,
   createProposalVersion,
@@ -44,9 +48,18 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
   );
 
   const [isPrintOpen, setIsPrintOpen] = useState(false);
+  const [showMultiTier, setShowMultiTier] = useState(false);
 
   const activeVersion =
     versions.find((v) => v.id === selectedVersionId) || versions[0] || null;
+
+  const copyDigitalProposalLink = () => {
+    const url = `${typeof window !== "undefined" ? window.location.origin : ""}/quote/${proposal.id}`;
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+      toast.success("تم نسخ رابط العرض الرقمي المخصص للعميل 🔗");
+    }
+  };
 
   const handleUpdateStatus = (newStatus: ProposalStatus) => {
     if (!activeVersion) return;
@@ -204,6 +217,37 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
                 </Button>
               </>
             )}
+            {/* Digital Proposal Portal Actions */}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={copyDigitalProposalLink}
+              className="gap-1.5 text-primary border-primary/30 hover:bg-primary/10"
+              title="نسخ رابط العرض الإلكتروني المخصص للعميل"
+            >
+              <Share2 className="h-4 w-4" />
+              <span>رابط العرض للعميل</span>
+            </Button>
+
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => window.open(`/quote/${proposal.id}`, "_blank")}
+              className="gap-1.5 text-xs"
+            >
+              <ExternalLink className="h-4 w-4" />
+              <span>معاينة البوابة</span>
+            </Button>
+
+            <Button
+              size="sm"
+              variant={showMultiTier ? "default" : "outline"}
+              onClick={() => setShowMultiTier(!showMultiTier)}
+              className="gap-1.5 text-xs"
+            >
+              <Layers className="h-4 w-4" />
+              <span>{showMultiTier ? "إخفاء باقات 3-Tier" : "باقات 3-Tier المقترحة"}</span>
+            </Button>
           </div>
         </div>
 
@@ -226,6 +270,16 @@ export function ProposalDetail({ proposal }: ProposalDetailProps) {
                 v{ver.version_number} ({ver.status})
               </button>
             ))}
+          </div>
+        )}
+
+        {/* Optional 3-Tier Comparison Matrix */}
+        {showMultiTier && activeVersion && (
+          <div className="p-6 rounded-2xl bg-muted/30 border border-border/80">
+            <MultiTierPackageMatrix
+              basePrice={Number(activeVersion.grand_total || 120000)}
+              currency={activeVersion.currency}
+            />
           </div>
         )}
 

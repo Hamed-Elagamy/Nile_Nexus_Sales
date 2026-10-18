@@ -19,6 +19,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ClientTypeBadge } from "./client-type-badge";
+import { ClientHealthBadge } from "./client-health-score";
 import { ContactsList } from "./contacts-list";
 import { WhatsAppQuickDialog } from "@/components/shared/whatsapp-quick-dialog";
 import { updateClient, type ClientWithRelations } from "@/lib/actions/clients";
@@ -90,6 +91,11 @@ export function ClientDetail({ client }: ClientDetailProps) {
               {client.business_id}
             </span>
             <ClientTypeBadge type={client.type} />
+            <ClientHealthBadge
+              wonDealsCount={client.deals?.filter((d) => d.stage === "WON").length}
+              activeDealsCount={client.deals?.filter((d) => d.stage !== "WON" && d.stage !== "LOST").length}
+              daysSinceLastContact={Math.floor((Date.now() - new Date(client.updated_at || client.created_at).getTime()) / (1000 * 60 * 60 * 24))}
+            />
           </div>
           {client.industry && (
             <p className="text-sm text-muted-foreground">{client.industry}</p>

@@ -16,6 +16,7 @@ import {
   TrendingUp,
   ShieldAlert,
   Upload,
+  MessageSquare,
 } from "lucide-react";
 import { demoServices } from "@/lib/demo-data";
 import { sounds } from "@/lib/utils/confetti-sound";
@@ -40,6 +41,7 @@ interface CommandPaletteProps {
   onOpenRoiCalculator?: () => void;
   onOpenBattlecards?: () => void;
   onOpenBulkImport?: () => void;
+  onOpenWhatsAppSequences?: () => void;
 }
 
 export function CommandPalette({
@@ -52,6 +54,7 @@ export function CommandPalette({
   onOpenRoiCalculator,
   onOpenBattlecards,
   onOpenBulkImport,
+  onOpenWhatsAppSequences,
 }: CommandPaletteProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -184,6 +187,18 @@ export function CommandPalette({
         },
         badge: "استيراد",
       },
+      {
+        id: "action-wa-sequences",
+        category: "أدوات وإجراءات سريعة",
+        title: "سلاسل رسائل الواتساب المتتابعة (WhatsApp Sequences)",
+        subtitle: "قوالب حملات متابعة تسلسلية ذكية لزيادة معدل الردود",
+        icon: <MessageSquare className="h-4 w-4 text-emerald-600" />,
+        action: () => {
+          onOpenChange(false);
+          onOpenWhatsAppSequences?.();
+        },
+        badge: "واتساب",
+      },
 
       // Core Pages
       {
@@ -273,6 +288,7 @@ export function CommandPalette({
     onOpenRoiCalculator,
     onOpenBattlecards,
     onOpenBulkImport,
+    onOpenWhatsAppSequences,
   ]);
 
   // Filtered by query

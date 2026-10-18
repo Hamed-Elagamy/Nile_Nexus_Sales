@@ -10,6 +10,7 @@ import { ProjectEstimatorDialog } from "@/components/sales/project-estimator-dia
 import { RoiCalculatorDialog } from "@/components/sales/roi-calculator-dialog";
 import { ObjectionBattlecardsDialog } from "@/components/sales/objection-battlecards-dialog";
 import { BulkImportDialog } from "@/components/potential-clients/bulk-import-dialog";
+import { WhatsAppSequencesDialog } from "./whatsapp-sequences-dialog";
 
 interface SalesToolsContextType {
   openCommandPalette: () => void;
@@ -20,6 +21,7 @@ interface SalesToolsContextType {
   openRoiCalculator: () => void;
   openBattlecards: () => void;
   openBulkImport: () => void;
+  openWhatsAppSequences: (phone?: string, name?: string, company?: string) => void;
 }
 
 const SalesToolsContext = createContext<SalesToolsContextType | null>(null);
@@ -35,6 +37,12 @@ export function SalesToolsProvider({ children }: { children: React.ReactNode }) 
   const [battlecardsOpen, setBattlecardsOpen] = useState(false);
   const [bulkImportOpen, setBulkImportOpen] = useState(false);
 
+  // WhatsApp Sequences Dialog State
+  const [waSequencesOpen, setWaSequencesOpen] = useState(false);
+  const [waPhone, setWaPhone] = useState("");
+  const [waName, setWaName] = useState("");
+  const [waCompany, setWaCompany] = useState("");
+
   const openCommandPalette = () => setCommandPaletteOpen(true);
   const openVatCalculator = (amount?: number) => {
     if (amount) setCalcAmount(amount);
@@ -47,6 +55,13 @@ export function SalesToolsProvider({ children }: { children: React.ReactNode }) 
   const openBattlecards = () => setBattlecardsOpen(true);
   const openBulkImport = () => setBulkImportOpen(true);
 
+  const openWhatsAppSequences = (phone = "", name = "", company = "") => {
+    setWaPhone(phone);
+    setWaName(name);
+    setWaCompany(company);
+    setWaSequencesOpen(true);
+  };
+
   return (
     <SalesToolsContext.Provider
       value={{
@@ -58,6 +73,7 @@ export function SalesToolsProvider({ children }: { children: React.ReactNode }) 
         openRoiCalculator,
         openBattlecards,
         openBulkImport,
+        openWhatsAppSequences,
       }}
     >
       {children}
@@ -73,6 +89,7 @@ export function SalesToolsProvider({ children }: { children: React.ReactNode }) 
         onOpenRoiCalculator={openRoiCalculator}
         onOpenBattlecards={openBattlecards}
         onOpenBulkImport={openBulkImport}
+        onOpenWhatsAppSequences={() => openWhatsAppSequences()}
       />
 
       <VatInstallmentCalculator
@@ -109,6 +126,14 @@ export function SalesToolsProvider({ children }: { children: React.ReactNode }) 
       <BulkImportDialog
         open={bulkImportOpen}
         onOpenChange={setBulkImportOpen}
+      />
+
+      <WhatsAppSequencesDialog
+        open={waSequencesOpen}
+        onOpenChange={setWaSequencesOpen}
+        defaultPhone={waPhone}
+        defaultClientName={waName}
+        defaultCompanyName={waCompany}
       />
 
       {/* Floating Speed Dial on bottom-end */}

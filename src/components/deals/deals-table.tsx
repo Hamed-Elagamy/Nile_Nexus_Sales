@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DealStageBadge } from "./deal-stage-badge";
+import { DealHeatBadge } from "./deal-heat-badge";
 import type { DealWithRelations } from "@/lib/actions/deals";
 import type { DealStage } from "@/lib/schemas/deal";
 
@@ -99,12 +100,18 @@ export function DealsTable({ deals, loading = false }: DealsTableProps) {
                   </TableCell>
 
                   <TableCell>
-                    <Link
-                      href={`/deals/${deal.id}`}
-                      className="font-medium text-foreground hover:text-primary transition-colors"
-                    >
-                      {deal.title}
-                    </Link>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Link
+                        href={`/deals/${deal.id}`}
+                        className="font-medium text-foreground hover:text-primary transition-colors"
+                      >
+                        {deal.title}
+                      </Link>
+                      <DealHeatBadge
+                        updatedAt={deal.updated_at || deal.created_at}
+                        isClosed={deal.stage === "WON" || deal.stage === "LOST"}
+                      />
+                    </div>
                   </TableCell>
 
                   <TableCell>
@@ -182,9 +189,15 @@ export function DealsTable({ deals, loading = false }: DealsTableProps) {
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <span className="text-[11px] font-mono text-muted-foreground block">
-                    {deal.business_id}
-                  </span>
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="text-[11px] font-mono text-muted-foreground block">
+                      {deal.business_id}
+                    </span>
+                    <DealHeatBadge
+                      updatedAt={deal.updated_at || deal.created_at}
+                      isClosed={deal.stage === "WON" || deal.stage === "LOST"}
+                    />
+                  </div>
                   <Link
                     href={`/deals/${deal.id}`}
                     className="font-semibold text-foreground text-base hover:text-primary transition-colors"

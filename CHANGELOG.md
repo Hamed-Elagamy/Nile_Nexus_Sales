@@ -2,6 +2,47 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.0] - 2026-10-18
+
+### Added
+- **Multi-Tier Proposal Package Matrix (`MultiTierPackageMatrix`)**:
+  - Side-by-side 3 tiers comparison (MVP Starter, Growth Recommended, Enterprise Scale).
+  - Deliverables checklist, SLA support terms, and price calculations.
+  - Integrated into proposal details view with 1-click expander toggle.
+
+- **Client Digital Proposal & E-Signature Portal (`/quote/[id]` & `ClientDigitalProposal`)**:
+  - Public branded digital proposal link for external clients without needing system login.
+  - Interactive HTML5 canvas digital signature drawing pad with touch/mouse support, clear, and sign.
+  - Legal compliance agreement confirmation and 1-click digital approval.
+  - Automated status transition to `ACCEPTED`, celebration sound chime, and confetti explosion.
+  - Direct WhatsApp button for client questions and PDF download/print.
+
+- **Deal Activity Heat & Stalled Deal Alert System (`DealHeatBadge`)**:
+  - Deal health calculation based on last activity date: 🔥 Hot (≤ 3 days), ⚡ Active (≤ 7 days), ❄️ Stalled (> 7 days).
+  - Integrated into Pipeline Kanban cards and Deals tables with 1-click revival link.
+
+- **4-Step WhatsApp Drip Sequences Hub (`WhatsAppSequencesDialog`)**:
+  - Ready-to-send Egyptian sales scripts for Cold Intro, Discovery Follow-up, Case Study & ROI, Demo Confirmation, and Ghosted Client Revival.
+
+- **Sales Quota & Gamified Commission Simulator (`/targets` & `CommissionQuotaSimulator`)**:
+  - Interactive quota targets, tier accelerators (Base, Bronze Closer, Silver Achiever, Gold Champion, Diamond Club), and projected monthly payouts.
+  - Added dedicated navigation entry in sidebar and mobile menu.
+
+- **Structured Deal Loss Post-Mortem Analytics (`LostDealDialog`)**:
+  - Upgraded loss dialog with structured reason pills (Competitor, Price/Budget, Postponed, Ghosted, Technical Scope).
+  - Competitor name tracking, client target budget capture, and 1-click resurface presets (+1 month, +3 months, +6 months).
+
+- **Client Health & Relationship Risk Score (`ClientHealthBadge` & `evaluateClientHealth`)**:
+  - Dynamic 0-100 score evaluating relationship recency, won deals count, active pipeline, and overdue tasks.
+  - Visual health badge (🟢 Champion, 🟢 Healthy, 🟡 At Risk, 🔴 Dormant) on desktop tables and mobile cards.
+
+- **Deal Stage Playbook & Objection Helper (`DealStagePlaybook`)**:
+  - Stage-specific BANT qualification questions, action checklists, and pro-tips directly accessible from pipeline cards.
+
+- **Testing & Verification**:
+  - 18 test suites and 97 tests passing (100% pass rate).
+  - Zero TypeScript errors across all 182 files.
+
 ## [1.6.0] - 2026-10-18
 
 ### Added

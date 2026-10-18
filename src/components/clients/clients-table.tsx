@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClientTypeBadge } from "./client-type-badge";
+import { ClientHealthBadge } from "./client-health-score";
 import { WhatsAppQuickDialog } from "@/components/shared/whatsapp-quick-dialog";
 import type { ClientWithRelations } from "@/lib/actions/clients";
 
@@ -78,6 +79,7 @@ export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
               <TableHead className="w-24 font-semibold">{t("table.code")}</TableHead>
               <TableHead className="font-semibold">{t("table.name")}</TableHead>
               <TableHead className="w-28 font-semibold">{t("table.type")}</TableHead>
+              <TableHead className="w-32 font-semibold">صحة العلاقة</TableHead>
               <TableHead className="font-semibold">{t("table.primaryContact")}</TableHead>
               <TableHead className="font-semibold">{t("table.contact")}</TableHead>
               <TableHead className="font-semibold">{t("table.owner")}</TableHead>
@@ -123,6 +125,14 @@ export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
 
                   <TableCell>
                     <ClientTypeBadge type={client.type} />
+                  </TableCell>
+
+                  <TableCell>
+                    <ClientHealthBadge
+                      wonDealsCount={client.deals?.filter((d) => d.stage === "WON").length}
+                      activeDealsCount={client.deals?.filter((d) => d.stage !== "WON" && d.stage !== "LOST").length}
+                      daysSinceLastContact={Math.floor((Date.now() - new Date(client.updated_at || client.created_at).getTime()) / (1000 * 60 * 60 * 24))}
+                    />
                   </TableCell>
 
                   <TableCell>
@@ -253,7 +263,15 @@ export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
                   )}
                 </div>
 
-                <ClientTypeBadge type={client.type} />
+                <div className="flex flex-col items-end gap-1.5 shrink-0">
+                  <ClientTypeBadge type={client.type} />
+                  <ClientHealthBadge
+                    compact
+                    wonDealsCount={client.deals?.filter((d) => d.stage === "WON").length}
+                    activeDealsCount={client.deals?.filter((d) => d.stage !== "WON" && d.stage !== "LOST").length}
+                    daysSinceLastContact={Math.floor((Date.now() - new Date(client.updated_at || client.created_at).getTime()) / (1000 * 60 * 60 * 24))}
+                  />
+                </div>
               </div>
 
               {primaryContact && (

@@ -246,3 +246,5 @@ class SoundEngine {
 }
 
 export const sounds = new SoundEngine();
+export const triggerConfetti = triggerCelebrationConfetti;
+export const playWonSound = () => sounds.won();

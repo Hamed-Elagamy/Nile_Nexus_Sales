@@ -15,6 +15,8 @@ export async function updateSession(request: NextRequest) {
     "/login",
     "/auth/callback",
     "/auth/reset-password",
+    "/quote",
+    "/p",
     "/api",
     "/sw.js",
     "/manifest.webmanifest",

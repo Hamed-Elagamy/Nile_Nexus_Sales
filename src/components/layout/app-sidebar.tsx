@@ -24,6 +24,7 @@ import {
   Tag,
   Smartphone,
   Calculator,
+  Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMobileNav } from "./mobile-nav-context";
@@ -41,6 +42,7 @@ export const navItems = [
   { key: "pipeline", href: "/pipeline", icon: GitBranch },
   { key: "services", href: "/services", icon: Tag },
   { key: "estimator", href: "/estimator", icon: Calculator },
+  { key: "targets", href: "/targets", icon: Target },
   { key: "followUps", href: "/follow-ups", icon: Phone },
   { key: "tasks", href: "/tasks", icon: CheckSquare },
   { key: "calendar", href: "/calendar", icon: Calendar },

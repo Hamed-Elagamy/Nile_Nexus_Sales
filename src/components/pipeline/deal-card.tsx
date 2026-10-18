@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { ChevronLeft, MoreVertical, Trophy, XCircle } from "lucide-react";
+import { ChevronLeft, MoreVertical, Trophy, XCircle, BookOpen } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { DealWithRelations } from "@/lib/actions/deals";
 import type { DealStage } from "@/lib/schemas/deal";
+import { DealHeatBadge, calculateDealHeat } from "@/components/deals/deal-heat-badge";
+import { DealStagePlaybook } from "@/components/deals/deal-stage-playbook";
 
 interface DealCardProps {
   deal: DealWithRelations;
@@ -39,6 +41,7 @@ export function DealCard({
 }: DealCardProps) {
   const t = useTranslations("pipeline");
   const tCommon = useTranslations("common");
+  const [isPlaybookOpen, setIsPlaybookOpen] = useState(false);
   const currentIndex = STAGE_ORDER.indexOf(deal.stage as DealStage);
   const nextStage = currentIndex >= 0 && currentIndex < STAGE_ORDER.length - 1
     ? STAGE_ORDER[currentIndex + 1]
@@ -53,9 +56,15 @@ export function DealCard({
       {/* Top Header */}
       <div className="flex items-start justify-between gap-1.5">
         <div className="space-y-0.5 flex-1 min-w-0">
-          <span className="font-mono text-[10px] text-muted-foreground block truncate">
-            {deal.business_id}
-          </span>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="font-mono text-[10px] text-muted-foreground block truncate">
+              {deal.business_id}
+            </span>
+            <DealHeatBadge
+              updatedAt={deal.updated_at || deal.created_at}
+              isClosed={deal.stage === "WON" || deal.stage === "LOST"}
+            />
+          </div>
           <Link
             href={`/deals/${deal.id}`}
             className="font-bold text-sm text-foreground hover:text-primary transition-colors block truncate"
@@ -65,14 +74,25 @@ export function DealCard({
           </Link>
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <Button variant="ghost" size="icon-xs" className="h-6 w-6 text-muted-foreground">
-                <MoreVertical className="h-3.5 w-3.5" />
-              </Button>
-            }
-          />
+        <div className="flex items-center gap-0.5">
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            onClick={() => setIsPlaybookOpen(true)}
+            className="h-6 w-6 text-muted-foreground hover:text-primary hover:bg-primary/10"
+            title="دليل المرحلة وأسئلة التأهيل الذكية"
+          >
+            <BookOpen className="h-3.5 w-3.5" />
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button variant="ghost" size="icon-xs" className="h-6 w-6 text-muted-foreground">
+                  <MoreVertical className="h-3.5 w-3.5" />
+                </Button>
+              }
+            />
           <DropdownMenuContent align="end" className="w-36">
             <DropdownMenuItem
               render={
@@ -102,6 +122,7 @@ export function DealCard({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+    </div>
 
       {/* Client Name */}
       {deal.client && (
@@ -111,6 +132,19 @@ export function DealCard({
             className="hover:text-foreground transition-colors"
           >
             🏢 {deal.client.name}
+          </Link>
+        </div>
+      )}
+
+      {/* Stalled Alert Banner */}
+      {calculateDealHeat(deal.updated_at || deal.created_at, deal.stage === "WON" || deal.stage === "LOST").temperature === "STALLED" && (
+        <div className="flex items-center justify-between p-1.5 rounded bg-cyan-500/10 border border-cyan-500/20 text-[10px] text-cyan-800 dark:text-cyan-300">
+          <span className="font-semibold">❄️ راكدة لم يتم التحديث</span>
+          <Link
+            href={`/deals/${deal.id}`}
+            className="font-bold underline hover:text-cyan-900 dark:hover:text-cyan-100"
+          >
+            تنشيط الآن
           </Link>
         </div>
       )}
@@ -134,6 +168,12 @@ export function DealCard({
           </Button>
         )}
       </div>
+
+      <DealStagePlaybook
+        stage={deal.stage as DealStage}
+        open={isPlaybookOpen}
+        onOpenChange={setIsPlaybookOpen}
+      />
     </Card>
   );
 }
