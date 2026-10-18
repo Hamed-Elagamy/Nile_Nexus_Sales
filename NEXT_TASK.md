@@ -50,6 +50,11 @@ Execute Production Database Clean-up & Roll Out to Company Employees:
 - [x] Structured Deal Loss Post-Mortem Analytics (`LostDealDialog`) with reason pills, competitor tracking, budget capture, and resurface presets
 - [x] Client Health & Relationship Risk Score (`ClientHealthBadge` & `evaluateClientHealth`) with dynamic 0-100 score
 - [x] Deal Stage Playbook & Objection Helper Popover (`DealStagePlaybook`) with BANT questions, action steps, and pro-tips
-- [x] 100% Vitest tests passing (97/97) across 18 test suites and 0 TypeScript compilation errors across all 182 files
+- [x] Crash-Proof Theme Accent Picker: zero-dependency popover with click-outside listener, fixing mobile crash
+- [x] Mobile Floating Speed Dial lifted to `bottom-20 md:bottom-6` to eliminate overlap with bottom bar "More / المزيد"
+- [x] Bilingual Speed Dial actions with 100% synchronized `speedDial` dictionary namespace
+- [x] Branded global error boundary fallback in `src/app/error.tsx`
+- [x] 100% Vitest tests passing (97/97) across 18 test suites and 0 TypeScript compilation errors across all 183 files
+- [x] Next.js 16 production build verified cleanly across all 26 routes
 - [ ] Push commit to origin main for automated Vercel Production deployment
 - [ ] Onboard company sales representatives and verify live digital proposal links

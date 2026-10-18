@@ -1083,5 +1083,36 @@
     "copyFailed": "Failed to copy message",
     "sendWhatsAppBtn": "Open WhatsApp",
     "invalidPhone": "Phone number is invalid for WhatsApp"
+  },
+  "speedDial": {
+    "addLead": "Add New Lead",
+    "newProposal": "New Proposal",
+    "vatCalculator": "VAT 14% & Installments",
+    "scratchpad": "Quick Scratchpad",
+    "snippets": "Bank Details & Snippets",
+    "quickTools": "Quick Sales Actions"
+  },
+  "themePicker": {
+    "title": "System Theme & Aesthetics",
+    "subtitle": "Luxury Themes",
+    "nile": "Nile Blue",
+    "nileDesc": "Royal Classic Identity",
+    "emerald": "Emerald Pro",
+    "emeraldDesc": "Growth & Financial Momentum",
+    "royal": "Royal Purple",
+    "royalDesc": "High-Tech Luxury & AI",
+    "amber": "Warm Amber",
+    "amberDesc": "Sales Energy & Drive",
+    "obsidian": "Obsidian Neon",
+    "obsidianDesc": "Vibrant Dark OLED Style",
+    "density": "Table Density:",
+    "densityNormal": "Normal",
+    "densityCompact": "Compact",
+    "soundFx": "Tactical Sound FX",
+    "soundEnabled": "Active",
+    "soundDisabled": "Muted",
+    "zenMode": "Zen Focus & Clean Mode",
+    "testConfetti": "Test Confetti Celebration 🎉",
+    "tooltip": "Customize Theme, Palettes & FX"
   }
 }

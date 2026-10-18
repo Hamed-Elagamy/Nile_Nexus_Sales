@@ -222,13 +222,20 @@ Production Deployed — Live on Vercel & Connected to Supabase
     - Upgraded Lost Deal Post-Mortem Analytics (`LostDealDialog`) with structured loss reason pills (Competitor, Price, Scope, Ghosted), competitor tracking, budget capture, and 1-click resurfacing presets.
     - Client Health & Relationship Risk Score (`ClientHealthBadge` & `evaluateClientHealth`) dynamically gauging client relationship status (Champion, Healthy, At Risk, Dormant) on tables and details.
 
+- **Phase 21 (Mobile UX Polish, Bug Fixes & Resilient Error Handling)**:
+  - **Crash-Proof Theme Accent Picker**: Rebuilt `ThemeAccentPicker` from scratch as an accessible, zero-dependency popover with native outside-click detection and Escape key handler, completely eradicating the Base UI menu traversal exception that crashed the page on mobile.
+  - **Mobile Floating Speed Dial Repositioning**: Moved floating `+` button to `bottom-20 md:bottom-6 end-4 sm:end-6`, lifting it cleanly 80px above the mobile bottom bar and eliminating overlap with the "More / المزيد" navigation tab. Added backdrop overlay for mobile dismissibility.
+  - **Speed Dial Dynamic Localization**: Connected all 5 actions and trigger tooltips to `useTranslations("speedDial")`, ensuring instant switching between Egyptian Arabic and English.
+  - **Custom Branded Error Boundary (`src/app/error.tsx`)**: Implemented a responsive bilingual error fallback screen with diagnostic error ID digest, retry action (`reset()`), and home navigation, replacing Next.js generic error screen.
+  - **100% Dictionary Synchronization**: Exactly 1000 keys in `messages/ar.json` and 1000 keys in `messages/en.json` (0 missing).
+
 ## Test Status
 - ✅ Vitest: 97/97 passing across 18 test suites (100% pass rate)
 - 0 failed
 
 ## Build Status
-- ✅ TypeScript: 0 errors across all 182 files (`node scripts/typecheck.js`)
-- ✅ Production build: verified and clean
+- ✅ TypeScript: 0 errors across all 183 files (`node scripts/typecheck.js`)
+- ✅ Next.js 16 Turbopack Production Build: verified and clean across all 26 routes
 
 ## Known Bugs
 - None

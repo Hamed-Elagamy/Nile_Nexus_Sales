@@ -1083,5 +1083,36 @@
     "copyFailed": "فشل نسخ النص",
     "sendWhatsAppBtn": "إرسال عبر واتساب",
     "invalidPhone": "رقم الهاتف غير صالح للإرسال"
+  },
+  "speedDial": {
+    "addLead": "إضافة عميل محتمل جديد",
+    "newProposal": "عرض أسعار جديد",
+    "vatCalculator": "حاسبة الضرائب والأقساط 14%",
+    "scratchpad": "المفكرة السريعة",
+    "snippets": "بنك الحسابات والنصوص",
+    "quickTools": "أدوات وإجراءات سريعة للمبيعات"
+  },
+  "themePicker": {
+    "title": "هوية وألوان النظام",
+    "subtitle": "ألوان فاخرة",
+    "nile": "أزرق النيل",
+    "nileDesc": "الهوية الكلاسيكية الملكية",
+    "emerald": "زمردي فاخر",
+    "emeraldDesc": "طاقة النمو والمال",
+    "royal": "بنفسجي ملكي",
+    "royalDesc": "فخامة التقنية والذكاء",
+    "amber": "برتقالي دافئ",
+    "amberDesc": "نشاط وحماس المبيعات",
+    "obsidian": "أسود نيون",
+    "obsidianDesc": "ستايل OLED تقني مضيء",
+    "density": "كثافة الجداول:",
+    "densityNormal": "عادي",
+    "densityCompact": "مضغوط",
+    "soundFx": "المؤثرات الصوتية التكتيكية",
+    "soundEnabled": "مفعل",
+    "soundDisabled": "صامت",
+    "zenMode": "وضع التركيز والعرض النظيف (Zen Mode)",
+    "testConfetti": "تجربة احتفال الصفقات 🎉",
+    "tooltip": "تخصيص الثيم والألوان والمؤثرات"
   }
 }

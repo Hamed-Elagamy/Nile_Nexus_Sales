@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.1] - 2026-10-18
+
+### Fixed
+- **Mobile Theme Accent Picker Crash**: Rebuilt `ThemeAccentPicker` as a lightweight, zero-dependency popover with click-outside detection and Escape listener, eliminating unhandled `@base-ui/react/menu` WAI-ARIA role invariant violations.
+- **Mobile Floating Speed Dial Overlap**: Shifted trigger position from `bottom-6` to `bottom-20 md:bottom-6 end-4 sm:end-6`, eliminating layout overlap with the mobile bottom navigation bar's "More / المزيد" button.
+- **Speed Dial Bilingual Localization**: Fully localized all speed-dial actions (`addLead`, `newProposal`, `vatCalculator`, `scratchpad`, `snippets`, `quickTools`) using `useTranslations("speedDial")`, resolving English locale inconsistencies.
+- **Global Branded Error Boundary (`src/app/error.tsx`)**: Added bilingual error boundary with retry and navigation handlers, replacing Next.js default error screen.
+
+### Added
+- **Synchronized i18n Namespaces**: Added `"speedDial"` and `"themePicker"` to `messages/ar.json` and `messages/en.json`, bringing total synchronized keys to 1000 in each dictionary (100% match, 0 missing).
+
 ## [1.7.0] - 2026-10-18
 
 ### Added
