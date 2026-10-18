@@ -17,6 +17,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { getDashboardMetrics } from "@/lib/actions/dashboard";
 import { DealStageBadge } from "@/components/deals/deal-stage-badge";
 import { SalesTargetCommissionTracker } from "@/components/dashboard/sales-target-commission-tracker";
+import { AnimatedCounter } from "@/components/ui/animated-counter";
 
 import { createClient } from "@/lib/supabase/server";
 
@@ -108,19 +109,19 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Main KPI Cards Grid */}
+      {/* Main KPI Cards Grid with 3D Tilt & Animated Counters */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Open Pipeline Value */}
         <Link href="/pipeline" className="group">
-          <Card className="p-5 bg-card border-border hover:border-primary/50 transition-all shadow-sm space-y-2 h-full">
+          <Card className="tilt-card p-5 bg-card border-border hover:border-primary/50 transition-all shadow-sm space-y-2 h-full">
             <div className="flex items-center justify-between text-muted-foreground text-xs">
               <span className="font-semibold">{t("openPipeline")}</span>
               <div className="p-2 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform">
                 <Briefcase className="h-4 w-4" />
               </div>
             </div>
-            <div className="text-2xl font-black font-mono text-foreground">
-              {metrics?.totalPipelineValue.toLocaleString() || 0}{" "}
+            <div className="text-2xl font-black font-mono text-foreground flex items-baseline gap-1">
+              <AnimatedCounter value={metrics?.totalPipelineValue || 0} />
               <span className="text-xs font-sans font-medium text-muted-foreground">EGP</span>
             </div>
             <p className="text-[11px] text-muted-foreground">
@@ -131,15 +132,15 @@ export default async function DashboardPage() {
 
         {/* Closed Won Deals */}
         <Link href="/deals" className="group">
-          <Card className="p-5 bg-card border-border hover:border-emerald-500/50 transition-all shadow-sm space-y-2 h-full">
+          <Card className="tilt-card p-5 bg-card border-border hover:border-emerald-500/50 transition-all shadow-sm space-y-2 h-full">
             <div className="flex items-center justify-between text-muted-foreground text-xs">
               <span className="font-semibold">{t("wonDeals")}</span>
               <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
                 <Trophy className="h-4 w-4" />
               </div>
             </div>
-            <div className="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
-              {metrics?.wonDealsValue.toLocaleString() || 0}{" "}
+            <div className="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400 flex items-baseline gap-1">
+              <AnimatedCounter value={metrics?.wonDealsValue || 0} />
               <span className="text-xs font-sans font-medium text-muted-foreground">EGP</span>
             </div>
             <p className="text-[11px] text-muted-foreground">
@@ -150,7 +151,7 @@ export default async function DashboardPage() {
 
         {/* Today's Follow-ups */}
         <Link href="/follow-ups" className="group">
-          <Card className="p-5 bg-card border-border hover:border-amber-500/50 transition-all shadow-sm space-y-2 h-full">
+          <Card className="tilt-card p-5 bg-card border-border hover:border-amber-500/50 transition-all shadow-sm space-y-2 h-full">
             <div className="flex items-center justify-between text-muted-foreground text-xs">
               <span className="font-semibold">{t("todayFollowUps")}</span>
               <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform">
@@ -158,7 +159,7 @@ export default async function DashboardPage() {
               </div>
             </div>
             <div className="text-2xl font-black font-mono text-foreground">
-              {metrics?.todayFollowUpsCount || 0}
+              <AnimatedCounter value={metrics?.todayFollowUpsCount || 0} />
             </div>
             <p className="text-[11px] text-muted-foreground">
               {t("todayFollowUpsDesc")}
@@ -168,7 +169,7 @@ export default async function DashboardPage() {
 
         {/* Confirmed Clients */}
         <Link href="/clients" className="group">
-          <Card className="p-5 bg-card border-border hover:border-purple-500/50 transition-all shadow-sm space-y-2 h-full">
+          <Card className="tilt-card p-5 bg-card border-border hover:border-purple-500/50 transition-all shadow-sm space-y-2 h-full">
             <div className="flex items-center justify-between text-muted-foreground text-xs">
               <span className="font-semibold">{t("activeClients")}</span>
               <div className="p-2 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 group-hover:scale-105 transition-transform">
@@ -176,7 +177,7 @@ export default async function DashboardPage() {
               </div>
             </div>
             <div className="text-2xl font-black font-mono text-foreground">
-              {metrics?.activeClientsCount || 0}
+              <AnimatedCounter value={metrics?.activeClientsCount || 0} />
             </div>
             <p className="text-[11px] text-muted-foreground">
               {t("activeClientsDesc", { count: metrics?.potentialClientsCount || 0 })}

@@ -11,6 +11,7 @@ import {
   type PipelineStageSummary,
 } from "@/lib/actions/deals";
 import { DEAL_STAGES, type DealStage } from "@/lib/schemas/deal";
+import { triggerCelebrationConfetti, sounds } from "@/lib/utils/confetti-sound";
 
 interface PipelineBoardProps {
   initialStages: Record<DealStage, PipelineStageSummary>;
@@ -35,6 +36,12 @@ export function PipelineBoard({ initialStages, onRefresh }: PipelineBoardProps) 
       });
 
       if (res.success) {
+        if (nextStage === "WON") {
+          triggerCelebrationConfetti(3500);
+          sounds.playWonChime();
+        } else {
+          sounds.playTactileClick();
+        }
         toast.success(t("movedSuccess", { stage: tDeals(`stages.${nextStage}`) }));
         onRefresh?.();
       } else {
@@ -51,6 +58,8 @@ export function PipelineBoard({ initialStages, onRefresh }: PipelineBoardProps) 
       });
 
       if (res.success) {
+        triggerCelebrationConfetti(4000);
+        sounds.playWonChime();
         toast.success(t("wonSuccess"), {
           duration: 5000,
         });

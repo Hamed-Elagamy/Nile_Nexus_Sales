@@ -2,7 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.5.5] - 2026-10-13
+## [1.6.0] - 2026-10-18
+
+### Added
+- **Luxury Visual & Style UX Engine**:
+  - `ThemeAccentProvider`: Runtime luxury palette switching across 5 presets (`nile`, `emerald`, `royal`, `amber`, `obsidian`), typography scaling, density spacing (`normal` vs `compact`), and zen mode.
+  - Zero-dependency celebratory HTML5 canvas confetti explosion (`triggerCelebrationConfetti`).
+  - Web Audio API synthesizer for tactile clicks, success blips, and won deal chimes (`SoundEngine`).
+  - Animated ambient moving aura glow (`.ambient-aura`), glassmorphic panels (`.glass-panel`), and 3D card tilt (`.tilt-card`).
+  - Rolling number animation (`AnimatedCounter`) for financial KPIs.
+  - Rotating live team activity milestone ticker (`LiveActivityTicker`) in header.
+
+- **In-Use Daily Sales Productivity Utilities**:
+  - Global Command Palette (`Ctrl + K` / `Cmd + K`) with instant fuzzy search across pages, quick sales actions, and all 173 services from the Nile Nexus catalog.
+  - Interactive VAT 14% and instant installment calculator modal with currency estimates and 1-click clipboard copy.
+  - Floating sales scratchpad with persistent `localStorage` and clock timestamping.
+  - 1-Click Smart Corporate Snippets (CIB/QNB bank details, InstaPay handle, Tax ID, and Google Maps office location).
+  - Floating expanding speed-dial action button on bottom-end.
+  - Egyptian and Gulf mobile carrier detection utility (`detectPhoneCarrier`) and visual badges (Vodafone, Orange, Etisalat, WE, Landlines, Saudi Arabia, UAE).
+
+- **Advanced Software Sales Execution Suite**:
+  - Project Scope & Tech Stack Estimator (`/estimator` and dialog) with team size, sprints, margin slider, and 3-tier proposals (MVP, Recommended, Enterprise).
+  - Client Software ROI & Payback Calculator dialog demonstrating break-even months and 3-year ROI %.
+  - Sales Objection Buster & Battlecards Hub addressing price resistance, competitor undercutting, Excel inertia, and decision delays.
+  - Bulk CSV/Excel Leads Importer with automatic delimiter detection and duplicate phone number prevention.
+
+- **Testing & Tooling**:
+  - Added custom robust TypeScript typecheck runner (`scripts/typecheck.js`) using compiler API (0 errors across 172 files).
+  - Expanded Vitest test suite to 91 tests across 17 test suites (100% pass rate).
+
 
 ### Fixed & Enhanced
 - **Reliable Potential Client Deletion & Instant UI Dismissal**:

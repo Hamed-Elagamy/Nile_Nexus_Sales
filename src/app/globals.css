@@ -252,3 +252,137 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+
+/* ==========================================================================
+   Luxury Theme Palettes
+   ========================================================================== */
+
+/* Emerald Tech */
+[data-palette="emerald"] {
+  --primary: oklch(0.55 0.18 155);
+  --ring: oklch(0.55 0.18 155);
+  --sidebar-primary: oklch(0.55 0.18 155);
+  --accent: oklch(0.94 0.04 155);
+  --sidebar-accent: oklch(0.94 0.04 155);
+}
+.dark[data-palette="emerald"], [data-palette="emerald"] .dark, .dark [data-palette="emerald"] {
+  --primary: oklch(0.68 0.18 155);
+  --ring: oklch(0.68 0.18 155);
+  --sidebar-primary: oklch(0.68 0.18 155);
+  --accent: oklch(0.24 0.04 155);
+  --sidebar-accent: oklch(0.24 0.04 155);
+}
+
+/* Royal Indigo */
+[data-palette="royal"] {
+  --primary: oklch(0.55 0.22 285);
+  --ring: oklch(0.55 0.22 285);
+  --sidebar-primary: oklch(0.55 0.22 285);
+  --accent: oklch(0.94 0.04 285);
+  --sidebar-accent: oklch(0.94 0.04 285);
+}
+.dark[data-palette="royal"], [data-palette="royal"] .dark, .dark [data-palette="royal"] {
+  --primary: oklch(0.68 0.22 285);
+  --ring: oklch(0.68 0.22 285);
+  --sidebar-primary: oklch(0.68 0.22 285);
+  --accent: oklch(0.24 0.05 285);
+  --sidebar-accent: oklch(0.24 0.05 285);
+}
+
+/* Sunset Amber */
+[data-palette="amber"] {
+  --primary: oklch(0.62 0.2 45);
+  --ring: oklch(0.62 0.2 45);
+  --sidebar-primary: oklch(0.62 0.2 45);
+  --accent: oklch(0.95 0.04 45);
+  --sidebar-accent: oklch(0.95 0.04 45);
+}
+.dark[data-palette="amber"], [data-palette="amber"] .dark, .dark [data-palette="amber"] {
+  --primary: oklch(0.7 0.2 45);
+  --ring: oklch(0.7 0.2 45);
+  --sidebar-primary: oklch(0.7 0.2 45);
+  --accent: oklch(0.25 0.05 45);
+  --sidebar-accent: oklch(0.25 0.05 45);
+}
+
+/* Obsidian Stealth / OLED */
+[data-palette="obsidian"] {
+  --primary: oklch(0.65 0.16 200);
+  --ring: oklch(0.65 0.16 200);
+}
+.dark[data-palette="obsidian"], [data-palette="obsidian"] .dark, .dark [data-palette="obsidian"] {
+  --background: oklch(0.05 0 0);
+  --card: oklch(0.09 0 0);
+  --popover: oklch(0.09 0 0);
+  --sidebar: oklch(0.07 0 0);
+  --border: oklch(0.2 0 0);
+  --primary: oklch(0.75 0.18 190);
+  --ring: oklch(0.75 0.18 190);
+  --accent: oklch(0.16 0.02 190);
+}
+
+/* Glassmorphism & Visual UX Effects */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.dark .glass-panel {
+  background: rgba(20, 24, 33, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.ambient-aura {
+  position: fixed;
+  top: -120px;
+  right: -80px;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+  opacity: 0.08;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  animation: floatAura 18s ease-in-out infinite alternate;
+}
+
+@keyframes floatAura {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-70px, 50px) scale(1.15); }
+  100% { transform: translate(30px, -30px) scale(0.95); }
+}
+
+/* Zen Mode */
+.zen-mode-active aside,
+.zen-mode-active header {
+  display: none !important;
+}
+.zen-mode-active main {
+  padding: 1rem !important;
+  max-width: 100vw !important;
+}
+
+/* Compact Density */
+.density-compact td,
+.density-compact th {
+  padding-top: 0.35rem !important;
+  padding-bottom: 0.35rem !important;
+  font-size: 0.8125rem !important;
+}
+.density-compact .card-metric {
+  padding: 0.75rem !important;
+}
+
+/* 3D Tilt Card */
+.tilt-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.tilt-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.12);
+}
+.dark .tilt-card:hover {
+  box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.45);
+}

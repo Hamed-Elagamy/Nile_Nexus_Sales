@@ -6,6 +6,9 @@ import { toast } from "sonner";
 import { PotentialClientsFilter } from "./potential-clients-filter";
 import { PotentialClientsTable } from "./potential-clients-table";
 import { CreatePotentialClientDialog } from "./create-potential-client-dialog";
+import { BulkImportDialog } from "./bulk-import-dialog";
+import { Button } from "@/components/ui/button";
+import { Upload } from "lucide-react";
 import {
   getPotentialClients,
   updatePotentialClientStatus,
@@ -29,6 +32,7 @@ export function PotentialClientsClient({ initialData, userRole = "SALES" }: Pote
 
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<PotentialClientStatusType | "ALL">("ALL");
+  const [bulkImportOpen, setBulkImportOpen] = useState(false);
 
   const loadData = useCallback(
     (searchQuery = query, currentStatus = status, page = 1) => {
@@ -102,8 +106,25 @@ export function PotentialClientsClient({ initialData, userRole = "SALES" }: Pote
           </p>
         </div>
 
-        <CreatePotentialClientDialog onSuccess={() => loadData(query, status, 1)} />
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="gap-1.5 text-xs h-9"
+            onClick={() => setBulkImportOpen(true)}
+          >
+            <Upload className="h-4 w-4" />
+            <span>استيراد شيت إكسيل (CSV)</span>
+          </Button>
+          <CreatePotentialClientDialog onSuccess={() => loadData(query, status, 1)} />
+        </div>
       </div>
+
+      <BulkImportDialog
+        open={bulkImportOpen}
+        onOpenChange={setBulkImportOpen}
+        onSuccess={() => loadData(query, status, 1)}
+      />
 
       {/* Filter and Search Bar */}
       <PotentialClientsFilter

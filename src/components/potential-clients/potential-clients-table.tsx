@@ -45,6 +45,7 @@ import { PotentialClientStatusBadge } from "./status-badge";
 import { OpportunityBadges } from "./opportunity-badges";
 import { WhatsAppQuickDialog } from "@/components/shared/whatsapp-quick-dialog";
 import { EditPotentialClientDialog } from "./edit-potential-client-dialog";
+import { PhoneCarrierBadge } from "@/components/shared/phone-carrier-badge";
 import {
   deletePotentialClient,
   type PotentialClientWithRelations,
@@ -183,9 +184,12 @@ export function PotentialClientsTable({
                     <div className="flex items-center gap-2">
                       {client.phone ? (
                         <>
-                          <span className="text-xs font-mono text-foreground" dir="ltr">
-                            {client.phone}
-                          </span>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-xs font-mono text-foreground" dir="ltr">
+                              {client.phone}
+                            </span>
+                            <PhoneCarrierBadge phone={client.phone} />
+                          </div>
                           <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                             <a
                               href={`tel:${client.phone}`}
@@ -364,15 +368,18 @@ export function PotentialClientsTable({
 
               {/* Actions & Links Bar */}
               <div className="pt-2 border-t border-border/60 flex items-center justify-between">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   {client.phone && (
-                    <a
-                      href={`tel:${client.phone}`}
-                      className="p-2 rounded-lg bg-muted text-foreground hover:bg-muted/80 text-xs flex items-center gap-1.5"
-                    >
-                      <Phone className="h-3.5 w-3.5" />
-                      <span dir="ltr">{client.phone}</span>
-                    </a>
+                    <div className="flex items-center gap-1.5">
+                      <a
+                        href={`tel:${client.phone}`}
+                        className="p-1.5 rounded-lg bg-muted text-foreground hover:bg-muted/80 text-xs flex items-center gap-1.5"
+                      >
+                        <Phone className="h-3.5 w-3.5" />
+                        <span dir="ltr">{client.phone}</span>
+                      </a>
+                      <PhoneCarrierBadge phone={client.phone} />
+                    </div>
                   )}
                   {client.phone && (
                     <WhatsAppQuickDialog

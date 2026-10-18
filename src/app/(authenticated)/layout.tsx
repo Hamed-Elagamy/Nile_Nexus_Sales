@@ -5,6 +5,8 @@ import { AppHeader } from "@/components/layout/app-header";
 import { MobileNavProvider } from "@/components/layout/mobile-nav-context";
 import { RealtimeNotificationProvider } from "@/components/notifications/realtime-notification-provider";
 import { PwaInstallPrompt } from "@/components/pwa/pwa-install-prompt";
+import { ThemeAccentProvider } from "@/components/theme/theme-accent-provider";
+import { SalesToolsProvider } from "@/components/shared/sales-tools-manager";
 
 /**
  * Authenticated layout — wraps all protected pages with sidebar + header.
@@ -42,19 +44,24 @@ export default async function AuthenticatedLayout({
   };
 
   return (
-    <RealtimeNotificationProvider userId={user.id}>
-      <MobileNavProvider>
-        <div className="min-h-screen flex">
-          <AppSidebar user={userWithProfile} />
-          <div className="flex-1 flex flex-col min-w-0">
-            <AppHeader user={userWithProfile} />
-            <main className="flex-1 p-4 md:p-6 lg:p-8 pb-24 md:pb-6 overflow-auto">
-              {children}
-            </main>
-          </div>
-        </div>
-        <PwaInstallPrompt />
-      </MobileNavProvider>
-    </RealtimeNotificationProvider>
+    <ThemeAccentProvider>
+      <RealtimeNotificationProvider userId={user.id}>
+        <MobileNavProvider>
+          <SalesToolsProvider>
+            <div className="min-h-screen flex relative overflow-x-hidden">
+              <div className="ambient-aura" />
+              <AppSidebar user={userWithProfile} />
+              <div className="flex-1 flex flex-col min-w-0 z-10">
+                <AppHeader user={userWithProfile} />
+                <main className="flex-1 p-4 md:p-6 lg:p-8 pb-24 md:pb-6 overflow-auto">
+                  {children}
+                </main>
+              </div>
+            </div>
+            <PwaInstallPrompt />
+          </SalesToolsProvider>
+        </MobileNavProvider>
+      </RealtimeNotificationProvider>
+    </ThemeAccentProvider>
   );
 }
