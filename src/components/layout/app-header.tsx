@@ -49,7 +49,7 @@ export function AppHeader({ user }: AppHeaderProps) {
     <header className="sticky top-0 z-40 bg-[var(--background)]/80 backdrop-blur-md border-b border-[var(--border)]">
       <div className="flex items-center justify-between h-14 px-3 sm:px-4 md:px-6 gap-2">
         {/* Left side: Mobile menu toggle + Command Search */}
-        <div className="flex items-center gap-2 flex-1 max-w-sm sm:max-w-md min-w-0">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
             onClick={mobileNav.toggle}
@@ -63,12 +63,12 @@ export function AppHeader({ user }: AppHeaderProps) {
           <button
             type="button"
             onClick={openCommandPalette}
-            className="relative flex-1 min-w-0 flex items-center justify-between ps-9 pe-2.5 py-1.5 sm:py-2 rounded-xl bg-muted/60 hover:bg-muted text-xs sm:text-sm text-muted-foreground border border-border/50 hover:border-border transition-all cursor-pointer text-start group shadow-2xs"
+            className="relative w-36 sm:w-48 md:w-56 lg:w-64 flex items-center justify-between ps-8 pe-2 sm:ps-9 sm:pe-2.5 py-1.5 sm:py-2 rounded-xl bg-muted/60 hover:bg-muted text-xs sm:text-sm text-muted-foreground border border-border/50 hover:border-border transition-all cursor-pointer text-start group shadow-2xs shrink-0"
             title="فتح شريط الأوامر والبحث الشامل (Ctrl + K)"
           >
-            <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-            <span className="truncate">{t("common.search")}...</span>
-            <kbd className="hidden sm:inline-flex items-center gap-0.5 text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-background border border-border text-muted-foreground">
+            <Search className="absolute start-2.5 sm:start-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+            <span className="truncate min-w-0 pe-1.5">{t("common.search")}...</span>
+            <kbd className="hidden md:inline-flex shrink-0 items-center gap-0.5 text-[10px] font-mono font-medium px-1.5 py-0.5 rounded bg-background border border-border text-muted-foreground">
               Ctrl K
             </kbd>
           </button>

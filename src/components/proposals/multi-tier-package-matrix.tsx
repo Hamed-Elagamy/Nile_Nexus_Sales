@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useLocale } from "next-intl";
 
 export interface TierPackage {
   id: "mvp" | "recommended" | "enterprise";
@@ -37,6 +38,8 @@ export function MultiTierPackageMatrix({
   selectedTier: externalSelectedTier,
   onSelectTier,
 }: MultiTierPackageMatrixProps) {
+  const locale = useLocale();
+  const isEn = locale === "en";
   const [internalSelected, setInternalSelected] = useState<"mvp" | "recommended" | "enterprise">("recommended");
 
   const activeTier = externalSelectedTier || internalSelected;
@@ -134,13 +137,15 @@ export function MultiTierPackageMatrix({
       <div className="text-center max-w-2xl mx-auto space-y-2">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary">
           <Sparkles className="h-3.5 w-3.5" />
-          <span>خيارات وباقات تنفيذ المشروع المتاحة</span>
+          <span>{isEn ? "Available Project Execution Packages" : "خيارات وباقات تنفيذ المشروع المتاحة"}</span>
         </div>
         <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-          اختر الباقة الأنسب لطبيعة نمو مشروعك وميزانيتك
+          {isEn ? "Select the Package Matching Your Growth & Budget" : "اختر الباقة الأنسب لطبيعة نمو مشروعك وميزانيتك"}
         </h3>
         <p className="text-sm text-muted-foreground">
-          نقدم مرونة كاملة تبدأ من إطلاق النسخة التجريبية الأساسية وحتى البنية التحتية المتكاملة للشركات الكبرى.
+          {isEn
+            ? "Full flexibility from a lean initial MVP launch to scalable, enterprise-grade cloud architecture."
+            : "نقدم مرونة كاملة تبدأ من إطلاق النسخة التجريبية الأساسية وحتى البنية التحتية المتكاملة للشركات الكبرى."}
         </p>
       </div>
 
@@ -162,24 +167,24 @@ export function MultiTierPackageMatrix({
               {tier.isPopular && (
                 <div className="absolute top-0 end-0 bg-primary text-primary-foreground text-[11px] font-bold px-3 py-1 rounded-es-xl flex items-center gap-1 shadow-sm">
                   <Star className="h-3 w-3 fill-current" />
-                  <span>الأكثر اختياراً وقيمة</span>
+                  <span>{isEn ? "Most Popular & Best Value" : "الأكثر اختياراً وقيمة"}</span>
                 </div>
               )}
 
               <div className="space-y-3 mb-6">
                 <div className="flex items-center justify-between">
                   <h4 className="text-lg font-bold text-foreground">
-                    {tier.title_ar}
+                    {isEn ? tier.title_en : tier.title_ar}
                   </h4>
                   {isSelected && (
                     <Badge variant="default" className="text-[10px] bg-primary">
-                      محددة
+                      {isEn ? "Selected" : "محددة"}
                     </Badge>
                   )}
                 </div>
 
                 <p className="text-xs text-muted-foreground min-h-[32px]">
-                  {tier.tagline_ar}
+                  {isEn ? tier.tagline_en : tier.tagline_ar}
                 </p>
 
                 <div className="pt-2 border-t border-border/50">
@@ -193,7 +198,11 @@ export function MultiTierPackageMatrix({
                   </div>
                   <div className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
                     <Zap className="h-3 w-3 text-amber-500" />
-                    <span>مدة التنفيذ المقدرة: {tier.deliveryWeeks} أسابيع</span>
+                    <span>
+                      {isEn
+                        ? `Estimated Timeline: ${tier.deliveryWeeks} weeks`
+                        : `مدة التنفيذ المقدرة: ${tier.deliveryWeeks} أسابيع`}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -202,10 +211,10 @@ export function MultiTierPackageMatrix({
               <div className="space-y-3 flex-1">
                 <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                   <Check className="h-4 w-4 text-primary" />
-                  <span>المخرجات والمزايا المضمنة:</span>
+                  <span>{isEn ? "Included Deliverables & Scope:" : "المخرجات والمزايا المضمنة:"}</span>
                 </div>
                 <ul className="space-y-2 text-xs">
-                  {tier.features_ar.map((feat, idx) => (
+                  {(isEn ? tier.features_en : tier.features_ar).map((feat, idx) => (
                     <li key={idx} className="flex items-start gap-2 text-foreground/90">
                       <div className="h-4 w-4 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
                         <Check className="h-3 w-3 stroke-[3]" />
@@ -220,13 +229,13 @@ export function MultiTierPackageMatrix({
               <div className="mt-6 pt-4 border-t border-border/60 text-xs space-y-3">
                 <div className="flex items-center gap-1.5 text-muted-foreground text-[11px]">
                   <Shield className="h-3.5 w-3.5 text-primary" />
-                  <span>{tier.support_ar}</span>
+                  <span>{isEn ? tier.support_en : tier.support_ar}</span>
                 </div>
 
                 <Button
                   variant={isSelected ? "default" : "outline"}
                   className={cn(
-                    "w-full text-xs font-bold transition-all",
+                    "w-full text-xs font-bold transition-all cursor-pointer",
                     isSelected ? "shadow-md" : "hover:bg-primary/10 hover:text-primary"
                   )}
                   onClick={(e) => {
@@ -234,7 +243,9 @@ export function MultiTierPackageMatrix({
                     handleSelect(tier.id);
                   }}
                 >
-                  {isSelected ? "الباقة المختارة حالياً ✓" : "اختيار هذه الباقة"}
+                  {isSelected
+                    ? (isEn ? "Currently Selected Tier ✓" : "الباقة المختارة حالياً ✓")
+                    : (isEn ? "Select This Tier" : "اختيار هذه الباقة")}
                 </Button>
               </div>
             </div>

@@ -156,7 +156,7 @@ export function ObjectionBattlecardsDialog({ open, onOpenChange }: ObjectionBatt
               <ShieldAlert className="h-5 w-5" />
             </div>
             <div>
-              <DialogTitle className="text-xl">دليل الرد على اعتراضات العملاء (Sales Objection Buster)</DialogTitle>
+              <DialogTitle className="text-xl">دليل الرد على اعتراضات العملاء وتكتيكات الإغلاق</DialogTitle>
               <DialogDescription>
                 بطاقات تميز وتكتيكات نفسية مجربة لإغلاق الصفقات وتحويل اعتراض العميل إلى فرصة تعاقد.
               </DialogDescription>

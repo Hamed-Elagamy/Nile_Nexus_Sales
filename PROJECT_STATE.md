@@ -226,8 +226,14 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - **Crash-Proof Theme Accent Picker**: Rebuilt `ThemeAccentPicker` from scratch as an accessible, zero-dependency popover with native outside-click detection and Escape key handler, completely eradicating the Base UI menu traversal exception that crashed the page on mobile.
   - **Mobile Floating Speed Dial Repositioning**: Moved floating `+` button to `bottom-20 md:bottom-6 end-4 sm:end-6`, lifting it cleanly 80px above the mobile bottom bar and eliminating overlap with the "More / المزيد" navigation tab. Added backdrop overlay for mobile dismissibility.
   - **Speed Dial Dynamic Localization**: Connected all 5 actions and trigger tooltips to `useTranslations("speedDial")`, ensuring instant switching between Egyptian Arabic and English.
-  - **Custom Branded Error Boundary (`src/app/error.tsx`)**: Implemented a responsive bilingual error fallback screen with diagnostic error ID digest, retry action (`reset()`), and home navigation, replacing Next.js generic error screen.
-  - **100% Dictionary Synchronization**: Exactly 1000 keys in `messages/ar.json` and 1000 keys in `messages/en.json` (0 missing).
+- **Phase 22 (Header Layout Fix, Targets & Estimator Bilingual Completion & Dialog Ergonomics)**:
+  - **Header Search Layout & Ctrl+K Overlap Fix**: Fixed search button with guaranteed width (`w-36 sm:w-48 md:w-56 lg:w-64 shrink-0`), `shrink-0` on `<kbd>`, and hidden on `<md` to completely eliminate badge overlapping placeholder text on laptop viewports.
+  - **Bilingual Live Activity Ticker**: Added `useLocale()` integration showing `Live:` and English news in English mode, and `مباشر:` in Arabic mode. Adjusted responsive visibility to `hidden xl:flex` to prevent header cramping on 1024px-1280px laptops.
+  - **Targets & Quotas Complete Bilingual Overhaul**: Localized `/targets` and `CommissionQuotaSimulator` with `useTranslations("targets")`, removing all parenthetical English strings, adding locale-aware currency (`EGP` vs `ج.م`), and resolving bidi text/symbol orientation glitches.
+  - **Project Estimator Bilingual Suite & Dialog Sizing Fix**: Fully translated `/estimator` and `ProjectEstimatorDialog` with `useTranslations("estimator")` across all 10 modules, 3 feature cards, controls, and financial summaries. Optimized dialog vertical sizing and card spacing to eliminate bottom button truncation on standard 768p/900p displays.
+  - **Eliminated Parenthetical English in Sales Dialogs**: Cleared remaining parenthetical phrases from titles in `RoiCalculatorDialog` and `ObjectionBattlecardsDialog`.
+  - **Multi-Tier Package Matrix Bilingual Switching**: Added `useLocale()` to `MultiTierPackageMatrix` for dynamic English/Arabic rendering of packages, deliverables, SLA terms, and buttons.
+  - **Dictionary Expansion**: 1,077 synchronized keys in `messages/ar.json` and 1,077 keys in `messages/en.json` (100% matched, 0 missing).
 
 ## Test Status
 - ✅ Vitest: 97/97 passing across 18 test suites (100% pass rate)

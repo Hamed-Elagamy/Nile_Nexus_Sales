@@ -53,7 +53,11 @@ Execute Production Database Clean-up & Roll Out to Company Employees:
 - [x] Crash-Proof Theme Accent Picker: zero-dependency popover with click-outside listener, fixing mobile crash
 - [x] Mobile Floating Speed Dial lifted to `bottom-20 md:bottom-6` to eliminate overlap with bottom bar "More / المزيد"
 - [x] Bilingual Speed Dial actions with 100% synchronized `speedDial` dictionary namespace
-- [x] Branded global error boundary fallback in `src/app/error.tsx`
+- [x] Header Search button layout fixed with guaranteed width & hidden Ctrl+K on mobile to eliminate overlap
+- [x] Live Activity Ticker upgraded to responsive `hidden xl:flex` with bilingual `Live:` and English translations
+- [x] Targets & Quotas module completely localized into clean Arabic & English without parenthetical labels
+- [x] Project Estimator & Dialog completely localized into clean Arabic & English with optimized dialog height
+- [x] Multi-Tier Proposal Matrix made bilingual with automatic locale switching
 - [x] 100% Vitest tests passing (97/97) across 18 test suites and 0 TypeScript compilation errors across all 183 files
 - [x] Next.js 16 production build verified cleanly across all 26 routes
 - [ ] Push commit to origin main for automated Vercel Production deployment

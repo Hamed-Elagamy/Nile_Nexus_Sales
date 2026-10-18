@@ -5,9 +5,12 @@ import { ProjectEstimatorDialog } from "@/components/sales/project-estimator-dia
 import { Button } from "@/components/ui/button";
 import { Calculator, Sparkles, Layers, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export default function EstimatorPage() {
   const [open, setOpen] = useState(true);
+  const t = useTranslations("estimator");
+  const tNav = useTranslations("nav");
 
   return (
     <div className="space-y-6">
@@ -19,20 +22,20 @@ export default function EstimatorPage() {
               className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
             >
               <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
-              <span>الرئيسية</span>
+              <span>{tNav("dashboard")}</span>
             </Link>
             <span className="text-muted-foreground">/</span>
-            <span className="text-xs font-semibold text-primary">حاسبة تقدير المشاريع</span>
+            <span className="text-xs font-semibold text-primary">{t("breadcrumb")}</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">حاسبة نطاق وتكلفة المشاريع البرمجية</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            تقدير أيام العمل، التكاليف المباشرة للمطورين، وهامش الربح وفق متطلبات العميل.
+            {t("subtitle")}
           </p>
         </div>
 
-        <Button onClick={() => setOpen(true)} className="gap-2">
+        <Button onClick={() => setOpen(true)} className="gap-2 cursor-pointer">
           <Calculator className="h-4 w-4" />
-          <span>فتح الحاسبة التفاعلية</span>
+          <span>{t("openInteractive")}</span>
         </Button>
       </div>
 
@@ -41,9 +44,9 @@ export default function EstimatorPage() {
           <div className="p-2.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 w-fit">
             <Layers className="h-5 w-5" />
           </div>
-          <h3 className="font-semibold text-base">تسعير مبني على المكونات (Component-Based)</h3>
+          <h3 className="font-semibold text-base">{t("feature1Title")}</h3>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            اختيار مباشر للمنصات (Web, Mobile, Admin Portal) والموديولات الجاهزة المأخوذة من كتالوج Nile Nexus المعتمد.
+            {t("feature1Desc")}
           </p>
         </div>
 
@@ -51,9 +54,9 @@ export default function EstimatorPage() {
           <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 w-fit">
             <Sparkles className="h-5 w-5" />
           </div>
-          <h3 className="font-semibold text-base">عروض أسعار ثلاثية المستويات (3-Tier Pricing)</h3>
+          <h3 className="font-semibold text-base">{t("feature2Title")}</h3>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            توليد فوري لباقات (MVP, الموصى به, Enterprise) لزيادة احتمالية إغلاق الصفقات دون تخفيض هوامش الأرباح.
+            {t("feature2Desc")}
           </p>
         </div>
 
@@ -61,9 +64,9 @@ export default function EstimatorPage() {
           <div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 w-fit">
             <Calculator className="h-5 w-5" />
           </div>
-          <h3 className="font-semibold text-base">تصدير مباشر للصفقات والعقود</h3>
+          <h3 className="font-semibold text-base">{t("feature3Title")}</h3>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            تحويل التقدير المالي بضغطة زر واحدة إلى صفقة نشطة في مسار المبيعات أو نسخ ملخص تنفيذي جاهز للمراسلة.
+            {t("feature3Desc")}
           </p>
         </div>
       </div>

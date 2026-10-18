@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.2] - 2026-10-18
+
+### Fixed
+- **Header Search Bar & Ctrl+K Badge Squishing**: Established guaranteed button widths (`w-36 sm:w-48 md:w-56 lg:w-64 shrink-0`), enabled `shrink-0` on `<kbd>`, and hid Ctrl+K badge on mobile/tablet viewports to prevent badge overlap with placeholder text.
+- **Live Activity Ticker Responsiveness & i18n**: Converted ticker into a fully bilingual component using `useLocale()` with `Live:` / `مباشر:` and respective English/Arabic news items, adjusting responsive breakpoint to `hidden xl:flex` to eliminate header cramping on medium laptops.
+- **Targets & Quotas Complete Localization**: Integrated `useTranslations("targets")` on `/targets` and `CommissionQuotaSimulator`, eradicating all hardcoded Arabic and ugly parenthetical English labels (`(Targets & Quotas)`, `(Sales Target & Quotas)`, `(Won)`, `(Quota)`), with proper locale-aware currency formatting (`EGP` vs `ج.م`) and bidi-safe text alignment.
+- **Project Estimator Complete Localization & Dialog Viewport Clipping**: Connected `/estimator` and `ProjectEstimatorDialog` to `useTranslations("estimator")`, fully translating all 10 modules, 3 feature cards, controls, and financial summaries into clean English and Egyptian Arabic without parenthetical slashes. Optimized dialog vertical sizing and card spacing to eliminate bottom button truncation on standard 768p/900p displays.
+- **Sales Objections & ROI Calculator Clean Titles**: Purged remaining parenthetical English strings (`(Software ROI & Payback)`, `(Sales Objection Buster)`) from modal titles.
+- **Multi-Tier Package Matrix Bilingual Rendering**: Added `useLocale()` switching to `MultiTierPackageMatrix` so package titles, taglines, deliverables, SLA terms, and selection buttons automatically switch between English and Arabic.
+
+### Added
+- **Synchronized i18n Keys**: Added 77 new synchronized translation keys across `targets` and `estimator` namespaces in `messages/ar.json` and `messages/en.json`, expanding dictionary to 1,077 keys each with 100% parity.
+
 ## [1.7.1] - 2026-10-18
 
 ### Fixed

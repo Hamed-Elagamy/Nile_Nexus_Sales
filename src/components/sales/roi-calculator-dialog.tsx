@@ -99,7 +99,7 @@ export function RoiCalculatorDialog({ open, onOpenChange }: RoiCalculatorDialogP
               <TrendingUp className="h-5 w-5" />
             </div>
             <div>
-              <DialogTitle className="text-xl">حاسبة العائد الاستثماري للعميل (Software ROI & Payback)</DialogTitle>
+              <DialogTitle className="text-xl">حاسبة العائد الاستثماري وسرعة استرداد التكلفة</DialogTitle>
               <DialogDescription>
                 أداة إقناع حاسمة لاجتماعات المبيعات؛ تبرهن للعميل ولإدارته المالية سرعة استرداد قيمة البرنامج.
               </DialogDescription>

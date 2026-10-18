@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { TrendingUp, Award, Zap, PhoneCall, Sparkles } from "lucide-react";
+import { useLocale } from "next-intl";
 
 interface TickerItem {
   id: string;
@@ -44,6 +45,8 @@ const defaultTickerItems: TickerItem[] = [
 ];
 
 export function LiveActivityTicker() {
+  const locale = useLocale();
+  const isEn = locale === "en";
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -56,7 +59,7 @@ export function LiveActivityTicker() {
   const current = defaultTickerItems[index];
 
   return (
-    <div className="hidden lg:flex items-center gap-2 px-3 py-1 bg-primary/5 border border-primary/15 rounded-full text-xs text-muted-foreground overflow-hidden max-w-md transition-all">
+    <div className="hidden xl:flex items-center gap-2 px-3 py-1 bg-primary/5 border border-primary/15 rounded-full text-xs text-muted-foreground overflow-hidden max-w-sm 2xl:max-w-md transition-all shrink">
       <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
       <span className="shrink-0 text-primary font-semibold flex items-center gap-1">
         {current.icon === "trending" && <TrendingUp className="h-3 w-3" />}
@@ -64,10 +67,10 @@ export function LiveActivityTicker() {
         {current.icon === "zap" && <Zap className="h-3 w-3" />}
         {current.icon === "phone" && <PhoneCall className="h-3 w-3" />}
         {current.icon === "sparkles" && <Sparkles className="h-3 w-3" />}
-        <span>مباشر:</span>
+        <span>{isEn ? "Live:" : "مباشر:"}</span>
       </span>
       <span className="truncate text-[11px] font-medium text-foreground transition-opacity duration-300">
-        {current.text_ar}
+        {isEn ? current.text_en : current.text_ar}
       </span>
     </div>
   );
