@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.0] - 2026-10-21
+
+### Added
+- **Coffex Specialized Onsite Field Sales System (`/coffex`)**:
+  - **Visible Navigation Tab**: Added "Coffex" to primary desktop sidebar navigation and mobile slide-over drawer with the Coffee icon.
+  - **Floating Speed Dial Action**: Added quick "Coffex Lead / عميل كوفيكس" action in the floating speed dial.
+  - **Command Palette Integration**: Added Coffex actions and page navigation to global Command Palette (`Ctrl + K`).
+  - **Mobile-First Field Capture Form (`CoffexOnsiteForm`)**:
+    - **1-Click GPS Capture**: Captures latitude and longitude via `navigator.geolocation` and generates an instant Google Maps pin URL.
+    - **Live Egyptian Carrier Detection**: Displays network badges (Vodafone 🔴, Orange 🟠, Etisalat 🟢, WE 🟣) as the rep types the phone number.
+    - **Coffee Industry Fields**: Activity types (Specialty Cafe, Commercial Cafe, Roastery, Coffee Kiosk, Bakery Cafe, Supplier, Restaurant Cafe), branches count (1, 2-3, 4-6, 7-10, 10+), current POS system (Foodics, Quick POS, Prodeland, Legacy POS, Custom), interested modules (POS, Recipes, QR Menu, KDS, Loyalty, Delivery, E-Invoice, Multi-Branch), daily volume, urgency level (🔥 Hot, ⚡ Warm, 🕒 Cold), estimated budget, and next scheduled action date.
+    - **Celebratory Visual & Audio Feedback**: Triggers full-canvas celebratory confetti and Web Audio chime (`sounds.won()`) upon lead creation.
+    - **1-Click Personalized WhatsApp Outreach**: Generates a tailored intro message in Egyptian Arabic or English with the contact's name, brand name, and Coffex portfolio introduction.
+  - **Coffex Directory & Leads List (`CoffexLeadsList` & `CoffexLeadCard`)**:
+    - Directory with live search, interest level filter tabs (All, 🔥 Hot, ⚡ Warm, 🕒 Cold), activity type filter, and direct call/WhatsApp buttons.
+    - Google Maps navigation button opening the lead's exact coordinates.
+    - 1-Click status progression dropdown (New, Contacted, Demo Scheduled, Proposal Sent, Won, Lost).
+    - UTF-8 BOM CSV Export formatted for Arabic Microsoft Excel.
+  - **Dual-Resilience Server Actions (`src/lib/actions/coffex.ts`)**:
+    - Robust server actions (`createCoffexLead`, `getCoffexLeads`, `updateCoffexLeadStatus`, `deleteCoffexLead`) with automatic fallback to `potential_clients` with `[COFFEX_ONSITE]` metadata if the table migration is pending.
+    - Automatically creates a follow-up task in `follow_ups` and logs the interaction in `activities`.
+  - **Database Migration (`supabase/migrations/012_create_coffex_leads.sql`)**:
+    - Created `coffex_leads` table, indexes, RLS policies, and sequential business ID generator (`CFX-00001`).
+  - **Full Bilingual Parity**:
+    - Added complete `coffex` namespace to `messages/ar.json` and `messages/en.json`, expanding dictionary to 1,178 keys each with 100% synchronization and 0 missing keys.
+  - **Comprehensive Test Suite**:
+    - Authored `coffex.test.ts` for schemas and server actions, verifying all 108 tests passing across 20 test suites with 0 TypeScript compilation errors.
+
 ## [1.7.3] - 2026-10-18
 
 ### Changed & Cleaned

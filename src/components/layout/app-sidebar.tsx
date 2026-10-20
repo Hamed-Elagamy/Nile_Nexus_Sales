@@ -25,6 +25,7 @@ import {
   Smartphone,
   Calculator,
   Target,
+  Coffee,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMobileNav } from "./mobile-nav-context";
@@ -36,6 +37,7 @@ import type { User } from "@supabase/supabase-js";
 
 export const navItems = [
   { key: "dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { key: "coffex", href: "/coffex", icon: Coffee },
   { key: "potentialClients", href: "/potential-clients", icon: Search },
   { key: "clients", href: "/clients", icon: Users },
   { key: "deals", href: "/deals", icon: Briefcase },

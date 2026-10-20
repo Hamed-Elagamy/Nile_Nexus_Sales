@@ -11,6 +11,7 @@ import {
   Calculator,
   Edit3,
   Copy,
+  Coffee,
 } from "lucide-react";
 import { sounds } from "@/lib/utils/confetti-sound";
 
@@ -56,6 +57,20 @@ export function FloatingSpeedDial({
         {/* Expanded Actions Stack */}
         {isOpen && (
           <div className="flex flex-col items-end gap-2 animate-in fade-in slide-in-from-bottom-4 duration-150">
+            {/* Action 0: Coffex Onsite Lead */}
+            <button
+              type="button"
+              onClick={() => handleAction(() => router.push("/coffex"))}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-card border border-amber-500/30 shadow-lg hover:bg-amber-500/10 text-foreground transition-all cursor-pointer group"
+            >
+              <span className="text-xs font-bold text-foreground group-hover:text-amber-600">
+                {t("coffexLead")}
+              </span>
+              <div className="h-8 w-8 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                <Coffee className="h-4 w-4" />
+              </div>
+            </button>
+
             {/* Action 1: Add Lead */}
             <button
               type="button"

@@ -235,13 +235,31 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - **Multi-Tier Package Matrix Bilingual Switching**: Added `useLocale()` to `MultiTierPackageMatrix` for dynamic English/Arabic rendering of packages, deliverables, SLA terms, and buttons.
   - **Dictionary Expansion**: 1,077 synchronized keys in `messages/ar.json` and 1,077 keys in `messages/en.json` (100% matched, 0 missing).
 
+- **Phase 23 (Production Demo Data Eradication & Clean Slate)**:
+  - Purged all hardcoded demo simulation records (`demoPotentialClients`, `demoClients`, `demoContacts`, `demoDeals`, `demoFollowUps`, `demoProposals`, `demoTasks`, `demoApprovals`, `demoNotifications`) from `src/lib/demo-data.ts`.
+  - Connected `/targets` to live Supabase active profiles and won deals, mapped 6 real enterprise team members.
+  - Purged fake names and numbers from `commission-quota-simulator.tsx`, `live-activity-ticker.tsx`, and `localized-notification.ts`.
+
+- **Phase 24 (Coffex Specialized Onsite Field Sales System - `/coffex`)**:
+  - **Dedicated Coffex Workspace**: Added `/coffex` route with visible "Coffex" tab in desktop sidebar and mobile navigation drawer, featuring the Coffee icon.
+  - **Mobile-First Field Lead Capture Form**: Built `CoffexOnsiteForm` tailored for field sales reps meeting potential clients onsite at cafés, roasteries, and coffee suppliers.
+  - **1-Click GPS Location Capture**: Integrated `navigator.geolocation` with reverse coordinates and automatic Google Maps link generation.
+  - **Live Carrier Detection**: Integrated `detectPhoneCarrier` with visual badges for Egyptian networks (Vodafone, Orange, Etisalat, WE).
+  - **Coffee-Specific Domain Fields**: Activity types (Specialty Cafe, Commercial Cafe, Roastery, Coffee Kiosk, Bakery Cafe, Supplier, Restaurant Cafe), branches count (1, 2-3, 4-6, 7-10, 10+), current POS system (Foodics, Quick POS, Prodeland, Legacy POS, Custom), interested modules chips (POS, Recipes, QR Menu, KDS, Loyalty, Delivery, E-Invoice, Multi-Branch), daily volume, urgency level (🔥 Hot, ⚡ Warm, 🕒 Cold), estimated budget, and next scheduled action date.
+  - **Personalized Instant WhatsApp Follow-up**: Celebratory feedback upon submission (confetti + sound) and immediate 1-click WhatsApp launcher with a tailored Egyptian Arabic or English intro and portfolio message.
+  - **Coffex Directory & Leads List**: Built `CoffexLeadsList` with search, interest filter tabs, activity filter, direct calling and WhatsApp triggers, Google Maps directions link, and UTF-8 BOM CSV export.
+  - **Dual-Resilience Server Actions**: Implemented `createCoffexLead`, `getCoffexLeads`, `updateCoffexLeadStatus`, and `deleteCoffexLead` with seamless fallback to `potential_clients` with `[COFFEX_ONSITE]` metadata if migration is pending, automatic follow-up creation in `follow_ups`, and activity logging.
+  - **Database Migration**: Created `supabase/migrations/012_create_coffex_leads.sql` with `coffex_leads` table, indexes, RLS policies, and sequential business ID generator (`CFX-00001`).
+  - **Full Bilingual Parity**: 1,178 synchronized keys in both `messages/ar.json` and `messages/en.json` (100% parity, 0 missing).
+  - **Quality Assurance**: Added full test suites `coffex.test.ts` for schemas and actions, verifying 108/108 passing tests across 20 suites and 0 TypeScript compilation errors.
+
 ## Test Status
-- ✅ Vitest: 97/97 passing across 18 test suites (100% pass rate)
+- ✅ Vitest: 108/108 passing across 20 test suites (100% pass rate)
 - 0 failed
 
 ## Build Status
-- ✅ TypeScript: 0 errors across all 183 files (`node scripts/typecheck.js`)
-- ✅ Next.js 16 Turbopack Production Build: verified and clean across all 26 routes
+- ✅ TypeScript: 0 errors across all 193 files (`node scripts/typecheck.js`)
+- ✅ Next.js 16 Turbopack Production Build: verified and clean across all routes
 
 ## Known Bugs
 - None

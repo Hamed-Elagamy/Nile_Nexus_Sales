@@ -17,6 +17,7 @@ import {
   ShieldAlert,
   Upload,
   MessageSquare,
+  Coffee,
 } from "lucide-react";
 import { demoServices } from "@/lib/demo-data";
 import { sounds } from "@/lib/utils/confetti-sound";
@@ -79,6 +80,18 @@ export function CommandPalette({
   const items: CommandItem[] = useMemo(() => {
     const list: CommandItem[] = [
       // Quick Tools & Actions
+      {
+        id: "action-coffex-lead",
+        category: "أدوات وإجراءات سريعة",
+        title: "تسجيل عميل كوفيكس ميداني (Coffex Onsite Lead)",
+        subtitle: "نموذج تسجيل سريع لكافيهات ومحامص القهوة مع التقاط الموقع GPS",
+        icon: <Coffee className="h-4 w-4 text-amber-600" />,
+        action: () => {
+          router.push("/coffex");
+          onOpenChange(false);
+        },
+        badge: "كوفيكس ☕",
+      },
       {
         id: "action-add-lead",
         category: "أدوات وإجراءات سريعة",
@@ -201,6 +214,17 @@ export function CommandPalette({
       },
 
       // Core Pages
+      {
+        id: "nav-coffex",
+        category: "صفحات النظام",
+        title: "كوفيكس للمبيعات الميدانية (Coffex Onsite)",
+        subtitle: "نموذج تسجيل العملاء الميداني وسجل زيارات الكافيهات",
+        icon: <Coffee className="h-4 w-4 text-amber-600" />,
+        action: () => {
+          router.push("/coffex");
+          onOpenChange(false);
+        },
+      },
       {
         id: "nav-potential",
         category: "صفحات النظام",

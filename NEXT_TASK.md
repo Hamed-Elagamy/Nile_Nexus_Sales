@@ -61,6 +61,9 @@ Execute Production Database Clean-up & Roll Out to Company Employees:
 - [x] Eradicated all demo simulation data and placeholder records across UI and fallback state
 - [x] Connected `/targets` to live Supabase active profiles and won deals
 - [x] Mapped 6 real enterprise team members (Mohamed Hamed, Reem Ezz, Nesma Fathy, Omar El Bagoury, Riham ELSayed, Zeinab Ahmed)
-- [x] 100% Vitest tests passing (97/97) and 0 TypeScript compilation errors
+- [x] Phase 24: Dedicated Coffex Onsite Sales Field System (`/coffex`) with 1-Click GPS, Egyptian carrier detection, coffee-specific fields, celebratory feedback, WhatsApp instant outreach, and leads directory
+- [x] Database migration `supabase/migrations/012_create_coffex_leads.sql` authored with RLS, indexes, and sequential ID sequence (`CFX-00001`)
+- [x] 100% Vitest tests passing (108/108 across 20 test suites) and 0 TypeScript compilation errors (193 files)
+- [x] 100% bilingual dictionary synchronization (1,178 keys each in `messages/ar.json` and `messages/en.json`)
 - [ ] Push latest commit to origin main for automated Vercel Production deployment
-- [ ] Execute migration `008_prepare_production_and_clean_demo_data.sql` in Supabase SQL Editor if resetting sequence numbers
+- [ ] Execute migration `012_create_coffex_leads.sql` in Supabase SQL Editor
