@@ -83,14 +83,14 @@ export function CommandPalette({
       {
         id: "action-coffex-lead",
         category: "أدوات وإجراءات سريعة",
-        title: "تسجيل عميل كوفيكس ميداني (Coffex Onsite Lead)",
+        title: "تسجيل عميل كوفيكس ميداني",
         subtitle: "نموذج تسجيل سريع لكافيهات ومحامص القهوة مع التقاط الموقع GPS",
-        icon: <Coffee className="h-4 w-4 text-amber-600" />,
+        icon: <Coffee className="h-4 w-4 text-primary" />,
         action: () => {
           router.push("/coffex");
           onOpenChange(false);
         },
-        badge: "كوفيكس ☕",
+        badge: "كوفيكس",
       },
       {
         id: "action-add-lead",
@@ -217,9 +217,9 @@ export function CommandPalette({
       {
         id: "nav-coffex",
         category: "صفحات النظام",
-        title: "كوفيكس للمبيعات الميدانية (Coffex Onsite)",
+        title: "كوفيكس للمبيعات الميدانية",
         subtitle: "نموذج تسجيل العملاء الميداني وسجل زيارات الكافيهات",
-        icon: <Coffee className="h-4 w-4 text-amber-600" />,
+        icon: <Coffee className="h-4 w-4 text-primary" />,
         action: () => {
           router.push("/coffex");
           onOpenChange(false);

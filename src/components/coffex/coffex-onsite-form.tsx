@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations, useLocale } from "next-intl";
@@ -8,24 +8,17 @@ import { toast } from "sonner";
 import {
   Coffee,
   MapPin,
-  Phone,
-  Building2,
-  User,
-  Navigation,
-  Calendar,
-  Layers,
-  Sparkles,
-  Check,
-  Send,
-  ExternalLink,
-  MessageSquare,
-  ShieldCheck,
-  Flame,
-  Zap,
-  Clock,
-  Coins,
-  Store,
   Compass,
+  Store,
+  ExternalLink,
+  Layers,
+  Check,
+  Flame,
+  Calendar,
+  Coins,
+  Sparkles,
+  MessageSquare,
+  AlertCircle,
 } from "lucide-react";
 import {
   createCoffexLeadSchema,
@@ -53,12 +46,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import type { CoffexLead } from "@/types/coffex";
 
+const DRAFT_STORAGE_KEY = "nile_coffex_onsite_draft";
+
 interface CoffexOnsiteFormProps {
   onSuccess?: (lead: CoffexLead) => void;
 }
 
 export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
   const t = useTranslations("coffex");
+  const tCommon = useTranslations("common");
   const locale = useLocale();
   const isEn = locale === "en";
 
@@ -82,7 +78,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
       phone: "",
       alternative_phone: "",
       email: "",
-      city: "القاهرة",
+      city: isEn ? "Cairo" : "القاهرة",
       area: "",
       address: "",
       gps_latitude: null,
@@ -95,11 +91,40 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
       interested_modules: ["POS", "RECIPES"],
       interest_level: "WARM",
       estimated_budget: 25000,
-      next_action: isEn ? "Demo presentation visit" : "زيارة تقديم ديمو حي ومتابعة العرض",
+      next_action: t("defaultNextAction"),
       next_action_date: "",
       notes: "",
     },
   });
+
+  // Preserve form state across language switching via sessionStorage draft
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = sessionStorage.getItem(DRAFT_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") {
+          Object.entries(parsed).forEach(([key, val]) => {
+            if (val !== undefined && val !== null && val !== "") {
+              setValue(key as any, val);
+            }
+          });
+        }
+      }
+    } catch {}
+  }, [setValue]);
+
+  // Persist entered draft values as the user fills out the form
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const subscription = watch((values) => {
+      try {
+        sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(values));
+      } catch {}
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   const phoneValue = watch("phone");
   const currentGpsUrl = watch("gps_maps_url");
@@ -116,11 +141,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
   const handleCaptureGps = () => {
     sounds.playTactileClick();
     if (typeof window === "undefined" || !navigator.geolocation) {
-      toast.error(
-        isEn
-          ? "Geolocation is not supported by your browser"
-          : "المتصفح لا يدعم تحديد الموقع الجغرافي"
-      );
+      toast.error(t("geoNotSupported"));
       return;
     }
 
@@ -137,19 +158,11 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
 
         setIsCapturingGps(false);
         sounds.success();
-        toast.success(
-          isEn
-            ? "📍 Current GPS coordinates captured!"
-            : "📍 تم التقاط إحداثيات الموقع الميداني بنجاح!"
-        );
+        toast.success(t("gpsCapturedToast"));
       },
       (err) => {
         setIsCapturingGps(false);
-        toast.error(
-          isEn
-            ? `GPS error: ${err.message}`
-            : `تعذر التقاط الموقع: ${err.message}`
-        );
+        toast.error(t("gpsError", { error: err.message }));
       },
       { enableHighAccuracy: true, timeout: 12000 }
     );
@@ -176,39 +189,49 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
       const res = await createCoffexLead(data);
 
       if (!res.success || !res.data) {
-        toast.error(res.error || (isEn ? "Failed to save lead" : "تعذر حفظ بيانات العميل"));
+        toast.error(res.error || t("saveFailed"));
         return;
       }
 
       sounds.won();
       triggerConfetti();
 
+      // Clear draft on successful save
+      try {
+        sessionStorage.removeItem(DRAFT_STORAGE_KEY);
+      } catch {}
+
       setSuccessLead(res.data);
-      toast.success(
-        isEn
-          ? `☕ Coffex lead for "${res.data.brand_name}" recorded successfully!`
-          : `☕ تم تسجيل عميل كوفيكس "${res.data.brand_name}" بنجاح!`
-      );
+      toast.success(t("saveSuccess", { brand: res.data.brand_name }));
 
       reset();
       if (onSuccess) onSuccess(res.data);
     } catch {
-      toast.error(isEn ? "An unexpected error occurred" : "حدث خطأ غير متوقع");
+      toast.error(t("unexpectedError"));
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Build Personalized Instant WhatsApp Message for Onsite Follow-up
+  const handleReset = () => {
+    sounds.playTactileClick();
+    try {
+      sessionStorage.removeItem(DRAFT_STORAGE_KEY);
+    } catch {}
+    reset();
+  };
+
+  // Build Personalized Instant WhatsApp Message using localized translations
   const buildWhatsAppUrl = (lead: CoffexLead) => {
     let cleanPhone = lead.phone.replace(/[^0-9]/g, "");
     if (cleanPhone.startsWith("01") && cleanPhone.length === 11) {
       cleanPhone = "2" + cleanPhone;
     }
 
-    const message = isEn
-      ? `Hello Mr. ${lead.contact_name}, it was an absolute pleasure meeting you today at ${lead.brand_name}! ☕\n\nRegarding our conversation about the Coffex Cafe Management & POS System for your branches, I'm sharing our official portfolio and features guide.\n\nPlease feel free to ask any questions. Have a wonderful day!\n\nBest regards,\nNile Nexus Coffex Team 🚀`
-      : `أهلاً بحضرتك يا أ. ${lead.contact_name}، كان لي الشرف بلقاء حضرتك اليوم في ${lead.brand_name} ☕\n\nبناءً على حديثنا الميداني بخصوص منظومة Coffex لإدارة مبيعات الكافيهات ونقاط البيع السحابية ومخزون البن، حابب أشارك مع حضرتك ملف سابقة الأعمال والحلول المتاحة.\n\nيسعدني الإجابة على أي استفسار لحضرتك في أي وقت، وبالتوفيق والازدهار دايماً يا رب ✨\n\nتحياتي،\nفريق حلول كوفيكس - Nile Nexus`;
+    const message = t("whatsAppIntroMessage", {
+      contact: lead.contact_name,
+      brand: lead.brand_name,
+    });
 
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
   };
@@ -216,10 +239,10 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
   return (
     <div className="space-y-6">
       {/* Onsite Header Card */}
-      <div className="rounded-2xl border border-amber-500/20 bg-linear-to-r from-amber-500/10 via-orange-500/5 to-transparent p-4 sm:p-6 shadow-xs">
+      <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-amber-600/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-500/30 shadow-xs">
+            <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20 shadow-xs">
               <Coffee className="h-6 w-6 stroke-[2.2px]" />
             </div>
             <div>
@@ -229,7 +252,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
                 </h2>
                 <Badge
                   variant="outline"
-                  className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 text-[11px] font-semibold"
+                  className="bg-primary/10 text-primary border-primary/30 text-[11px] font-semibold"
                 >
                   {t("onsiteBadge")}
                 </Badge>
@@ -250,7 +273,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
             className="border-primary/30 text-primary hover:bg-primary/10 gap-1.5 shrink-0 h-10 px-4 text-xs font-semibold rounded-xl cursor-pointer"
           >
             <Compass
-              className={`h-4 w-4 ${isCapturingGps ? "animate-spin text-amber-600" : ""}`}
+              className={`h-4 w-4 ${isCapturingGps ? "animate-spin text-primary" : ""}`}
             />
             <span>
               {isCapturingGps
@@ -263,7 +286,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
         </div>
 
         {currentGpsUrl && (
-          <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground bg-background/80 dark:bg-card/80 p-2 rounded-lg border border-border/60">
+          <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 p-2 rounded-lg border border-border/60">
             <MapPin className="h-3.5 w-3.5 text-primary shrink-0" />
             <span className="truncate flex-1 font-mono text-[11px]">{currentGpsUrl}</span>
             <a
@@ -284,7 +307,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
         {/* Section 1: Brand & Contact Info */}
         <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4 shadow-xs">
           <div className="flex items-center gap-2 pb-2 border-b border-border/60">
-            <Store className="h-4 w-4 text-amber-600" />
+            <Store className="h-4 w-4 text-primary" />
             <h3 className="text-sm font-bold text-foreground">
               {t("sectionBrandInfo")}
             </h3>
@@ -295,7 +318,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground flex items-center gap-1">
                 <span>{t("brandName")}</span>
-                <span className="text-red-500">*</span>
+                <span className="text-destructive">*</span>
               </label>
               <Input
                 {...register("brand_name")}
@@ -303,7 +326,10 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
                 className="h-10 text-xs"
               />
               {errors.brand_name && (
-                <p className="text-[11px] text-red-500">{errors.brand_name.message}</p>
+                <p className="text-[11px] text-destructive flex items-center gap-1 font-medium mt-1">
+                  <AlertCircle className="h-3 w-3 shrink-0" />
+                  <span>{t("validation.brandNameRequired")}</span>
+                </p>
               )}
             </div>
 
@@ -311,7 +337,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground flex items-center gap-1">
                 <span>{t("contactName")}</span>
-                <span className="text-red-500">*</span>
+                <span className="text-destructive">*</span>
               </label>
               <Input
                 {...register("contact_name")}
@@ -319,7 +345,10 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
                 className="h-10 text-xs"
               />
               {errors.contact_name && (
-                <p className="text-[11px] text-red-500">{errors.contact_name.message}</p>
+                <p className="text-[11px] text-destructive flex items-center gap-1 font-medium mt-1">
+                  <AlertCircle className="h-3 w-3 shrink-0" />
+                  <span>{t("validation.contactNameRequired")}</span>
+                </p>
               )}
             </div>
 
@@ -347,7 +376,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
               <div className="flex items-center justify-between">
                 <label className="text-xs font-semibold text-foreground flex items-center gap-1">
                   <span>{t("phone")}</span>
-                  <span className="text-red-500">*</span>
+                  <span className="text-destructive">*</span>
                 </label>
                 {carrierInfo && (
                   <span
@@ -364,7 +393,10 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
                 className="h-10 text-xs font-mono"
               />
               {errors.phone && (
-                <p className="text-[11px] text-red-500">{errors.phone.message}</p>
+                <p className="text-[11px] text-destructive flex items-center gap-1 font-medium mt-1">
+                  <AlertCircle className="h-3 w-3 shrink-0" />
+                  <span>{t("validation.phoneRequired")}</span>
+                </p>
               )}
             </div>
 
@@ -375,7 +407,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
               </label>
               <Input
                 {...register("city")}
-                placeholder={isEn ? "Cairo, Giza..." : "القاهرة، الجيزة..."}
+                placeholder={t("cityPlaceholder")}
                 className="h-10 text-xs"
               />
             </div>
@@ -384,7 +416,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground flex items-center gap-1">
                 <span>{t("area")}</span>
-                <span className="text-red-500">*</span>
+                <span className="text-destructive">*</span>
               </label>
               <Input
                 {...register("area")}
@@ -392,7 +424,10 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
                 className="h-10 text-xs"
               />
               {errors.area && (
-                <p className="text-[11px] text-red-500">{errors.area.message}</p>
+                <p className="text-[11px] text-destructive flex items-center gap-1 font-medium mt-1">
+                  <AlertCircle className="h-3 w-3 shrink-0" />
+                  <span>{t("validation.areaRequired")}</span>
+                </p>
               )}
             </div>
           </div>
@@ -401,7 +436,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
         {/* Section 2: Coffee Activity & Operational Profile */}
         <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4 shadow-xs">
           <div className="flex items-center gap-2 pb-2 border-b border-border/60">
-            <Coffee className="h-4 w-4 text-amber-600" />
+            <Coffee className="h-4 w-4 text-primary" />
             <h3 className="text-sm font-bold text-foreground">
               {t("sectionActivityProfile")}
             </h3>
@@ -425,7 +460,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
                     }}
                     className={`p-2.5 rounded-xl border text-xs font-medium transition-all text-start flex items-center gap-2 cursor-pointer ${
                       isSelected
-                        ? "border-amber-500 bg-amber-500/10 text-amber-700 dark:text-amber-300 font-bold ring-1 ring-amber-500/30"
+                        ? "border-primary bg-primary/10 text-primary font-bold ring-1 ring-primary/30"
                         : "border-border hover:bg-muted/50 text-muted-foreground"
                     }`}
                   >
@@ -487,9 +522,14 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
 
             {/* Estimated Budget */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">
-                {t("estimatedBudget")}
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-foreground">
+                  {t("estimatedBudget")}
+                </label>
+                <span className="text-[11px] font-medium text-muted-foreground">
+                  {t("currency")}
+                </span>
+              </div>
               <div className="relative">
                 <Input
                   type="number"
@@ -546,7 +586,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
         {/* Section 4: Urgency, Next Follow-up & Notes */}
         <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4 shadow-xs">
           <div className="flex items-center gap-2 pb-2 border-b border-border/60">
-            <Flame className="h-4 w-4 text-red-500" />
+            <Flame className="h-4 w-4 text-primary" />
             <h3 className="text-sm font-bold text-foreground">
               {t("sectionFollowUp")}
             </h3>
@@ -634,7 +674,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
           <Button
             type="button"
             variant="ghost"
-            onClick={() => reset()}
+            onClick={handleReset}
             disabled={isSubmitting}
             className="text-xs"
           >
@@ -644,7 +684,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="h-12 px-8 text-sm font-bold bg-amber-600 hover:bg-amber-700 text-white rounded-xl shadow-md hover:shadow-lg transition-all gap-2 cursor-pointer"
+            className="h-11 px-8 text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-md transition-all gap-2 cursor-pointer"
           >
             <Coffee className="h-4 w-4" />
             <span>{isSubmitting ? t("submitting") : t("submitLead")}</span>
@@ -657,7 +697,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
         <Dialog open={!!successLead} onOpenChange={() => setSuccessLead(null)}>
           <DialogContent className="sm:max-w-md text-start">
             <DialogHeader>
-              <div className="mx-auto h-12 w-12 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/30 shadow-xs mb-2">
+              <div className="mx-auto h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shadow-xs mb-2">
                 <Sparkles className="h-6 w-6" />
               </div>
               <DialogTitle className="text-center text-lg font-bold">

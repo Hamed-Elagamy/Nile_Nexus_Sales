@@ -90,9 +90,9 @@ export function CoffexClientPage({
             </h1>
             <Badge
               variant="outline"
-              className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 text-xs font-bold"
+              className="bg-primary/10 text-primary border-primary/30 text-xs font-bold"
             >
-              Coffex Onsite
+              {t("onsiteBadge")}
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground mt-1">
@@ -205,7 +205,7 @@ export function CoffexClientPage({
           <div className="text-2xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400 flex items-baseline gap-1">
             <AnimatedCounter value={metrics.estimatedPipelineValue} />
             <span className="text-xs font-normal text-muted-foreground">
-              {isEn ? "EGP" : "ج.م"}
+              {t("currency")}
             </span>
           </div>
         </div>

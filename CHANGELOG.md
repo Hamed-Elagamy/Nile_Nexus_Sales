@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
   - **Floating Speed Dial Action**: Added quick "Coffex Lead / عميل كوفيكس" action in the floating speed dial.
   - **Command Palette Integration**: Added Coffex actions and page navigation to global Command Palette (`Ctrl + K`).
   - **Mobile-First Field Capture Form (`CoffexOnsiteForm`)**:
+    - **Strict Preservation of Existing Localization Architecture**: Reused the native Next.js/next-intl architecture without separate switchers or external frameworks. All text is fully localized into formal standard Arabic and English with zero hardcoded UI strings.
+    - **Draft Persistence Across Language Switching**: Connected form fields to `sessionStorage` (`nile_coffex_onsite_draft`), ensuring rep data is never lost or cleared when switching between Arabic and English.
     - **1-Click GPS Capture**: Captures latitude and longitude via `navigator.geolocation` and generates an instant Google Maps pin URL.
     - **Live Egyptian Carrier Detection**: Displays network badges (Vodafone 🔴, Orange 🟠, Etisalat 🟢, WE 🟣) as the rep types the phone number.
     - **Coffee Industry Fields**: Activity types (Specialty Cafe, Commercial Cafe, Roastery, Coffee Kiosk, Bakery Cafe, Supplier, Restaurant Cafe), branches count (1, 2-3, 4-6, 7-10, 10+), current POS system (Foodics, Quick POS, Prodeland, Legacy POS, Custom), interested modules (POS, Recipes, QR Menu, KDS, Loyalty, Delivery, E-Invoice, Multi-Branch), daily volume, urgency level (🔥 Hot, ⚡ Warm, 🕒 Cold), estimated budget, and next scheduled action date.
@@ -26,7 +28,7 @@ All notable changes to this project will be documented in this file.
   - **Database Migration (`supabase/migrations/012_create_coffex_leads.sql`)**:
     - Created `coffex_leads` table, indexes, RLS policies, and sequential business ID generator (`CFX-00001`).
   - **Full Bilingual Parity**:
-    - Added complete `coffex` namespace to `messages/ar.json` and `messages/en.json`, expanding dictionary to 1,178 keys each with 100% synchronization and 0 missing keys.
+    - Added complete `coffex` namespace to `messages/ar.json` and `messages/en.json`, expanding dictionary to 1,195 keys each with 100% synchronization and 0 missing keys.
   - **Comprehensive Test Suite**:
     - Authored `coffex.test.ts` for schemas and server actions, verifying all 108 tests passing across 20 test suites with 0 TypeScript compilation errors.
 

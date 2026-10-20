@@ -242,16 +242,19 @@ Production Deployed — Live on Vercel & Connected to Supabase
 
 - **Phase 24 (Coffex Specialized Onsite Field Sales System - `/coffex`)**:
   - **Dedicated Coffex Workspace**: Added `/coffex` route with visible "Coffex" tab in desktop sidebar and mobile navigation drawer, featuring the Coffee icon.
-  - **Mobile-First Field Lead Capture Form**: Built `CoffexOnsiteForm` tailored for field sales reps meeting potential clients onsite at cafés, roasteries, and coffee suppliers.
+  - **Strict Preservation of Existing Localization Architecture**: Inherits the application's native `next-intl` runtime switching and standard Arabic/English terminology without creating any separate switchers, colloquial slang, or hardcoded strings.
+  - **Mobile-First Field Lead Capture Form**: Built `CoffexOnsiteForm` with existing CRM design tokens and components (`Input`, `Textarea`, `Button`, `Badge`, `Dialog`).
+  - **Zero Form Data Loss on Language Switch**: Implemented persistent in-progress draft synchronization (`sessionStorage` under `nile_coffex_onsite_draft`), ensuring form fields are fully preserved when switching languages.
   - **1-Click GPS Location Capture**: Integrated `navigator.geolocation` with reverse coordinates and automatic Google Maps link generation.
   - **Live Carrier Detection**: Integrated `detectPhoneCarrier` with visual badges for Egyptian networks (Vodafone, Orange, Etisalat, WE).
-  - **Coffee-Specific Domain Fields**: Activity types (Specialty Cafe, Commercial Cafe, Roastery, Coffee Kiosk, Bakery Cafe, Supplier, Restaurant Cafe), branches count (1, 2-3, 4-6, 7-10, 10+), current POS system (Foodics, Quick POS, Prodeland, Legacy POS, Custom), interested modules chips (POS, Recipes, QR Menu, KDS, Loyalty, Delivery, E-Invoice, Multi-Branch), daily volume, urgency level (🔥 Hot, ⚡ Warm, 🕒 Cold), estimated budget, and next scheduled action date.
-  - **Personalized Instant WhatsApp Follow-up**: Celebratory feedback upon submission (confetti + sound) and immediate 1-click WhatsApp launcher with a tailored Egyptian Arabic or English intro and portfolio message.
-  - **Coffex Directory & Leads List**: Built `CoffexLeadsList` with search, interest filter tabs, activity filter, direct calling and WhatsApp triggers, Google Maps directions link, and UTF-8 BOM CSV export.
+  - **Coffee-Specific Domain Fields**: Activity types, branches count, current POS system, interested modules chips, daily volume, urgency level (🔥 Hot, ⚡ Warm, 🕒 Cold), estimated budget, and next scheduled action date.
+  - **Localized Validation & Error Handling**: Localized validation messages via `useTranslations` and standard `text-destructive` with `AlertCircle`.
+  - **Personalized Instant WhatsApp Follow-up**: Fully localized WhatsApp outreach messages in standard Arabic and English without slang or hardcoding.
+  - **Coffex Directory & Leads List**: Built `CoffexLeadsList` with search, interest filter tabs, activity filter, direct calling and WhatsApp triggers, Google Maps directions link, and bilingual UTF-8 BOM CSV export.
   - **Dual-Resilience Server Actions**: Implemented `createCoffexLead`, `getCoffexLeads`, `updateCoffexLeadStatus`, and `deleteCoffexLead` with seamless fallback to `potential_clients` with `[COFFEX_ONSITE]` metadata if migration is pending, automatic follow-up creation in `follow_ups`, and activity logging.
   - **Database Migration**: Created `supabase/migrations/012_create_coffex_leads.sql` with `coffex_leads` table, indexes, RLS policies, and sequential business ID generator (`CFX-00001`).
-  - **Full Bilingual Parity**: 1,178 synchronized keys in both `messages/ar.json` and `messages/en.json` (100% parity, 0 missing).
-  - **Quality Assurance**: Added full test suites `coffex.test.ts` for schemas and actions, verifying 108/108 passing tests across 20 suites and 0 TypeScript compilation errors.
+  - **Full Bilingual Parity**: 1,195 synchronized keys in both `messages/ar.json` and `messages/en.json` (100% parity, 0 missing).
+  - **Quality Assurance**: 108/108 passing tests across 20 suites, 0 TypeScript compilation errors across all 193 files, and clean Next.js build.
 
 ## Test Status
 - ✅ Vitest: 108/108 passing across 20 test suites (100% pass rate)

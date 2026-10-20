@@ -35,6 +35,7 @@ interface CoffexLeadCardProps {
 
 export function CoffexLeadCard({ lead, onStatusChange }: CoffexLeadCardProps) {
   const t = useTranslations("coffex");
+  const tCommon = useTranslations("common");
   const locale = useLocale();
   const isEn = locale === "en";
 
@@ -53,9 +54,10 @@ export function CoffexLeadCard({ lead, onStatusChange }: CoffexLeadCardProps) {
 
   const handleLaunchWhatsApp = () => {
     sounds.playTactileClick();
-    const msg = isEn
-      ? `Hello Mr. ${lead.contact_name}, regarding Coffex Café Management solutions for ${lead.brand_name}... ☕`
-      : `أهلاً بحضرتك يا أ. ${lead.contact_name}، معاك فريق حلول Coffex لكافيه ${lead.brand_name}... ☕`;
+    const msg = t("whatsAppCardMessage", {
+      contact: lead.contact_name,
+      brand: lead.brand_name,
+    });
     const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
     window.open(url, "_blank");
   };
@@ -156,7 +158,7 @@ export function CoffexLeadCard({ lead, onStatusChange }: CoffexLeadCardProps) {
             {t(`systems.${lead.current_system}`)}
           </span>
           <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold block">
-            {Number(lead.estimated_budget || 0).toLocaleString()} {isEn ? "EGP" : "ج.م"}
+            {Number(lead.estimated_budget || 0).toLocaleString()} {t("currency")}
           </span>
         </div>
       </div>
@@ -241,7 +243,7 @@ export function CoffexLeadCard({ lead, onStatusChange }: CoffexLeadCardProps) {
             className="h-8 px-2.5 text-xs text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10 gap-1 font-semibold cursor-pointer"
           >
             <MessageSquare className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">واتساب</span>
+            <span className="hidden sm:inline">{tCommon("whatsapp")}</span>
           </Button>
 
           <a
@@ -250,7 +252,7 @@ export function CoffexLeadCard({ lead, onStatusChange }: CoffexLeadCardProps) {
             className="inline-flex items-center justify-center h-8 px-2.5 rounded-md border border-border text-xs text-foreground hover:bg-muted font-medium transition-colors gap-1"
           >
             <Phone className="h-3.5 w-3.5 text-primary" />
-            <span className="hidden sm:inline">{t("call")}</span>
+            <span className="hidden sm:inline">{tCommon("call")}</span>
           </a>
         </div>
       </div>

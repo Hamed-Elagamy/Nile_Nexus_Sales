@@ -78,29 +78,49 @@ export function CoffexLeadsList({ initialLeads, onRefresh }: CoffexLeadsListProp
   const handleExportCsv = () => {
     sounds.playTactileClick();
     if (filteredLeads.length === 0) {
-      toast.error(isEn ? "No leads to export" : "لا توجد بيانات للتصدير");
+      toast.error(t("noDataToExport"));
       return;
     }
 
-    const headers = [
-      "Business ID",
-      "Brand / Cafe Name",
-      "Contact Person",
-      "Role",
-      "Phone",
-      "City",
-      "Area",
-      "Activity Type",
-      "Branches Count",
-      "Current System",
-      "Interest Level",
-      "Estimated Budget (EGP)",
-      "Next Action",
-      "Next Action Date",
-      "Status",
-      "GPS Map Link",
-      "Created At",
-    ];
+    const headers = isEn
+      ? [
+          "Business ID",
+          "Brand / Cafe Name",
+          "Contact Person",
+          "Role",
+          "Phone",
+          "City",
+          "Area",
+          "Activity Type",
+          "Branches Count",
+          "Current System",
+          "Interest Level",
+          "Estimated Budget (EGP)",
+          "Next Action",
+          "Next Action Date",
+          "Status",
+          "GPS Map Link",
+          "Created At",
+        ]
+      : [
+          "كود العميل",
+          "اسم الكافيه / العلامة التجارية",
+          "الشخص المقابل",
+          "الصفة / المنصب",
+          "رقم الهاتف",
+          "المدينة",
+          "المنطقة / الحي",
+          "نوع النشاط",
+          "عدد الفروع",
+          "النظام الحالي",
+          "درجة الاهتمام",
+          "الميزانية المتوقعة (ج.م)",
+          "الإجراء القادم",
+          "تاريخ المتابعة",
+          "الحالة",
+          "رابط موقع GPS",
+          "تاريخ التسجيل",
+        ];
 
     const rows = filteredLeads.map((l) => [
       l.business_id,
@@ -119,7 +139,7 @@ export function CoffexLeadsList({ initialLeads, onRefresh }: CoffexLeadsListProp
       l.next_action_date || "",
       l.status,
       l.gps_maps_url || "",
-      new Date(l.created_at).toLocaleDateString(),
+      new Date(l.created_at).toLocaleDateString(locale),
     ]);
 
     const csvContent =
@@ -138,11 +158,7 @@ export function CoffexLeadsList({ initialLeads, onRefresh }: CoffexLeadsListProp
     link.click();
     document.body.removeChild(link);
 
-    toast.success(
-      isEn
-        ? `Exported ${filteredLeads.length} Coffex leads to Excel/CSV!`
-        : `تم تصدير ${filteredLeads.length} عميل كوفيكس إلى إكسيل بنجاح!`
-    );
+    toast.success(t("exportSuccess", { count: filteredLeads.length }));
   };
 
   return (

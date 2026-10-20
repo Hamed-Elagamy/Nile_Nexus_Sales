@@ -1309,6 +1309,25 @@
     "exportCsv": "Export Excel",
     "refresh": "Refresh",
     "noLeadsFoundTitle": "No Coffex leads found",
-    "noLeadsFoundDesc": "Start by recording your first cafe or roastery field visit using the form above"
+    "noLeadsFoundDesc": "Start by recording your first cafe or roastery field visit using the form above",
+    "validation": {
+      "brandNameRequired": "Cafe or brand name is required (at least 2 characters)",
+      "contactNameRequired": "Contact person name is required (at least 2 characters)",
+      "phoneRequired": "Please enter a valid phone number (at least 7 digits)",
+      "areaRequired": "Area or district is required"
+    },
+    "geoNotSupported": "Geolocation is not supported by your browser",
+    "gpsCapturedToast": "Current GPS coordinates captured successfully",
+    "gpsError": "GPS error: {error}",
+    "saveSuccess": "Coffex lead \"{brand}\" recorded successfully",
+    "saveFailed": "Failed to save lead information",
+    "unexpectedError": "An unexpected error occurred, please try again",
+    "noDataToExport": "No leads available to export",
+    "exportSuccess": "Successfully exported {count} leads to Excel",
+    "whatsAppIntroMessage": "Hello Mr. {contact}, it was a pleasure meeting you today at {brand}. Regarding our discussion on the Coffex Cafe Management & POS System, I am sharing our official portfolio and features guide. Please feel free to reach out with any questions. Best regards, Nile Nexus Coffex Team",
+    "whatsAppCardMessage": "Hello Mr. {contact}, regarding Coffex solutions for {brand}...",
+    "cityPlaceholder": "Cairo, Giza, Alexandria...",
+    "currency": "EGP",
+    "defaultNextAction": "Demo presentation visit and requirements review"
   }
 }
