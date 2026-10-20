@@ -11,8 +11,6 @@ import {
   Compass,
   Store,
   ExternalLink,
-  Layers,
-  Check,
   Flame,
   Calendar,
   Coins,
@@ -28,7 +26,6 @@ import {
   COFFEX_CURRENT_SYSTEMS,
   COFFEX_DECISION_MAKER_ROLES,
   COFFEX_INTEREST_LEVELS,
-  COFFEX_AVAILABLE_MODULES,
 } from "@/lib/schemas/coffex";
 import { createCoffexLead } from "@/lib/actions/coffex";
 import { detectPhoneCarrier } from "@/lib/utils/phone-carrier";
@@ -88,7 +85,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
       branches_count: "1",
       current_system: "NONE",
       daily_orders_volume: "100_300",
-      interested_modules: ["POS", "RECIPES"],
+      interested_modules: [],
       interest_level: "WARM",
       estimated_budget: 25000,
       next_action: t("defaultNextAction"),
@@ -128,7 +125,6 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
 
   const phoneValue = watch("phone");
   const currentGpsUrl = watch("gps_maps_url");
-  const selectedModules = watch("interested_modules") || [];
   const selectedInterest = watch("interest_level");
   const selectedActivity = watch("activity_type");
   const selectedBranches = watch("branches_count");
@@ -166,19 +162,6 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
       },
       { enableHighAccuracy: true, timeout: 12000 }
     );
-  };
-
-  const toggleModule = (moduleCode: string) => {
-    sounds.playTactileClick();
-    const current = selectedModules || [];
-    if (current.includes(moduleCode)) {
-      setValue(
-        "interested_modules",
-        current.filter((m) => m !== moduleCode)
-      );
-    } else {
-      setValue("interested_modules", [...current, moduleCode]);
-    }
   };
 
   const onSubmit = async (data: CreateCoffexLeadInput) => {
@@ -543,47 +526,7 @@ export function CoffexOnsiteForm({ onSuccess }: CoffexOnsiteFormProps) {
           </div>
         </div>
 
-        {/* Section 3: Interested Coffex Modules */}
-        <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4 shadow-xs">
-          <div className="flex items-center gap-2 pb-2 border-b border-border/60">
-            <Layers className="h-4 w-4 text-primary" />
-            <div>
-              <h3 className="text-sm font-bold text-foreground">
-                {t("sectionModules")}
-              </h3>
-              <p className="text-[11px] text-muted-foreground">
-                {t("sectionModulesDesc")}
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            {COFFEX_AVAILABLE_MODULES.map((mod) => {
-              const isSelected = selectedModules.includes(mod);
-              return (
-                <button
-                  key={mod}
-                  type="button"
-                  onClick={() => toggleModule(mod)}
-                  className={`p-3 rounded-xl border text-xs font-medium transition-all text-start flex items-center justify-between cursor-pointer ${
-                    isSelected
-                      ? "border-primary bg-primary/10 text-primary font-bold shadow-xs ring-1 ring-primary/20"
-                      : "border-border hover:bg-muted/40 text-muted-foreground"
-                  }`}
-                >
-                  <span className="truncate">{t(`modules.${mod}`)}</span>
-                  {isSelected && (
-                    <div className="h-4 w-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center shrink-0">
-                      <Check className="h-2.5 w-2.5 stroke-[3]" />
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Section 4: Urgency, Next Follow-up & Notes */}
+        {/* Section 3: Urgency, Next Follow-up & Notes */}
         <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 space-y-4 shadow-xs">
           <div className="flex items-center gap-2 pb-2 border-b border-border/60">
             <Flame className="h-4 w-4 text-primary" />

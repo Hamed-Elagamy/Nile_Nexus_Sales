@@ -189,19 +189,6 @@ export function CoffexLeadCard({ lead, onStatusChange }: CoffexLeadCardProps) {
         )}
       </div>
 
-      {/* Interested Modules Chips */}
-      {lead.interested_modules && lead.interested_modules.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {lead.interested_modules.map((mod) => (
-            <span
-              key={mod}
-              className="text-[10px] bg-amber-500/10 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-md font-medium"
-            >
-              {t(`modules.${mod}`)}
-            </span>
-          ))}
-        </div>
-      )}
 
       {/* Notes or Next Action */}
       {lead.next_action && (

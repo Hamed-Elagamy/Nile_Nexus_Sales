@@ -247,7 +247,7 @@ Production Deployed — Live on Vercel & Connected to Supabase
   - **Zero Form Data Loss on Language Switch**: Implemented persistent in-progress draft synchronization (`sessionStorage` under `nile_coffex_onsite_draft`), ensuring form fields are fully preserved when switching languages.
   - **1-Click GPS Location Capture**: Integrated `navigator.geolocation` with reverse coordinates and automatic Google Maps link generation.
   - **Live Carrier Detection**: Integrated `detectPhoneCarrier` with visual badges for Egyptian networks (Vodafone, Orange, Etisalat, WE).
-  - **Coffee-Specific Domain Fields**: Activity types, branches count, current POS system, interested modules chips, daily volume, urgency level (🔥 Hot, ⚡ Warm, 🕒 Cold), estimated budget, and next scheduled action date.
+  - **Coffee-Specific Domain Fields**: Activity types, branches count, current POS system, daily volume, urgency level (🔥 Hot, ⚡ Warm, 🕒 Cold), estimated budget, and next scheduled action date (technical modules selector removed for ultra-fast onsite mobile capture).
   - **Localized Validation & Error Handling**: Localized validation messages via `useTranslations` and standard `text-destructive` with `AlertCircle`.
   - **Personalized Instant WhatsApp Follow-up**: Fully localized WhatsApp outreach messages in standard Arabic and English without slang or hardcoding.
   - **Coffex Directory & Leads List**: Built `CoffexLeadsList` with search, interest filter tabs, activity filter, direct calling and WhatsApp triggers, Google Maps directions link, and bilingual UTF-8 BOM CSV export.
