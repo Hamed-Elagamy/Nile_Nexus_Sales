@@ -162,12 +162,17 @@ export function ClientDigitalProposal({ proposal }: ClientDigitalProposalProps) 
         {/* Navigation & Utilities */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/40 pb-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-lg shadow-sm">
-              NN
+            <div className="h-10 w-10 rounded-xl overflow-hidden shadow-sm shrink-0 border border-border">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/app-icon.png"
+                alt="Tammlo"
+                className="h-full w-full object-cover"
+              />
             </div>
             <div>
-              <div className="text-sm font-bold text-foreground">نايل نيكسس للحلول البرمجية</div>
-              <div className="text-[11px] text-muted-foreground">Nile Nexus Software Solutions</div>
+              <div className="text-sm font-bold text-foreground">تامللو للحلول البرمجية والتحول الرقمي</div>
+              <div className="text-[11px] text-muted-foreground">Tammlo Software Solutions</div>
             </div>
           </div>
 

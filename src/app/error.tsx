@@ -12,7 +12,7 @@ interface ErrorProps {
 export default function GlobalError({ error, reset }: ErrorProps) {
   useEffect(() => {
     // Log the error securely for diagnostics
-    console.error("[Nile Nexus Error Boundary]:", error);
+    console.error("[Tammlo Sales Error Boundary]:", error);
   }, [error]);
 
   const handleRetry = () => {

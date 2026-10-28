@@ -107,12 +107,21 @@ export function AppSidebar({ user }: AppSidebarProps = {}) {
       {/* ============================================================== */}
       <aside className="hidden md:flex flex-col w-64 border-e border-[var(--sidebar-border)] bg-[var(--sidebar-background)] h-screen sticky top-0">
         {/* Brand */}
-        <div className="p-5 border-b border-[var(--sidebar-border)]">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <span className="text-xl font-bold text-[var(--sidebar-primary)]">
-              Nile Nexus
-            </span>
-            <span className="text-xs bg-[var(--sidebar-accent)] text-[var(--sidebar-accent-foreground)] px-2 py-0.5 rounded-full font-medium">
+        <div className="p-4 border-b border-[var(--sidebar-border)]">
+          <Link href="/dashboard" className="flex items-center gap-2 group">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/logo.png"
+              alt="Tammlo"
+              className="h-8 w-auto object-contain dark:hidden"
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/logo-dark.png"
+              alt="Tammlo"
+              className="h-8 w-auto object-contain hidden dark:block"
+            />
+            <span className="text-[11px] bg-[var(--sidebar-accent)] text-[var(--sidebar-accent-foreground)] px-2 py-0.5 rounded-full font-semibold border border-[var(--sidebar-border)]">
               Sales
             </span>
           </Link>
@@ -170,10 +179,19 @@ export function AppSidebar({ user }: AppSidebarProps = {}) {
                   onClick={mobileNav.close}
                   className="flex items-center gap-2"
                 >
-                  <span className="text-lg font-bold text-[var(--sidebar-primary)]">
-                    Nile Nexus
-                  </span>
-                  <span className="text-[10px] bg-[var(--sidebar-accent)] text-[var(--sidebar-accent-foreground)] px-2 py-0.5 rounded-full font-medium">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/images/logo.png"
+                    alt="Tammlo"
+                    className="h-7 w-auto object-contain dark:hidden"
+                  />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/images/logo-dark.png"
+                    alt="Tammlo"
+                    className="h-7 w-auto object-contain hidden dark:block"
+                  />
+                  <span className="text-[10px] bg-[var(--sidebar-accent)] text-[var(--sidebar-accent-foreground)] px-2 py-0.5 rounded-full font-medium border border-[var(--sidebar-border)]">
                     Sales
                   </span>
                 </Link>

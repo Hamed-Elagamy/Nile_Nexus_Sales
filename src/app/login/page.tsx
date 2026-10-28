@@ -9,10 +9,22 @@ export default function LoginPage() {
       </div>
       <div className="w-full max-w-md">
         {/* Logo/Brand */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[var(--primary)]">
-            Nile Nexus Sales
-          </h1>
+        <div className="flex flex-col items-center justify-center mb-8">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/logo.png"
+            alt="Tammlo"
+            className="h-12 sm:h-14 w-auto object-contain dark:hidden mb-2"
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/logo-dark.png"
+            alt="Tammlo"
+            className="h-12 sm:h-14 w-auto object-contain hidden dark:block mb-2"
+          />
+          <span className="text-[11px] tracking-wider uppercase bg-primary/10 text-primary border border-primary/20 px-3 py-0.5 rounded-full font-semibold">
+            Sales CRM
+          </span>
         </div>
 
         {/* Login Card */}

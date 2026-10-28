@@ -1,15 +1,17 @@
 /**
- * Nile Nexus Sales - Service Worker
+ * Tammlo Sales - Service Worker
  * Handles offline caching, PWA installation, and Real-Time Push Notifications
  */
 
-const CACHE_NAME = 'nile-nexus-v2';
+const CACHE_NAME = 'tammlo-sales-v1';
 const STATIC_ASSETS = [
   '/',
   '/manifest.webmanifest',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
-  '/icons/icon.svg',
+  '/images/logo.png',
+  '/images/logo-dark.png',
+  '/images/app-icon.png',
 ];
 
 // Install: Cache critical static assets

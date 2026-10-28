@@ -15,8 +15,8 @@ const defaultTickerItems: TickerItem[] = [
   {
     id: "1",
     icon: "trending",
-    text_ar: "منصة Nile Nexus للمبيعات: نظام إدارة ومتابعة الصفقات وعروض الأسعار المعتمد",
-    text_en: "Nile Nexus Sales: Enterprise CRM, Deal Pipeline & Proposal Management",
+    text_ar: "منصة Tammlo للمبيعات: نظام إدارة ومتابعة الصفقات وعروض الأسعار المعتمد",
+    text_en: "Tammlo Sales: Enterprise CRM, Deal Pipeline & Proposal Management",
   },
   {
     id: "2",

@@ -21,19 +21,23 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Nile Nexus Sales | نايل نيكسس للمبيعات",
-  description: "نظام إدارة المبيعات والصفقات وعروض الأسعار المتكامل لشركة نايل نيكسس",
+  title: "Tammlo Sales | تامللو للمبيعات",
+  description: "نظام إدارة المبيعات والصفقات وعروض الأسعار المتكامل لشركة تامللو - Tammlo Sales CRM",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Nile Nexus",
+    title: "Tammlo",
   },
   formatDetection: {
     telephone: true,
   },
   icons: {
-    icon: "/icons/icon-192x192.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
     shortcut: "/icons/icon-192x192.png",
     apple: "/icons/apple-touch-icon.png",
   },

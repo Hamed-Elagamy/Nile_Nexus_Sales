@@ -420,7 +420,7 @@ export function CommandPalette({
         <div className="px-4 py-2 border-t border-border bg-muted/40 flex items-center justify-between text-[11px] text-muted-foreground">
           <span>انقر أو اضغط Enter للتنفيذ</span>
           <div className="flex items-center gap-2">
-            <span>Nile Nexus Sales Copilot</span>
+            <span>Tammlo Sales Copilot</span>
           </div>
         </div>
       </div>

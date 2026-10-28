@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.0] - 2026-10-28
+
+### Changed
+- **Rebranding to Tammlo (Brand Name, Logo & Icon)**:
+  - **Brand Identity**: Updated platform name to **Tammlo** / **Tammlo Sales** (Arabic: **تامللو** / **تامللو للمبيعات**) across all user-facing interfaces, metadata titles, next-intl translations (`messages/ar.json`, `messages/en.json`), live activity tickers, and command palette.
+  - **Official Logo Integration**: Rendered the new Tammlo logo across desktop sidebar, mobile navigation drawer, login screen, commercial digital proposals, and printable quotations with adaptive contrast (`logo.png` for light mode and `logo-dark.png` for dark mode).
+  - **High-Resolution App Icons & Favicon**: Generated a complete high-DPI asset suite from the official square app icon (`public/favicon.ico`, `public/favicon.png`, `src/app/icon.png`, `src/app/apple-icon.png`, `public/apple-touch-icon.png`, and PWA icons in 192x192 and 512x512 standard and maskable variants).
+  - **PWA & Cache Management**: Updated `src/app/manifest.ts` and `public/manifest.json`, and upgraded Service Worker cache name to `tammlo-sales-v1` to ensure automatic cache eviction and instant visual refresh.
+  - **Preserved Architecture**: Maintained 100% workflow integrity, zero database schema changes, zero route modifications, and 100% passing test coverage (108/108 tests passing).
+
 ## [1.8.0] - 2026-10-21
 
 ### Added

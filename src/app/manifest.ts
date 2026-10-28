@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Nile Nexus Sales | نايل نيكسس للمبيعات",
-    short_name: "Nile Nexus",
-    description: "نظام إدارة المبيعات والصفقات وعروض الأسعار المتكامل لشركة نايل نيكسس",
+    name: "Tammlo Sales | تامللو للمبيعات",
+    short_name: "Tammlo",
+    description: "نظام إدارة المبيعات والصفقات وعروض الأسعار المتكامل لشركة تامللو - Tammlo Sales CRM",
     start_url: "/dashboard",
     scope: "/",
     display: "standalone",
@@ -38,11 +38,6 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",
-      },
-      {
-        src: "/icons/icon.svg",
-        sizes: "any",
-        type: "image/svg+xml",
       },
     ],
   };

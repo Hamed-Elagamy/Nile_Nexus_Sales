@@ -43,3 +43,7 @@ node_modules
 
 .vercel
 .env*
+
+# Local portfolio screenshots
+portfolio-showcase/
+scripts/capture-portfolio-screenshots.mjs

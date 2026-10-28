@@ -1,9 +1,14 @@
-# Project State — Nile Nexus Sales
+# Project State — Tammlo Sales (formerly Nile Nexus Sales)
 
 ## Current Phase
-Production Deployed — Live on Vercel & Connected to Supabase
+Production Deployed — Live on Vercel & Connected to Supabase (Rebranded to Tammlo)
 
 ## Completed Phases
+- **Phase 13 (Brand Rebranding to Tammlo)**:
+  - Rebranded application name to **Tammlo Sales** (**تامللو للمبيعات**) across all bilingual strings, metadata, manifests, tickers, and navigation.
+  - Implemented dual light/dark mode logo support (`logo.png`, `logo-dark.png`) in sidebar, login, and proposals.
+  - Deployed full high-DPI icon suite (`favicon.ico`, `favicon.png`, `src/app/icon.png`, apple-touch-icon, and PWA icons).
+  - Preserved 100% of underlying workflows, databases, RLS, and domain business logic.
 - **Phase 0**: Repository & Documentation bootstrap
 - **Phase 1**: Foundation & Design System (Next.js 16, Tailwind CSS v4, shadcn/ui components, i18n ar/en, dark mode, Supabase client suite, Auth middleware, login)
 - **Phase 2**: Database Migrations (001_initial_schema, 002_rls_policies, 003_seed_data)

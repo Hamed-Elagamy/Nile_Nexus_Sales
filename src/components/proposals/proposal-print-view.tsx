@@ -56,10 +56,19 @@ export function ProposalPrintView({ proposal, version, onClose }: ProposalPrintV
         {/* Quotation Header */}
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 border-b border-border/80 pb-6">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-2xl font-black tracking-tight text-primary">
-                Nile Nexus
-              </span>
+            <div className="flex items-center gap-3 mb-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/logo.png"
+                alt="Tammlo"
+                className="h-8 w-auto object-contain dark:hidden"
+              />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/logo-dark.png"
+                alt="Tammlo"
+                className="h-8 w-auto object-contain hidden dark:block"
+              />
               <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded font-bold">
                 Sales & Tech Solutions
               </span>
