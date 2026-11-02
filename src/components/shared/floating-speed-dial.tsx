@@ -12,6 +12,7 @@ import {
   Edit3,
   Copy,
   Coffee,
+  ShoppingBag,
 } from "lucide-react";
 import { sounds } from "@/lib/utils/confetti-sound";
 
@@ -68,6 +69,20 @@ export function FloatingSpeedDial({
               </span>
               <div className="h-8 w-8 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                 <Coffee className="h-4 w-4" />
+              </div>
+            </button>
+
+            {/* Action 0.5: Nexa Retail Lead */}
+            <button
+              type="button"
+              onClick={() => handleAction(() => router.push("/nexa"))}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-card border border-primary/30 shadow-lg hover:bg-primary/10 text-foreground transition-all cursor-pointer group"
+            >
+              <span className="text-xs font-bold text-foreground group-hover:text-primary">
+                {t("nexaLead")}
+              </span>
+              <div className="h-8 w-8 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0">
+                <ShoppingBag className="h-4 w-4" />
               </div>
             </button>
 

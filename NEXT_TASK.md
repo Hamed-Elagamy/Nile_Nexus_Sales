@@ -12,6 +12,14 @@ Execute Production Database Clean-up & Roll Out to Company Employees:
 - **Vercel Project Dashboard**: [https://vercel.com/hamed-elagamy/nile-nexus-sales](https://vercel.com/hamed-elagamy/nile-nexus-sales)
 
 ## Verification Checklist
+- [x] Dedicated Nexa E-Commerce & Retail Sales Lead Capture module deployed (`/nexa`)
+- [x] Nexa mobile-first onsite capture form with GPS, draft persistence, and Egyptian carrier detection
+- [x] Nexa leads directory with live search, vertical & interest filters, and UTF-8 BOM CSV export
+- [x] Dual-resilience server actions with automatic fallback to `potential_clients` tagged `[NEXA_LEAD]`
+- [x] Full bilingual localization (Arabic RTL default, English LTR) in `messages/ar.json` & `messages/en.json`
+- [x] Global navigation integration (desktop sidebar, mobile drawer, floating speed dial, command palette)
+- [x] Migration `013_create_nexa_leads.sql` authored with RLS policies and sequential ID generator (`NXA-00001`)
+- [x] 100% test coverage passing (119/119 unit tests passing across 22 test files)
 - [x] Application rebranded to Tammlo Sales (Brand Name, Logo & Icon suite)
 - [x] Application successfully built and optimized with Next.js Turbopack
 - [x] All 24 routes operational with zero 404s (including `/manifest.webmanifest`)

@@ -4,6 +4,16 @@
 Production Deployed — Live on Vercel & Connected to Supabase (Rebranded to Tammlo)
 
 ## Completed Phases
+- **Phase 14 (Nexa Specialized E-Commerce & Retail Sales Lead Capture Module)**:
+  - Delivered dedicated `/nexa` workspace for sales representatives registering retail and merchant leads seeking the Nexa platform.
+  - Implemented mobile-first onsite capture form (`NexaOnsiteForm`) with GPS coordinate capture, draft persistence in `sessionStorage` across language switches, and Egyptian carrier badge detection.
+  - Integrated 8 retail verticals (Fashion, F&B, Supermarket, Electronics, Beauty, Home, Pharmacy, General Retail) and commerce models (Online Only, Physical Only, Omnichannel Hybrid).
+  - Built comprehensive lead directory (`NexaLeadsList` and `NexaLeadCard`) with status progression, 1-click tailored Egyptian WhatsApp intro, and UTF-8 BOM CSV export for Excel.
+  - Deployed dual-resilience server actions with automatic fallback to `potential_clients` tagged `[NEXA_LEAD]`.
+  - Added full bilingual synchronization in `messages/ar.json` and `messages/en.json`.
+  - Added to desktop sidebar navigation, mobile drawer, floating speed dial, and global command palette (`Ctrl + K`).
+  - Created migration `supabase/migrations/013_create_nexa_leads.sql`.
+  - Maintained 100% test passing rate across 22 test files (119/119 unit tests passing) and 0 TypeScript errors.
 - **Phase 13 (Brand Rebranding to Tammlo)**:
   - Rebranded application name to **Tammlo Sales** (**تامللو للمبيعات**) across all bilingual strings, metadata, manifests, tickers, and navigation.
   - Implemented dual light/dark mode logo support (`logo.png`, `logo-dark.png`) in sidebar, login, and proposals.

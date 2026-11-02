@@ -18,6 +18,7 @@ import {
   Upload,
   MessageSquare,
   Coffee,
+  ShoppingBag,
 } from "lucide-react";
 import { demoServices } from "@/lib/demo-data";
 import { sounds } from "@/lib/utils/confetti-sound";
@@ -91,6 +92,18 @@ export function CommandPalette({
           onOpenChange(false);
         },
         badge: "كوفيكس",
+      },
+      {
+        id: "action-nexa-lead",
+        category: "أدوات وإجراءات سريعة",
+        title: "تسجيل عميل منصة Nexa (متاجر وتجزئة)",
+        subtitle: "نموذج تسجيل فوري للمتاجر والبراندات الراغبة في الاشتراك بمنصة Nexa",
+        icon: <ShoppingBag className="h-4 w-4 text-primary" />,
+        action: () => {
+          router.push("/nexa");
+          onOpenChange(false);
+        },
+        badge: "Nexa",
       },
       {
         id: "action-add-lead",
@@ -222,6 +235,17 @@ export function CommandPalette({
         icon: <Coffee className="h-4 w-4 text-primary" />,
         action: () => {
           router.push("/coffex");
+          onOpenChange(false);
+        },
+      },
+      {
+        id: "nav-nexa",
+        category: "صفحات النظام",
+        title: "Nexa لمنصة المتاجر والتجزئة",
+        subtitle: "شاشة تسجيل وسجل عملاء منصة التجارة الإلكترونية ونقاط البيع",
+        icon: <ShoppingBag className="h-4 w-4 text-primary" />,
+        action: () => {
+          router.push("/nexa");
           onOpenChange(false);
         },
       },

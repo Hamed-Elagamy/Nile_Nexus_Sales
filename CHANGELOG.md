@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.10.0] - 2026-11-02
+
+### Added
+- **Nexa Specialized E-Commerce & Retail Sales Lead Capture Module (`/nexa`)**:
+  - **Dedicated Navigation**: Added "Nexa" to desktop sidebar navigation (`ShoppingBag` icon), mobile slide-over drawer, and floating speed dial (`ShoppingBag` icon).
+  - **Command Palette Integration**: Added Nexa page navigation and quick lead registration action to global Command Palette (`Ctrl + K`).
+  - **Commercial Merchant Onsite Capture Form (`NexaOnsiteForm`)**:
+    - Mobile-first capture designed for sales reps closing retail stores, supermarkets, fashion boutiques, electronics shops, pharmacies, beauty brands, home goods, and F&B merchants seeking the Nexa platform.
+    - Fields: Store / Brand Name, Vertical Type (Fashion, F&B, Supermarket, Electronics, Beauty, Home, Pharmacy, Retail), Commerce Model (Online Only, Physical Only, Omnichannel Hybrid), Decision Maker details (Owner, GM, E-commerce Manager, IT Director, Operations Manager), Egyptian carrier badge detection (Vodafone, Orange, Etisalat, WE), current tech platform (Shopify, WooCommerce, Salla, Zid, Foodics, Custom, Excel, None), branches count, monthly order volume, target plan (Starter, Growth, Omnichannel Enterprise), interest level (🔥 Hot, ⚡ Warm, 🕒 Cold), estimated budget (EGP), GPS coordinates capture, demo date, and notes.
+    - **Session Draft Persistence**: Seamlessly persists in-progress form inputs in `sessionStorage` (`tammlo_nexa_onsite_draft`), preventing data loss during Arabic/English language switches or page reloads.
+    - **1-Click GPS Capture**: Captures physical store coordinates via `navigator.geolocation` with direct Google Maps navigation link.
+    - **Celebratory Feedback**: Triggers full-canvas confetti and audio chimes upon lead creation.
+  - **Nexa Directory & Directory Coordinator (`NexaLeadsList`, `NexaLeadCard`, `NexaClientPage`)**:
+    - Real-time directory with live search, interest level filters, vertical filters, and instant status progression (New, Contacted, Demo Scheduled, Proposal Sent, Won, Lost).
+    - 1-Click tailored Egyptian Arabic WhatsApp outreach introducing Nexa e-commerce & retail platform.
+    - Direct phone call and Google Maps location launcher.
+    - UTF-8 BOM CSV export for Microsoft Excel compatibility.
+  - **Dual-Resilience Server Actions (`src/lib/actions/nexa.ts`)**:
+    - Robust server actions (`createNexaLead`, `getNexaLeads`, `updateNexaLeadStatus`, `deleteNexaLead`) with automatic fallback to `potential_clients` tagged `[NEXA_LEAD]` if migration 013 is pending.
+    - Automatically creates follow-up reminders in `follow_ups` and logs interactions in `activities`.
+  - **Database Migration (`supabase/migrations/013_create_nexa_leads.sql`)**:
+    - Created `nexa_leads` table, indexes, RLS policies, and sequential business ID generator (`NXA-00001`).
+  - **Full Bilingual Parity**:
+    - Added complete `nexa` dictionary to `messages/ar.json` and `messages/en.json`, expanding dictionary with 100% key synchronization.
+  - **Testing & Verification**:
+    - 11 new unit tests for schemas and server actions.
+    - 100% test pass rate across all 22 test files (119/119 tests passing).
+    - 0 TypeScript compiler errors across all 203 project files.
+
 ## [1.9.0] - 2026-10-28
 
 ### Changed
