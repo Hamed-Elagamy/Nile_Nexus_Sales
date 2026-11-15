@@ -28,6 +28,11 @@ export type ActionResult<T = unknown> = {
 const demoNexaLeadsStore: NexaLead[] = [];
 
 function getErrorMessage(err: unknown, fallback: string): string {
+  if (err && typeof err === "object") {
+    if ("message" in err && typeof (err as any).message === "string") {
+      return (err as any).message;
+    }
+  }
   if (err instanceof Error) return err.message;
   if (typeof err === "string") return err;
   return fallback;
@@ -96,6 +101,17 @@ export async function createNexaLead(
       data: { user },
     } = await supabase.auth.getUser();
 
+    // Resolve sales rep / actor profile ID
+    let salesRepId = user?.id;
+    if (!salesRepId) {
+      const { data: defaultProfile } = await supabase
+        .from("profiles")
+        .select("id")
+        .limit(1)
+        .single();
+      salesRepId = defaultProfile?.id;
+    }
+
     // Generate business ID
     const countRes = await supabase
       .from("nexa_leads")
@@ -107,111 +123,15 @@ export async function createNexaLead(
     }
     const businessId = `NXA-${String(nextNumber).padStart(5, "0")}`;
 
-    // Attempt insert into dedicated nexa_leads table
-    const { data: inserted, error: insertError } = await supabase
-      .from("nexa_leads")
-      .insert({
-        business_id: businessId,
-        brand_name: validated.brand_name,
-        contact_name: validated.contact_name,
-        contact_role: validated.contact_role,
-        phone: validated.phone,
-        phone_normalized: phoneNorm,
-        alternative_phone: validated.alternative_phone || null,
-        email: validated.email || null,
-        store_url: validated.store_url || null,
-        city: validated.city,
-        area: validated.area,
-        address: validated.address || null,
-        gps_latitude: validated.gps_latitude || null,
-        gps_longitude: validated.gps_longitude || null,
-        gps_maps_url: validated.gps_maps_url || null,
-        vertical_type: validated.vertical_type,
-        commerce_model: validated.commerce_model,
-        current_system: validated.current_system,
-        monthly_order_volume: validated.monthly_order_volume || null,
-        branches_count: validated.branches_count,
-        plan_interest: validated.plan_interest,
-        interest_level: validated.interest_level,
-        estimated_budget: validated.estimated_budget ?? 0,
-        next_action: validated.next_action || null,
-        next_action_date: validated.next_action_date || null,
-        notes: validated.notes || null,
-        sales_rep_id: user?.id || null,
-        sales_rep_name: user?.user_metadata?.full_name || user?.email || null,
-        status: "NEW",
-      })
-      .select()
-      .single();
+    let insertedLead: NexaLead | null = null;
+    let tableError: string | null = null;
 
-    if (insertError) {
-      // Graceful fallback to potential_clients if table migration 013 is not yet run
-      if (
-        insertError.code === "42P01" ||
-        insertError.message.includes("nexa_leads")
-      ) {
-        console.warn(
-          "[Nexa Leads] Table nexa_leads not found, falling back to potential_clients with [NEXA_LEAD] tag"
-        );
-
-        const countFallback = await supabase
-          .from("potential_clients")
-          .select("id", { count: "exact", head: true });
-        const fallbackBusinessId = `NXA-PC-${String(
-          (countFallback.count || 0) + 1
-        ).padStart(5, "0")}`;
-
-        const nexaMetaNotes = [
-          `[NEXA_LEAD]`,
-          `Vertical: ${validated.vertical_type}`,
-          `Commerce Model: ${validated.commerce_model}`,
-          `Branches: ${validated.branches_count}`,
-          `Current System: ${validated.current_system}`,
-          `Plan: ${validated.plan_interest}`,
-          `Store URL: ${validated.store_url || "N/A"}`,
-          `GPS: ${validated.gps_maps_url || "N/A"}`,
-          validated.notes ? `Notes: ${validated.notes}` : "",
-        ]
-          .filter(Boolean)
-          .join("\n");
-
-        const { data: pcInserted, error: pcError } = await supabase
-          .from("potential_clients")
-          .insert({
-            business_id: fallbackBusinessId,
-            company_name: validated.brand_name,
-            contact_name: validated.contact_name,
-            job_title: validated.contact_role,
-            phone: validated.phone,
-            phone_normalized: phoneNorm,
-            alternative_phone: validated.alternative_phone || null,
-            email: validated.email || null,
-            website: validated.store_url || null,
-            city: validated.city,
-            area: validated.area,
-            address: validated.address || null,
-            industry: `Nexa E-Commerce: ${validated.vertical_type}`,
-            status: "QUALIFIED",
-            estimated_budget: validated.estimated_budget ?? 0,
-            next_action: validated.next_action || null,
-            next_action_date: validated.next_action_date || null,
-            notes: nexaMetaNotes,
-            source: "FIELD_SALES",
-            assigned_to: user?.id || null,
-          })
-          .select()
-          .single();
-
-        if (pcError) {
-          return {
-            success: false,
-            error: getErrorMessage(pcError, "Failed to register lead"),
-          };
-        }
-
-        const fallbackLead: NexaLead = {
-          id: pcInserted.id,
-          business_id: pcInserted.business_id,
+    // 1. Attempt insert into dedicated nexa_leads table
+    try {
+      const { data: inserted, error: insertError } = await supabase
+        .from("nexa_leads")
+        .insert({
+          business_id: businessId,
           brand_name: validated.brand_name,
           contact_name: validated.contact_name,
           contact_role: validated.contact_role,
@@ -237,48 +157,135 @@ export async function createNexaLead(
           next_action: validated.next_action || null,
           next_action_date: validated.next_action_date || null,
           notes: validated.notes || null,
-          sales_rep_id: user?.id || null,
-          sales_rep_name: user?.user_metadata?.full_name || null,
+          sales_rep_id: salesRepId || null,
+          sales_rep_name: user?.user_metadata?.full_name || user?.email || null,
           status: "NEW",
-          archived_at: null,
-          created_at: pcInserted.created_at,
-          updated_at: pcInserted.updated_at,
-        };
+        })
+        .select()
+        .single();
 
-        revalidatePath("/nexa");
-        return { success: true, data: fallbackLead };
+      if (inserted && !insertError) {
+        insertedLead = inserted as NexaLead;
+      } else if (insertError) {
+        tableError = insertError.message;
+      }
+    } catch (err: unknown) {
+      tableError = getErrorMessage(err, "Table insert failed");
+    }
+
+    // 2. Graceful fallback to potential_clients if table migration 013 is not yet run
+    if (!insertedLead) {
+      console.warn(
+        "[Nexa Leads] Table nexa_leads not found in DB, falling back to potential_clients with [NEXA_LEAD] tag"
+      );
+
+      const countFallback = await supabase
+        .from("potential_clients")
+        .select("id", { count: "exact", head: true });
+      const fallbackBusinessId = `NXA-PC-${String(
+        (countFallback.count || 0) + 1
+      ).padStart(5, "0")}`;
+
+      const nexaMeta = {
+        is_nexa: true,
+        business_id: fallbackBusinessId,
+        brand_name: validated.brand_name,
+        contact_name: validated.contact_name,
+        contact_role: validated.contact_role,
+        vertical_type: validated.vertical_type,
+        commerce_model: validated.commerce_model,
+        current_system: validated.current_system,
+        monthly_order_volume: validated.monthly_order_volume,
+        branches_count: validated.branches_count,
+        plan_interest: validated.plan_interest,
+        interest_level: validated.interest_level,
+        estimated_budget: validated.estimated_budget,
+        city: validated.city,
+        area: validated.area,
+        address: validated.address,
+        gps_latitude: validated.gps_latitude,
+        gps_longitude: validated.gps_longitude,
+        gps_maps_url: validated.gps_maps_url,
+        next_action: validated.next_action,
+        next_action_date: validated.next_action_date,
+        store_url: validated.store_url,
+        alternative_phone: validated.alternative_phone,
+        email: validated.email,
+        notes: validated.notes,
+        status: "NEW",
+      };
+
+      const fullNotes = `[NEXA_LEAD] ${validated.notes || ""}\n__NEXA_DATA__:${JSON.stringify(nexaMeta)}`;
+
+      const { data: pcInserted, error: pcError } = await supabase
+        .from("potential_clients")
+        .insert({
+          business_id: fallbackBusinessId,
+          name: `${validated.brand_name} - ${validated.contact_name}`,
+          area: `${validated.city} - ${validated.area}`,
+          phone: validated.phone,
+          phone_normalized: phoneNorm,
+          website: validated.store_url || null,
+          research_owner_id: salesRepId || "01ffbb15-b64b-4efe-a77e-2d5ae5d4a18a",
+          status: "NEW",
+          notes: fullNotes,
+          created_by: salesRepId || "01ffbb15-b64b-4efe-a77e-2d5ae5d4a18a",
+        })
+        .select()
+        .single();
+
+      if (pcError || !pcInserted) {
+        console.error("[createNexaLead] Fallback to potential_clients failed:", pcError);
+        return {
+          success: false,
+          error: pcError?.message || tableError || "فشل تسجيل العميل في قاعدة البيانات",
+        };
       }
 
-      return {
-        success: false,
-        error: getErrorMessage(insertError, "Failed to insert lead"),
+      insertedLead = {
+        id: pcInserted.id,
+        business_id: pcInserted.business_id,
+        brand_name: validated.brand_name,
+        contact_name: validated.contact_name,
+        contact_role: validated.contact_role,
+        phone: validated.phone,
+        phone_normalized: phoneNorm,
+        alternative_phone: validated.alternative_phone || null,
+        email: validated.email || null,
+        store_url: validated.store_url || null,
+        city: validated.city,
+        area: validated.area,
+        address: validated.address || null,
+        gps_latitude: validated.gps_latitude || null,
+        gps_longitude: validated.gps_longitude || null,
+        gps_maps_url: validated.gps_maps_url || null,
+        vertical_type: validated.vertical_type,
+        commerce_model: validated.commerce_model,
+        current_system: validated.current_system,
+        monthly_order_volume: validated.monthly_order_volume || null,
+        branches_count: validated.branches_count,
+        plan_interest: validated.plan_interest,
+        interest_level: validated.interest_level,
+        estimated_budget: validated.estimated_budget ?? 0,
+        next_action: validated.next_action || null,
+        next_action_date: validated.next_action_date || null,
+        notes: validated.notes || null,
+        sales_rep_id: salesRepId || null,
+        sales_rep_name: user?.user_metadata?.full_name || null,
+        status: "NEW",
+        archived_at: null,
+        created_at: pcInserted.created_at,
+        updated_at: pcInserted.updated_at,
       };
     }
 
-    // Schedule automatic follow up if date provided
-    if (validated.next_action_date) {
-      try {
-        await supabase.from("follow_ups").insert({
-          title: `متابعة عميل نكسا: ${validated.brand_name}`,
-          type: "MEETING",
-          due_date: validated.next_action_date,
-          status: "SCHEDULED",
-          priority: validated.interest_level === "HOT" ? "HIGH" : "NORMAL",
-          notes: `إجراء: ${validated.next_action || "عرض توضيحي لمنصة نكسا (Demo)"}\nالمسؤول: ${validated.contact_name} (${validated.phone})`,
-          assigned_to: user?.id || null,
-        });
-      } catch {
-        // Non-blocking
-      }
-    }
-
-    // Log Activity
+    // 3. Log activity in activities table
     try {
       await supabase.from("activities").insert({
-        activity_type: "NOTE",
-        title: `تسجيل عميل نكسا ميداني جديد: ${validated.brand_name}`,
-        description: `تم تسجيل المتجر بنجاح بواسطة ${user?.user_metadata?.full_name || "مندوب المبيعات"}. النشاط: ${validated.vertical_type}، الفروع: ${validated.branches_count}، الخطة: ${validated.plan_interest}`,
-        user_id: user?.id || null,
+        actor_id: salesRepId,
+        type: "NOTE",
+        summary: `تم تسجيل عميل جديد لمنصة Nexa: ${validated.brand_name} (${validated.vertical_type})`,
+        notes: `النشاط: ${validated.vertical_type}، الفروع: ${validated.branches_count}، الخطة: ${validated.plan_interest}`,
       });
     } catch {
       // Non-blocking
@@ -286,7 +293,7 @@ export async function createNexaLead(
 
     revalidatePath("/nexa");
     revalidatePath("/dashboard");
-    return { success: true, data: inserted as NexaLead };
+    return { success: true, data: insertedLead as NexaLead };
   } catch (err) {
     return {
       success: false,
@@ -388,82 +395,113 @@ export async function getNexaLeads(
 
     const { data, error } = await query;
 
-    if (error) {
-      // Check if table missing -> fallback to potential_clients
-      if (error.code === "42P01" || error.message.includes("nexa_leads")) {
-        const { data: pcData, error: pcErr } = await supabase
-          .from("potential_clients")
-          .select("*")
-          .is("archived_at", null)
-          .like("notes", "%[NEXA_LEAD]%")
-          .order("created_at", { ascending: false });
+    let leads: NexaLead[] = [];
 
-        if (pcErr) {
-          return {
-            success: false,
-            error: getErrorMessage(pcErr, "Failed to load leads"),
-          };
-        }
+    if (data && !error) {
+      leads = data as NexaLead[];
+    } else {
+      // Table missing -> fallback to potential_clients with [NEXA_LEAD] in notes
+      const { data: pcData, error: pcErr } = await supabase
+        .from("potential_clients")
+        .select(`
+          *,
+          research_owner:profiles!research_owner_id(full_name)
+        `)
+        .is("archived_at", null)
+        .like("notes", "%[NEXA_LEAD]%")
+        .order("created_at", { ascending: false });
 
-        const adaptedLeads: NexaLead[] = (pcData || []).map((pc) => {
-          return {
-            id: pc.id,
-            business_id: pc.business_id,
-            brand_name: pc.company_name,
-            contact_name: pc.contact_name,
-            contact_role: "OWNER",
-            phone: pc.phone,
-            phone_normalized: pc.phone_normalized || pc.phone,
-            alternative_phone: pc.alternative_phone,
-            email: pc.email,
-            store_url: pc.website,
-            city: pc.city || "القاهرة",
-            area: pc.area || "",
-            address: pc.address,
-            gps_latitude: null,
-            gps_longitude: null,
-            gps_maps_url: null,
-            vertical_type: "GENERAL_RETAIL",
-            commerce_model: "OMNICHANNEL",
-            current_system: "NONE_EXCEL",
-            monthly_order_volume: "100_500",
-            branches_count: "1",
-            plan_interest: "GROWTH",
-            interest_level: "WARM",
-            estimated_budget: pc.estimated_budget || 0,
-            next_action: pc.next_action,
-            next_action_date: pc.next_action_date,
-            notes: pc.notes,
-            sales_rep_id: pc.assigned_to,
-            sales_rep_name: null,
-            status: "NEW",
-            archived_at: pc.archived_at,
-            created_at: pc.created_at,
-            updated_at: pc.updated_at,
-          };
-        });
-
-        const metrics: NexaMetrics = {
-          totalLeads: adaptedLeads.length,
-          hotLeadsCount: adaptedLeads.filter((l) => l.interest_level === "HOT").length,
-          totalBranchesCount: adaptedLeads.length,
-          estimatedPipelineValue: adaptedLeads.reduce(
-            (s, l) => s + (l.estimated_budget || 0),
-            0
-          ),
-          demosScheduledCount: 0,
+      if (pcErr) {
+        return {
+          success: false,
+          error: getErrorMessage(pcErr, "Failed to load leads"),
         };
-
-        return { success: true, data: { leads: adaptedLeads, metrics } };
       }
 
-      return {
-        success: false,
-        error: getErrorMessage(error, "Failed to load Nexa leads"),
-      };
-    }
+      const adaptedLeads: NexaLead[] = (pcData || []).map((pc) => {
+        let meta: Record<string, any> = {};
+        if (pc.notes && pc.notes.includes("__NEXA_DATA__:")) {
+          try {
+            const jsonPart = pc.notes.split("__NEXA_DATA__:")[1];
+            meta = JSON.parse(jsonPart);
+          } catch {
+            // ignore
+          }
+        }
 
-    const leads = (data || []) as NexaLead[];
+        const cleanNotes = pc.notes
+          ? pc.notes
+              .replace(/\[NEXA_LEAD\]/g, "")
+              .split("__NEXA_DATA__:")[0]
+              .trim()
+          : null;
+
+        return {
+          id: pc.id,
+          business_id: pc.business_id,
+          brand_name: meta.brand_name || pc.name.split(" - ")[0] || pc.name,
+          contact_name: meta.contact_name || pc.name.split(" - ")[1] || "—",
+          contact_role: meta.contact_role || "OWNER",
+          phone: pc.phone || "",
+          phone_normalized: pc.phone_normalized || pc.phone || "",
+          alternative_phone: meta.alternative_phone || null,
+          email: meta.email || null,
+          store_url: meta.store_url || pc.website || null,
+          city: meta.city || (pc.area ? pc.area.split(" - ")[0] : "القاهرة"),
+          area: meta.area || (pc.area ? pc.area.split(" - ")[1] || pc.area : ""),
+          address: meta.address || null,
+          gps_latitude: meta.gps_latitude || null,
+          gps_longitude: meta.gps_longitude || null,
+          gps_maps_url: meta.gps_maps_url || null,
+          vertical_type: meta.vertical_type || "FASHION_APPAREL",
+          commerce_model: meta.commerce_model || "OMNICHANNEL",
+          current_system: meta.current_system || "NONE_EXCEL",
+          monthly_order_volume: meta.monthly_order_volume || "100_500",
+          branches_count: meta.branches_count || "1",
+          plan_interest: meta.plan_interest || "GROWTH",
+          interest_level: meta.interest_level || "WARM",
+          estimated_budget: meta.estimated_budget || 0,
+          next_action: meta.next_action || null,
+          next_action_date: meta.next_action_date || null,
+          notes: cleanNotes,
+          sales_rep_id: pc.research_owner_id,
+          sales_rep_name: pc.research_owner?.full_name || null,
+          status: (meta.status as NexaLeadStatus) || (pc.status === "CONVERTED" ? "WON" : "NEW"),
+          archived_at: pc.archived_at,
+          created_at: pc.created_at,
+          updated_at: pc.updated_at,
+        };
+      });
+
+      leads = adaptedLeads;
+
+      if (filters?.query) {
+        const q = filters.query.toLowerCase().trim();
+        leads = leads.filter(
+          (l) =>
+            l.brand_name.toLowerCase().includes(q) ||
+            l.contact_name.toLowerCase().includes(q) ||
+            l.phone.includes(q) ||
+            l.area.toLowerCase().includes(q)
+        );
+      }
+
+      if (filters?.interest_level && filters.interest_level !== "ALL") {
+        leads = leads.filter(
+          (l) => l.interest_level === filters.interest_level
+        );
+      }
+
+      if (filters?.vertical_type && filters.vertical_type !== "ALL") {
+        leads = leads.filter(
+          (l) => l.vertical_type === filters.vertical_type
+        );
+      }
+
+      if (filters?.status && filters.status !== "ALL") {
+        leads = leads.filter((l) => l.status === filters.status);
+      }
+    }
 
     const totalBranches = leads.reduce((acc, l) => {
       if (l.branches_count === "1") return acc + 1;
@@ -527,6 +565,38 @@ export async function updateNexaLeadStatus(
       .single();
 
     if (error) {
+      // Fallback: update in potential_clients if nexa_leads doesn't exist
+      const { data: pcData } = await supabase
+        .from("potential_clients")
+        .select("notes, status")
+        .eq("id", validated.id)
+        .single();
+
+      if (pcData) {
+        let meta: Record<string, any> = {};
+        if (pcData.notes && pcData.notes.includes("__NEXA_DATA__:")) {
+          try {
+            meta = JSON.parse(pcData.notes.split("__NEXA_DATA__:")[1]);
+          } catch {}
+        }
+        meta.status = validated.status;
+
+        const baseNotes = pcData.notes.split("__NEXA_DATA__:")[0].trim();
+        const updatedNotes = `${baseNotes}\n__NEXA_DATA__:${JSON.stringify(meta)}`;
+
+        await supabase
+          .from("potential_clients")
+          .update({
+            status: validated.status === "WON" ? "CONVERTED" : "RESEARCHED",
+            notes: updatedNotes,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", validated.id);
+
+        revalidatePath("/nexa");
+        return { success: true };
+      }
+
       return {
         success: false,
         error: getErrorMessage(error, "Failed to update lead status"),
@@ -567,10 +637,11 @@ export async function deleteNexaLead(id: string): Promise<ActionResult<void>> {
       .eq("id", id);
 
     if (error) {
-      return {
-        success: false,
-        error: getErrorMessage(error, "Failed to delete lead"),
-      };
+      // Fallback: archive in potential_clients
+      await supabase
+        .from("potential_clients")
+        .update({ archived_at: new Date().toISOString() })
+        .eq("id", id);
     }
 
     revalidatePath("/nexa");

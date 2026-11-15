@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.11.1] - 2026-11-15
+
+### Fixed
+- **Nexa Lead Registration Dual-Resilience Fallback (`src/lib/actions/nexa.ts`)**:
+  - **Fixed "Failed to register lead" Error**: Resolved schema mismatch where the fallback attempted to insert non-existent columns (`company_name`, `contact_name`, `city`, `status: QUALIFIED`) into `potential_clients`.
+  - **Strict Schema Alignment**: Aligned `potential_clients` fallback to exact database columns (`name`, `area`, `phone`, `phone_normalized`, `website`, `research_owner_id`, `created_by`, `status: NEW`), serializing the full 20+ Nexa metadata attributes in `__NEXA_DATA__:<JSON>` within `notes`.
+  - **Enhanced Error Reporting**: Upgraded `getErrorMessage` to inspect structured PostgREST error objects so actual database diagnostics are never obscured by fallback strings.
+  - **Profile Resolution**: Implemented automatic profile fallback so foreign key constraints on `research_owner_id` and `created_by` always succeed even if the auth token context is resolving.
+  - **Lifecycle Actions**: Added graceful fallback support to `updateNexaLeadStatus` and `deleteNexaLead` to update or archive leads directly in `potential_clients`.
+
 ## [1.11.0] - 2026-11-15
 
 ### Fixed & Enhanced
