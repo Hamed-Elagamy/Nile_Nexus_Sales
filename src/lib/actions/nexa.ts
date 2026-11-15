@@ -16,6 +16,7 @@ import type {
   NexaMetrics,
   NexaLeadStatus,
 } from "@/types/nexa";
+import { broadcastNotification } from "@/lib/actions/notifications";
 
 export type ActionResult<T = unknown> = {
   success: boolean;
@@ -286,6 +287,20 @@ export async function createNexaLead(
         type: "NOTE",
         summary: `تم تسجيل عميل جديد لمنصة Nexa: ${validated.brand_name} (${validated.vertical_type})`,
         notes: `النشاط: ${validated.vertical_type}، الفروع: ${validated.branches_count}، الخطة: ${validated.plan_interest}`,
+      });
+    } catch {
+      // Non-blocking
+    }
+
+    // 4. Live notification dispatch across team devices
+    try {
+      await broadcastNotification({
+        title: `🛍️ عميل Nexa جديد: ${validated.brand_name}`,
+        body: `تم تسجيل عميل جديد لمنصة Nexa (${validated.brand_name}) في منطقة ${validated.area} - باقة ${validated.plan_interest}`,
+        category: "UPDATE",
+        type: "SUCCESS",
+        link: "/nexa",
+        notifyAdminsAndGMs: true,
       });
     } catch {
       // Non-blocking

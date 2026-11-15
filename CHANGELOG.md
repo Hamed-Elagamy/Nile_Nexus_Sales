@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.12.0] - 2026-11-15
+
+### Added & Enhanced
+- **Live Real-Time Device Notifications & Automated Multi-Device Dispatch System**:
+  - **Native OS Device Notifications (Android, iOS PWA, Windows, macOS)**: Upgraded `showDeviceNotification` to utilize Service Worker registration (`navigator.serviceWorker.ready.showNotification`) with automatic fallback to window `Notification`, enabling background alerts on standalone mobile PWAs (iOS 16.4+ and Android Standalone).
+  - **Executive Luxury 3-Tone Acoustic Chime**: Synthesized an uplifting corporate triad (F5 698.46Hz -> A5 880Hz -> C6 1046.50Hz) via the Web Audio API with soft triangle harmonic overtones and smooth exponential decay.
+  - **Audio Autoplay Unlock (`initAudioUnlock`)**: Added user-gesture listener (`click`, `touchstart`, `keydown`) that automatically resumes suspended AudioContext, ensuring notification chimes play reliably even under strict browser autoplay policies.
+  - **Haptic Vibration Feedback**: Configured mobile vibration patterns (`[120, 60, 120]`) on incoming notifications.
+  - **Home Screen & Dock App Badging**: Wired dynamic app badging via `navigator.setAppBadge(count)` and `navigator.clearAppBadge()`, displaying live unread counts directly on installed PWA icons.
+  - **Automated Broadcast Engine (`broadcastNotification`)**:
+    - Automatic dispatch across team devices on key business actions:
+      - **Nexa Leads (`createNexaLead`)**: Dispatches `🛍️ عميل Nexa جديد: <brand_name>` to management and sales teams.
+      - **Coffex Leads (`createCoffexLead`)**: Dispatches `☕ عميل كوفيكس جديد: <brand_name>`.
+      - **Deals (`createDeal` / `updateDealStage`)**: Dispatches `💼 صفقة جديدة: <title>` on creation and `🎉 تم إغلاق صفقة رابحة!` when closed as WON.
+      - **Follow-ups (`createFollowUp`)**: Dispatches `⏰ متابعة مجدولة: <action>` to assigned representatives.
+      - **Tasks (`createTask`)**: Dispatches `📌 مهمة تنفيذية جديدة: <title>` with due dates to assignees and leadership.
+  - **Proactive Device Notification Activation Prompt (`DeviceNotificationPrompt`)**:
+    - Sleek, dismissible luxury banner displayed to authenticated users whose browser notification permission is `default`.
+    - 1-click activation button that requests permission, triggers instant audio confirmation, mobile vibration, and sends an immediate test device notification.
+  - **Service Worker Message Listener & Brand Modernization (`public/sw.js`)**: Updated push fallbacks to **Tammlo Sales | تامللو للمبيعات** and added direct client `postMessage` listener.
+  - **Foreground Resync**: Automatically triggers notifications refresh when the user switches tabs or wakes their mobile device (`visibilitychange` & `focus`).
+  - **Testing**: Added unit test for `broadcastNotification`; maintained 100% test pass rate across all 24 test suites (134/134 tests passing) with 0 TypeScript compiler errors across 215 files.
+
 ## [1.11.1] - 2026-11-15
 
 ### Fixed

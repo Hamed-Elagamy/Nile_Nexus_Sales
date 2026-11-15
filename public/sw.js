@@ -94,11 +94,11 @@ self.addEventListener('push', (event) => {
     try {
       data = event.data.json();
     } catch {
-      data = { title: 'Nile Nexus Sales | Notification', body: event.data.text() };
+      data = { title: 'Tammlo Sales | تامللو للمبيعات', body: event.data.text() };
     }
   }
 
-  const title = data.title || 'Nile Nexus Sales | Notification';
+  const title = data.title || 'Tammlo Sales | تامللو للمبيعات';
   const options = {
     body: data.body || 'لديك تنبيه جديد / New notification update',
     icon: '/icons/icon-192x192.png',
@@ -143,4 +143,19 @@ self.addEventListener('notificationclick', (event) => {
       }
     })
   );
+});
+
+// Client Message Event: Direct notification trigger via postMessage
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
+    const { title, options } = event.data;
+    const notifTitle = title || 'Tammlo Sales | تامللو للمبيعات';
+    const notifOptions = {
+      icon: '/icons/icon-192x192.png',
+      badge: '/icons/icon-192x192.png',
+      vibrate: [200, 100, 200],
+      ...(options || {}),
+    };
+    event.waitUntil(self.registration.showNotification(notifTitle, notifOptions));
+  }
 });

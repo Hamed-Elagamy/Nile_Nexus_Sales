@@ -8,6 +8,7 @@ import {
   deleteNotification,
   createNotification,
   sendTestNotification,
+  broadcastNotification,
 } from "../notifications";
 
 // Mock Supabase config to simulate offline/demo mode by default
@@ -85,5 +86,18 @@ describe("Notifications Server Actions", () => {
     expect(res.data).toBeDefined();
     expect(res.data!.title).toContain("Real-Time Notification Test");
     expect(res.data!.body).toContain("This real-time notification was successfully tested");
+  });
+
+  it("broadcasts notifications to team in fallback mode", async () => {
+    const res = await broadcastNotification({
+      title: "عميل Nexa جديد",
+      body: "تم تسجيل عميل جديد",
+      category: "UPDATE",
+      type: "SUCCESS",
+      link: "/nexa",
+      notifyAdminsAndGMs: true,
+    });
+    expect(res.success).toBe(true);
+    expect(res.data?.count).toBeGreaterThan(0);
   });
 });

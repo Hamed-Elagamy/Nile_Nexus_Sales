@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/layout/app-sidebar";
 import { AppHeader } from "@/components/layout/app-header";
 import { MobileNavProvider } from "@/components/layout/mobile-nav-context";
 import { RealtimeNotificationProvider } from "@/components/notifications/realtime-notification-provider";
+import { DeviceNotificationPrompt } from "@/components/notifications/device-notification-prompt";
 import { PwaInstallPrompt } from "@/components/pwa/pwa-install-prompt";
 import { ThemeAccentProvider } from "@/components/theme/theme-accent-provider";
 import { SalesToolsProvider } from "@/components/shared/sales-tools-manager";
@@ -53,6 +54,7 @@ export default async function AuthenticatedLayout({
               <AppSidebar user={userWithProfile} />
               <div className="flex-1 flex flex-col min-w-0 z-10">
                 <AppHeader user={userWithProfile} />
+                <DeviceNotificationPrompt />
                 <main className="flex-1 p-4 md:p-6 lg:p-8 pb-24 md:pb-6 overflow-auto">
                   {children}
                 </main>

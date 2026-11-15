@@ -20,6 +20,7 @@ import {
   type DealStage,
 } from "@/lib/schemas/deal";
 import type { Deal, Client } from "@/types/domain";
+import { broadcastNotification } from "@/lib/actions/notifications";
 
 export type ActionResult<T = unknown> = {
   success: boolean;
@@ -438,6 +439,21 @@ export async function createDeal(input: CreateDealInput): Promise<ActionResult<D
       metadata: { deal_id: inserted.id },
     });
 
+    // Live notification dispatch across team devices
+    try {
+      await broadcastNotification({
+        title: `💼 صفقة جديدة: ${inserted.title}`,
+        body: `تم تسجيل صفقة جديدة (${inserted.title}) بقيمة تقديرية ${validated.estimated_value ? Number(validated.estimated_value).toLocaleString() + " " + (validated.currency || "EGP") : "غير محددة"}`,
+        category: "UPDATE",
+        type: "INFO",
+        link: `/deals/${inserted.id}`,
+        targetUserIds: salesOwnerId ? [salesOwnerId] : [],
+        notifyAdminsAndGMs: true,
+      });
+    } catch {
+      // Non-blocking
+    }
+
     revalidatePath("/deals");
     revalidatePath("/pipeline");
 
@@ -584,6 +600,21 @@ export async function updateDealStage(
 
     if (error) {
       return { success: false, error: error.message };
+    }
+
+    if (validated.stage === "WON") {
+      try {
+        await broadcastNotification({
+          title: "🎉 تم إغلاق صفقة رابحة!",
+          body: `تهانينا للفريق! تم تحويل الصفقة بنجاح إلى مرحلة التعاقد والربح (WON)${validated.final_value ? ` بقيمة نهائية ${Number(validated.final_value).toLocaleString()} ج.م` : ""}.`,
+          category: "UPDATE",
+          type: "SUCCESS",
+          link: `/deals/${validated.deal_id}`,
+          notifyAdminsAndGMs: true,
+        });
+      } catch {
+        // Non-blocking
+      }
     }
 
     revalidatePath("/deals");

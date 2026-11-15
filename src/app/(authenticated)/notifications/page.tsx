@@ -6,7 +6,7 @@ import { NotificationsClient } from "@/components/notifications/notifications-cl
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("notifications");
   return {
-    title: `${t("title")} | Nile Nexus Sales`,
+    title: `${t("title")} | Tammlo Sales`,
     description: t("subtitle"),
   };
 }

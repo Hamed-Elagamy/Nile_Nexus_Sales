@@ -16,6 +16,7 @@ import type {
   CoffexMetrics,
   CoffexLeadStatus,
 } from "@/types/coffex";
+import { broadcastNotification } from "@/lib/actions/notifications";
 
 export type ActionResult<T = unknown> = {
   success: boolean;
@@ -268,6 +269,20 @@ export async function createCoffexLead(
       } catch {
         // Non-blocking
       }
+    }
+
+    // Live notification dispatch across team devices
+    try {
+      await broadcastNotification({
+        title: `☕ عميل كوفيكس جديد: ${validated.brand_name}`,
+        body: `تم تسجيل عميل ميداني جديد (${validated.brand_name}) في منطقة ${validated.area} - النشاط: ${validated.activity_type}`,
+        category: "UPDATE",
+        type: "SUCCESS",
+        link: "/coffex",
+        notifyAdminsAndGMs: true,
+      });
+    } catch {
+      // Non-blocking
     }
 
     revalidatePath("/coffex");

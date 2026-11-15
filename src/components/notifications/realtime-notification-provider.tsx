@@ -20,6 +20,8 @@ import {
   vibrateDevice,
   requestNotificationPermission,
   showDeviceNotification,
+  updateAppBadge,
+  initAudioUnlock,
 } from "@/lib/utils/notifications";
 import { formatLocalizedNotification } from "@/lib/utils/localized-notification";
 
@@ -65,12 +67,22 @@ export function RealtimeNotificationProvider({
   const [permission, setPermission] = useState<NotificationPermission>("default");
   const [isRealtimeConnected, setIsRealtimeConnected] = useState<boolean>(false);
 
+  // Initialize Web Audio unlock on mount to ensure sound plays even under strict browser autoplay policies
+  useEffect(() => {
+    initAudioUnlock();
+  }, []);
+
   // Sync initial browser notification permission
   useEffect(() => {
     if (typeof window !== "undefined" && "Notification" in window) {
       setPermission(Notification.permission);
     }
   }, []);
+
+  // Sync PWA App Badge on home screen / dock with unread count
+  useEffect(() => {
+    updateAppBadge(unreadCount);
+  }, [unreadCount]);
 
   // Fetch initial notifications list and unread count
   const loadNotifications = useCallback(async () => {
@@ -93,12 +105,29 @@ export function RealtimeNotificationProvider({
     loadNotifications();
   }, [loadNotifications]);
 
+  // Refresh notifications whenever the user brings the app to foreground or wakes device
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        loadNotifications();
+      }
+    };
+
+    window.addEventListener("focus", loadNotifications);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("focus", loadNotifications);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [loadNotifications]);
+
   // Handle incoming notification with runtime bilingual localization
   const handleIncomingNotification = useCallback(
     (notif: NotificationItem) => {
       const localized = formatLocalizedNotification(notif, locale);
 
-      // 1. Play synthesized chime
+      // 1. Play executive 3-tone chime
       playNotificationSound();
 
       // 2. Vibrate mobile device
@@ -122,8 +151,12 @@ export function RealtimeNotificationProvider({
         duration: 6000,
       });
 
-      // 5. Update local state
-      setUnreadCount((prev) => prev + 1);
+      // 5. Update local state & App Badge
+      setUnreadCount((prev) => {
+        const next = prev + 1;
+        updateAppBadge(next);
+        return next;
+      });
       setNotifications((prev) => [notif, ...prev.filter((n) => n.id !== notif.id)]);
     },
     [router, locale]
@@ -183,17 +216,37 @@ export function RealtimeNotificationProvider({
     };
   }, [userId, handleIncomingNotification]);
 
-  // Request native permission
+  // Request native permission with immediate confirmation audio and device notification
   const handleRequestPermission = useCallback(async () => {
     const perm = await requestNotificationPermission();
     setPermission(perm);
     if (perm === "granted") {
-      toast.success("تم تفعيل الإشعارات الفورية على هذا الجهاز بنجاح! 🔔");
+      playNotificationSound();
+      vibrateDevice([120, 60, 120]);
+      showDeviceNotification(
+        locale === "en" ? "🔔 Device Notifications Enabled" : "🔔 تم تفعيل إشعارات الجهاز",
+        {
+          body:
+            locale === "en"
+              ? "Tammlo Sales live notifications are now active on this device!"
+              : "إشعارات تامللو للمبيعات اللحظية مفعلة الآن بنجاح على هذا الجهاز!",
+          url: "/notifications",
+        }
+      );
+      toast.success(
+        locale === "en"
+          ? "Live device notifications enabled successfully! 🔔"
+          : "تم تفعيل الإشعارات الفورية على هذا الجهاز بنجاح! 🔔"
+      );
     } else if (perm === "denied") {
-      toast.error("تم رفض الإشعارات من إعدادات المتصفح. يمكنك تفعيلها يدوياً من إعدادات الموقع.");
+      toast.error(
+        locale === "en"
+          ? "Notifications are blocked by browser settings. Please allow notifications in site settings."
+          : "تم رفض الإشعارات من إعدادات المتصفح. يمكنك تفعيلها يدوياً من إعدادات الموقع."
+      );
     }
     return perm;
-  }, []);
+  }, [locale]);
 
   // Mark single as read
   const handleMarkAsRead = useCallback(async (id: string) => {
@@ -261,8 +314,8 @@ export function RealtimeNotificationProvider({
           user_id: userId || "demo-user",
           category: "UPDATE",
           title: isEn
-            ? "🔔 Real-Time Notification Test | Nile Nexus Sales"
-            : "🔔 تجربة الإشعار اللحظي | Nile Nexus Sales",
+            ? "🔔 Real-Time Notification Test | Tammlo Sales"
+            : "🔔 تجربة الإشعار اللحظي | تامللو للمبيعات",
           body: isEn
             ? `This real-time notification was successfully tested and received at (${nowStr}). The system is operating seamlessly across your devices and smartphone!`
             : `تم اختبار واستقبال هذا الإشعار اللحظي بنجاح في تمام الساعة (${nowStr}). النظام يعمل بكفاءة تامة على هاتفك وجهازك!`,

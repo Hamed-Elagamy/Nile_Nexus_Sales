@@ -386,8 +386,8 @@ export async function sendTestNotification(targetLocale?: "ar" | "en"): Promise<
       : new Date().toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
     const title = isEn
-      ? "🔔 Real-Time Notification Test | Nile Nexus Sales"
-      : "🔔 تجربة الإشعار اللحظي | Nile Nexus Sales";
+      ? "🔔 Real-Time Notification Test | Tammlo Sales"
+      : "🔔 تجربة الإشعار اللحظي | تامللو للمبيعات";
 
     const body = isEn
       ? `This real-time notification was successfully tested and received at (${nowStr}). The system is operating seamlessly across your devices and smartphone!`
@@ -404,5 +404,95 @@ export async function sendTestNotification(targetLocale?: "ar" | "en"): Promise<
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Failed to trigger test notification";
     return { success: false, error: msg };
+  }
+}
+
+/**
+ * Broadcast an automated notification to target users and/or Admin/GM team
+ */
+export async function broadcastNotification(params: {
+  title: string;
+  body: string;
+  category?: NotificationCategory;
+  type?: "ALERT" | "INFO" | "SUCCESS";
+  link?: string;
+  targetUserIds?: string[];
+  notifyAdminsAndGMs?: boolean;
+  excludeUserId?: string;
+}): Promise<ActionResult<{ count: number }>> {
+  try {
+    if (!isSupabaseConfigured()) {
+      return { success: true, data: { count: 1 } };
+    }
+
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const senderId = params.excludeUserId || user?.id;
+    const recipientIds = new Set<string>();
+
+    if (params.targetUserIds && params.targetUserIds.length > 0) {
+      params.targetUserIds.forEach((id) => {
+        if (id && id !== senderId) recipientIds.add(id);
+      });
+    }
+
+    if (params.notifyAdminsAndGMs !== false) {
+      try {
+        let query = supabase.from("profiles").select("id, role, is_active");
+        if (typeof (query as unknown as { in?: Function }).in === "function") {
+          query = (query as unknown as { in: Function }).in("role", ["GM", "ADMIN"]);
+        }
+        if (typeof (query as unknown as { eq?: Function }).eq === "function") {
+          query = (query as unknown as { eq: Function }).eq("is_active", true);
+        }
+        const { data: profiles } = await query;
+        if (Array.isArray(profiles)) {
+          profiles.forEach((p: { id?: string; role?: string; is_active?: boolean }) => {
+            const matchesRole = !p.role || p.role === "GM" || p.role === "ADMIN";
+            const isActive = p.is_active !== false;
+            if (p.id && p.id !== senderId && matchesRole && isActive) {
+              recipientIds.add(p.id);
+            }
+          });
+        }
+      } catch (profileErr) {
+        console.debug("[broadcastNotification] Could not query admin profiles:", profileErr);
+      }
+    }
+
+    // Fallback: if no other recipients found, notify current user so they see the live feedback
+    if (recipientIds.size === 0 && user) {
+      recipientIds.add(user.id);
+    }
+
+    const category = params.category || (params.type === "ALERT" ? "ACTION_REQUIRED" : "UPDATE");
+    const link = params.link || null;
+    const type = params.type || (category === "ACTION_REQUIRED" ? "ALERT" : "INFO");
+
+    const rowsToInsert = Array.from(recipientIds).map((uid) => ({
+      user_id: uid,
+      title: params.title,
+      body: params.body,
+      category,
+      link,
+      action_url: link,
+      type,
+      is_read: false,
+    }));
+
+    if (rowsToInsert.length > 0) {
+      const { error } = await supabase.from("notifications").insert(rowsToInsert);
+      if (error) {
+        console.error("[broadcastNotification] DB Insert Error:", error.message);
+      }
+    }
+
+    return { success: true, data: { count: rowsToInsert.length } };
+  } catch (err) {
+    console.error("[broadcastNotification] Error:", err);
+    return { success: false, error: err instanceof Error ? err.message : "Broadcast failed" };
   }
 }

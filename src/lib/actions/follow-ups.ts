@@ -20,6 +20,7 @@ import {
   type FilterFollowUpsInput,
 } from "@/lib/schemas/follow-up";
 import type { FollowUp, Client, Deal } from "@/types/domain";
+import { broadcastNotification } from "@/lib/actions/notifications";
 
 export type ActionResult<T = unknown> = {
   success: boolean;
@@ -337,6 +338,21 @@ export async function createFollowUp(
       notes: validated.notes || null,
       metadata: { follow_up_id: inserted.id },
     });
+
+    // Live notification dispatch across team devices
+    try {
+      await broadcastNotification({
+        title: `⏰ متابعة مجدولة: ${validated.action}`,
+        body: `تم تحديد موعد متابعة قادم بتاريخ ${new Date(validated.due_at).toLocaleDateString("ar-EG")} - الإجراء: ${validated.action}`,
+        category: "ACTION_REQUIRED",
+        type: "ALERT",
+        link: "/follow-ups",
+        targetUserIds: responsibleId ? [responsibleId] : [],
+        notifyAdminsAndGMs: false,
+      });
+    } catch {
+      // Non-blocking
+    }
 
     revalidatePath("/follow-ups");
     revalidatePath(`/clients/${validated.client_id}`);

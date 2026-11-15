@@ -21,6 +21,7 @@ import {
 } from "@/lib/schemas/task";
 import type { TaskWithRelations, TasksListResult, TaskFormData } from "@/types/task";
 import type { TaskPriority, TaskStatus } from "@/types/domain";
+import { broadcastNotification } from "@/lib/actions/notifications";
 
 export type ActionResult<T = unknown> = {
   success: boolean;
@@ -244,20 +245,19 @@ export async function createTask(
       };
     }
 
-    // Notify assignee if not creating for oneself
-    if (parsed.assignee_id !== user.id) {
-      try {
-        await supabase.from("notifications").insert({
-          user_id: parsed.assignee_id,
-          category: "ACTION_REQUIRED",
-          title: "مهمة تنفيذية جديدة",
-          body: `تم تكليفك بمهمة جديدة: ${parsed.title}`,
-          link: "/tasks",
-          is_read: false,
-        });
-      } catch {
-        // Non-blocking notification
-      }
+    // Live notification dispatch across team devices
+    try {
+      await broadcastNotification({
+        title: "📌 مهمة تنفيذية جديدة",
+        body: `تم إنشاء مهمة: ${parsed.title}${parsed.deadline ? ` (تاريخ الاستحقاق: ${parsed.deadline})` : ""}`,
+        category: "ACTION_REQUIRED",
+        type: "INFO",
+        link: "/tasks",
+        targetUserIds: parsed.assignee_id ? [parsed.assignee_id] : [],
+        notifyAdminsAndGMs: true,
+      });
+    } catch {
+      // Non-blocking notification
     }
 
     // Log activity
