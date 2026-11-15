@@ -765,23 +765,73 @@
     "urgentTasks": "مهام عاجلة",
     "inProgressTasks": "قيد التنفيذ",
     "completedTasks": "مكتملة",
+    "todoTasks": "جديدة",
     "noTasks": "لا توجد مهام حالياً",
-    "noTasksDesc": "يمكنك إضافة وتكليف مهام جديدة لفريق المبيعات.",
+    "noTasksDesc": "يمكنك إضافة وتكليف مهام جديدة لفريق المبيعات بالضغط على زر «مهمة جديدة».",
     "priority": {
       "NORMAL": "عادي",
       "IMPORTANT": "مهم",
       "URGENT": "عاجل 🔥"
     },
     "status": {
+      "TODO": "جديدة",
       "PENDING": "معلقة",
       "IN_PROGRESS": "قيد التنفيذ",
+      "DONE": "مكتملة",
       "COMPLETED": "مكتملة",
       "CANCELLED": "ملغاة"
     },
     "assignedTo": "المسؤول",
     "dueDate": "تاريخ الاستحقاق",
     "deal": "الصفقة",
-    "client": "العميل"
+    "client": "العميل",
+    "searchPlaceholder": "ابحث في المهام، الملاحظات، أو اسم المسؤول...",
+    "filter": {
+      "all": "الكل",
+      "todo": "جديدة",
+      "inProgress": "قيد التنفيذ",
+      "done": "مكتملة",
+      "urgent": "عاجلة 🔥",
+      "cancelled": "ملغاة"
+    },
+    "actions": {
+      "markDone": "إكمال المهمة",
+      "markInProgress": "بدء التنفيذ",
+      "markTodo": "إعادة للانتظار",
+      "cancel": "إلغاء المهمة",
+      "edit": "تعديل المهمة",
+      "delete": "حذف المهمة",
+      "details": "التفاصيل"
+    },
+    "dialog": {
+      "createTitle": "إضافة مهمة تنفيذية جديدة",
+      "createSubtitle": "تكليف أحد أفراد الفريق بإجراء أو متابعة تشغيلية أو توثيق صفقة",
+      "editTitle": "تعديل بيانات المهمة",
+      "detailsTitle": "تفاصيل المهمة والتكليف",
+      "taskTitle": "عنوان المهمة",
+      "taskTitlePlaceholder": "اكتب عنوان المهمة أو الإجراء المطلوب...",
+      "assignee": "المسؤول عن التنفيذ",
+      "assigneePlaceholder": "اختر العضو المكلف",
+      "priority": "مستوى الأولوية",
+      "status": "حالة المهمة",
+      "dueDate": "تاريخ ووقت الاستحقاق",
+      "client": "العميل المرتبط (اختياري)",
+      "clientPlaceholder": "اختر العميل إن وجد",
+      "deal": "الصفقة المرتبطة (اختياري)",
+      "dealPlaceholder": "اختر الصفقة إن وجدت",
+      "notes": "الملاحظات وتفاصيل التكليف",
+      "notesPlaceholder": "اكتب أي تفاصيل أو خطوات تنفيذية مطلوبة للمهمة...",
+      "cancel": "إلغاء",
+      "save": "حفظ المهمة",
+      "saving": "جاري الحفظ..."
+    },
+    "messages": {
+      "createSuccess": "تم إنشاء المهمة وتكليف المسؤول بنجاح",
+      "updateSuccess": "تم تحديث المهمة بنجاح",
+      "statusSuccess": "تم تحديث حالة المهمة بنجاح",
+      "deleteSuccess": "تم حذف المهمة بنجاح",
+      "error": "حدث خطأ أثناء معالجة المهمة"
+    }
   },
   "approvals": {
     "title": "مركز الموافقات والاعتمادات",

@@ -765,23 +765,73 @@
     "urgentTasks": "Urgent Tasks",
     "inProgressTasks": "In Progress",
     "completedTasks": "Completed",
+    "todoTasks": "New Tasks",
     "noTasks": "No tasks yet",
-    "noTasksDesc": "You can add and assign new tasks to sales team members.",
+    "noTasksDesc": "You can add and assign new tasks to sales team members by clicking 'New Task'.",
     "priority": {
       "NORMAL": "Normal",
       "IMPORTANT": "Important",
       "URGENT": "Urgent 🔥"
     },
     "status": {
+      "TODO": "New",
       "PENDING": "Pending",
       "IN_PROGRESS": "In Progress",
+      "DONE": "Completed",
       "COMPLETED": "Completed",
       "CANCELLED": "Cancelled"
     },
     "assignedTo": "Assignee",
     "dueDate": "Due Date",
     "deal": "Deal",
-    "client": "Client"
+    "client": "Client",
+    "searchPlaceholder": "Search tasks, notes, or assignee name...",
+    "filter": {
+      "all": "All",
+      "todo": "New",
+      "inProgress": "In Progress",
+      "done": "Completed",
+      "urgent": "Urgent 🔥",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "markDone": "Complete Task",
+      "markInProgress": "Start Progress",
+      "markTodo": "Mark To Do",
+      "cancel": "Cancel Task",
+      "edit": "Edit Task",
+      "delete": "Delete Task",
+      "details": "Details"
+    },
+    "dialog": {
+      "createTitle": "Add New Executive Task",
+      "createSubtitle": "Assign a team member to an operational task, follow-up, or deal documentation",
+      "editTitle": "Edit Task Details",
+      "detailsTitle": "Task Details & Assignment",
+      "taskTitle": "Task Title",
+      "taskTitlePlaceholder": "Enter task title or required action...",
+      "assignee": "Assignee",
+      "assigneePlaceholder": "Select assigned member",
+      "priority": "Priority Level",
+      "status": "Task Status",
+      "dueDate": "Due Date & Time",
+      "client": "Linked Client (Optional)",
+      "clientPlaceholder": "Select client if applicable",
+      "deal": "Linked Deal (Optional)",
+      "dealPlaceholder": "Select deal if applicable",
+      "notes": "Notes & Assignment Details",
+      "notesPlaceholder": "Enter any details or steps required for the task...",
+      "cancel": "Cancel",
+      "save": "Save Task",
+      "saving": "Saving..."
+    },
+    "messages": {
+      "createSuccess": "Task created and assigned successfully",
+      "updateSuccess": "Task updated successfully",
+      "statusSuccess": "Task status updated successfully",
+      "deleteSuccess": "Task deleted successfully",
+      "error": "An error occurred while processing the task"
+    }
   },
   "approvals": {
     "title": "Approvals Center",

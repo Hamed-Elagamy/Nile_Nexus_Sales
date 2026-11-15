@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.11.0] - 2026-11-15
+
+### Fixed & Enhanced
+- **Full Operational Implementation of Executive Tasks (`/tasks`)**:
+  - **Resolved Non-Working State**: Transformed the previously static placeholder tasks page into a full-featured, interactive, real-time task management module.
+  - **Interactive Creation Dialog (`CreateTaskDialog`)**: Added modal dialog powered by Zod and Server Actions to create tasks with title, priority (NORMAL, IMPORTANT, URGENT 🔥), assignee from team profiles, due date/time, linked client, linked deal, and notes.
+  - **Edit & Details Modals (`EditTaskDialog` & `TaskDetailsDialog`)**: Full inspection and editing of task attributes, timeline, and assignment.
+  - **Fast Status Toggling (`TaskCard`)**: 1-click status transitions (TODO ➡ IN_PROGRESS ➡ DONE) with visual feedback, strikethrough styling, and overdue alert badges.
+  - **Dynamic Filtering & Live Search (`TasksFilterBar`)**: Real-time text search across title, notes, assignee, client, and deal, alongside quick-filter tabs (All, Urgent 🔥, In Progress, To Do, Done) and priority dropdown filter.
+  - **Robust Server Actions (`src/lib/actions/tasks.ts`)**: Built `getTasks`, `createTask`, `updateTask`, `updateTaskStatus`, `deleteTask`, and `getTaskFormData` with dual-mode resilience (Supabase RLS in production with seamless fallback in Demo Mode).
+  - **Database Migration (`014_allow_tasks_delete_and_creator_update.sql`)**: Authored migration granting GM, Admin, and task creator RLS permissions for deleting and updating tasks.
+  - **Bilingual Synchronization**: Fully expanded `tasks` translations in `messages/ar.json` and `messages/en.json` (dialogs, filters, actions, notifications, status keys).
+  - **Testing**: Added 14 new unit tests across schemas and server actions, bringing the test suite to 133/133 passing tests with 0 TypeScript compiler errors across 214 files.
+
 ## [1.10.0] - 2026-11-02
 
 ### Added
