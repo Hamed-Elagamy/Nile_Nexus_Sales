@@ -34,6 +34,15 @@ export function ThemeAccentProvider({ children }: { children: React.ReactNode })
   const [zenMode, setZenMode] = useState<boolean>(false);
   const [soundEnabled, setSoundEnabledState] = useState<boolean>(true);
 
+  const applyToDOM = (p: ThemePalette, f: FontFamily, d: DensityMode) => {
+    if (typeof document === "undefined") return;
+    const root = document.documentElement;
+
+    root.setAttribute("data-palette", p);
+    root.setAttribute("data-font", f);
+    root.setAttribute("data-density", d);
+  };
+
   useEffect(() => {
     // Load persisted settings
     const savedPalette = (localStorage.getItem(STORAGE_PALETTE) as ThemePalette) || "nile";
@@ -47,15 +56,6 @@ export function ThemeAccentProvider({ children }: { children: React.ReactNode })
 
     applyToDOM(savedPalette, savedFont, savedDensity);
   }, []);
-
-  const applyToDOM = (p: ThemePalette, f: FontFamily, d: DensityMode) => {
-    if (typeof document === "undefined") return;
-    const root = document.documentElement;
-
-    root.setAttribute("data-palette", p);
-    root.setAttribute("data-font", f);
-    root.setAttribute("data-density", d);
-  };
 
   const setPalette = (p: ThemePalette) => {
     setPaletteState(p);

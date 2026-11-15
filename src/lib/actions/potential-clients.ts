@@ -22,6 +22,7 @@ import {
   type PotentialClientStatusType,
 } from "@/lib/schemas/potential-client";
 import type { PotentialClient, OpportunityIndicator } from "@/types/domain";
+import { broadcastNotification } from "@/lib/actions/notifications";
 
 export type ActionResult<T = unknown> = {
   success: boolean;
@@ -360,7 +361,7 @@ export async function createPotentialClient(
         name: validated.name,
       });
 
-      const newId = `pc-${Date.now().toString().slice(-4)}`;
+      const newId = crypto.randomUUID();
       const businessId = `POT-00${100 + demoPotentialClients.length + 1}`;
       const owner = demoProfiles.find((p) => p.id === validated.research_owner_id) || demoProfiles[2];
 
@@ -468,6 +469,21 @@ export async function createPotentialClient(
       notes: validated.notes || null,
       metadata: { potential_client_id: inserted.id },
     });
+
+    // Live notification dispatch across team devices
+    try {
+      await broadcastNotification({
+        title: `💼 عميل محتمل جديد: ${inserted.name}`,
+        body: `تم إدراج عميل محتمل جديد (${inserted.name}) في قاعدة البيانات وتعيينه للمتابعة الأولية.`,
+        category: "UPDATE",
+        type: "INFO",
+        link: `/potential-clients/${inserted.id}`,
+        targetUserIds: researchOwnerId ? [researchOwnerId] : [],
+        notifyAdminsAndGMs: true,
+      });
+    } catch {
+      // Non-blocking
+    }
 
     revalidatePath("/potential-clients");
 

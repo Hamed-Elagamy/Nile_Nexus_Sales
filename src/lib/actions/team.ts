@@ -103,6 +103,20 @@ export async function updateMemberRole(
       return { success: false, error: "Authentication required" };
     }
 
+    // Verify current caller is GM
+    const { data: currentProfile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (currentProfile?.role !== "GM") {
+      return {
+        success: false,
+        error: "فقط المدير العام (GM) يمتلك صلاحية تعديل رتب أعضاء الفريق",
+      };
+    }
+
     const { error } = await supabase
       .from("profiles")
       .update({ role: validated.role })
@@ -145,6 +159,27 @@ export async function toggleMemberStatus(
 
     if (!user) {
       return { success: false, error: "Authentication required" };
+    }
+
+    if (validated.user_id === user.id && !validated.is_active) {
+      return {
+        success: false,
+        error: "لا يمكنك تعطيل حسابك الشخصي",
+      };
+    }
+
+    // Verify current caller is GM or ADMIN
+    const { data: currentProfile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (currentProfile?.role !== "GM" && currentProfile?.role !== "ADMIN") {
+      return {
+        success: false,
+        error: "فقط المدير العام أو المشرف يمتلك صلاحية تفعيل أو تعطيل الحسابات",
+      };
     }
 
     const { error } = await supabase

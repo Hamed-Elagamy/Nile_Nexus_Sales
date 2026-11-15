@@ -23,6 +23,7 @@ import {
 } from "@/lib/schemas/client";
 import { normalizePhoneNumber } from "@/lib/schemas/potential-client";
 import type { Client, Contact, Deal } from "@/types/domain";
+import { broadcastNotification } from "@/lib/actions/notifications";
 
 export type ActionResult<T = unknown> = {
   success: boolean;
@@ -244,7 +245,7 @@ export async function createClient(
     const validated = createClientSchema.parse(input);
 
     if (!isSupabaseConfigured()) {
-      const newId = `c-${Date.now().toString().slice(-4)}`;
+      const newId = crypto.randomUUID();
       const businessId = `CLIENT-00${200 + demoClients.length + 1}`;
       const owner = demoProfiles.find((p) => p.id === validated.account_owner_id) || demoProfiles[2];
 
@@ -273,7 +274,7 @@ export async function createClient(
 
       if (validated.primary_contact) {
         demoContacts.push({
-          id: `cnt-${Date.now().toString().slice(-4)}`,
+          id: crypto.randomUUID(),
           client_id: newId,
           name: validated.primary_contact.name,
           job_title: validated.primary_contact.job_title || null,
@@ -362,6 +363,21 @@ export async function createClient(
       summary: `تسجيل عميل جديد: ${inserted.name} (${inserted.business_id})`,
       metadata: { client_id: inserted.id },
     });
+
+    // Live notification dispatch across team devices
+    try {
+      await broadcastNotification({
+        title: `🏢 عميل جديد: ${inserted.name}`,
+        body: `تم تسجيل عميل رسمي جديد (${inserted.name} - ${inserted.business_id}) في المنظومة.`,
+        category: "UPDATE",
+        type: "SUCCESS",
+        link: `/clients/${inserted.id}`,
+        targetUserIds: accountOwnerId ? [accountOwnerId] : [],
+        notifyAdminsAndGMs: true,
+      });
+    } catch {
+      // Non-blocking
+    }
 
     revalidatePath("/clients");
 
@@ -547,7 +563,7 @@ export async function convertPotentialClientToClient(
       const pc = demoPotentialClients.find((p) => p.id === potentialClientId);
       if (!pc) return { success: false, error: "Potential client not found" };
 
-      const newClientId = `c-${Date.now().toString().slice(-4)}`;
+      const newClientId = crypto.randomUUID();
       const newBusinessId = `CLIENT-00${200 + demoClients.length + 1}`;
 
       const newClient: Client = {
@@ -578,7 +594,7 @@ export async function convertPotentialClientToClient(
       let createdDeal: Deal | undefined;
       if (options.createDeal && options.dealTitle) {
         createdDeal = {
-          id: `d-${Date.now().toString().slice(-4)}`,
+          id: crypto.randomUUID(),
           business_id: `DEAL-00${300 + demoDeals.length + 1}`,
           title: options.dealTitle,
           client_id: newClientId,
@@ -722,6 +738,21 @@ export async function convertPotentialClientToClient(
         deal_id: createdDeal?.id,
       },
     });
+
+    // Live notification dispatch across team devices
+    try {
+      await broadcastNotification({
+        title: `🎉 تحويل عميل مؤكد: ${client.name}`,
+        body: `تم تحويل العميل المحتمل (${pc.name}) بنجاح إلى عميل مؤكد (${client.business_id})${createdDeal ? ` وفتح صفقة بقيمة ${createdDeal.estimated_value || 0} ج.م` : ""}.`,
+        category: "UPDATE",
+        type: "SUCCESS",
+        link: `/clients/${client.id}`,
+        targetUserIds: client.account_owner_id ? [client.account_owner_id] : [],
+        notifyAdminsAndGMs: true,
+      });
+    } catch {
+      // Non-blocking
+    }
 
     revalidatePath("/potential-clients");
     revalidatePath("/clients");

@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { AlertTriangle, RefreshCw, Home, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 import { sounds } from "@/lib/utils/confetti-sound";
 
 interface ErrorProps {
@@ -63,13 +64,13 @@ export default function GlobalError({ error, reset }: ErrorProps) {
             <span>إعادة المحاولة / Retry</span>
           </button>
 
-          <a
+          <Link
             href="/"
             className="w-full sm:flex-1 h-11 rounded-xl border border-border bg-card hover:bg-muted text-foreground font-semibold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98"
           >
             <Home className="w-4 h-4 text-muted-foreground" />
             <span>الرئيسية / Home</span>
-          </a>
+          </Link>
         </div>
       </div>
     </div>

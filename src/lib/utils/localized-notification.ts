@@ -159,7 +159,7 @@ export function formatLocalizedNotification(
 
     // --- New Pipeline Opportunity ---
     if (rawTitle.includes("فرصة جديدة بالبايبلاين") || rawTitle.includes("صفقة جديدة بالبايبلاين")) {
-      let enBody = "A new deal opportunity has been added to the sales pipeline and assigned for follow-up.";
+      const enBody = "A new deal opportunity has been added to the sales pipeline and assigned for follow-up.";
       return {
         title: "💼 New Pipeline Opportunity",
         body: enBody,

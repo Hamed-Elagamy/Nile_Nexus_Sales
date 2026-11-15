@@ -1,9 +1,18 @@
 # Project State — Tammlo Sales (formerly Nile Nexus Sales)
 
 ## Current Phase
-Production Deployed — Live on Vercel & Connected to Supabase (Rebranded to Tammlo)
+Stabilized & Hardened — Autonomous Full-System Validation Complete (Branch: `fix/tammlo-full-system-stabilization`)
 
 ## Completed Phases
+- **Phase 17 (Autonomous Full-System Diagnosis, Security Hardening, and E2E Workflow Validation)**:
+  - Resolved privilege escalation vulnerability in `src/lib/actions/team.ts` by strictly enforcing GM-only authority for role modifications and GM/Admin authority for member activation/deactivation with self-deactivation prevention.
+  - Authored PostgreSQL security migration `015_harden_profile_role_security.sql` with trigger `check_profile_role_modification()` ensuring role integrity at database level.
+  - Resolved all 53 ESLint errors (React 19 compiler rules, variable declaration hoisting in `theme-accent-provider.tsx`, Link in `error.tsx`, unescaped quotes, and render purity).
+  - Replaced legacy non-UUID ID generators with compliant RFC 4122 v4 `crypto.randomUUID()` across `clients.ts`, `deals.ts`, `tasks.ts`, `potential-clients.ts`, `follow-ups.ts`, and `proposals.ts`, resolving downstream Zod schema validation errors.
+  - Authored E2E employee workflow test suite (`src/lib/__tests__/e2e-employee-workflows.test.ts`) covering full Lead-to-Cash cycle, proposal financial immutability, client filtering, deal won/lost transitions, and permission security boundaries.
+  - Authored dedicated security test suite `src/lib/actions/__tests__/team.test.ts` (8/8 tests passing).
+  - Integrated notification auto-dispatch into client creation, proposal creation/acceptance, and lead generation.
+  - Full regression validation: 147/147 Vitest tests passing (100% across 26 test files), 0 TypeScript compiler errors across 217 files, 0 ESLint errors, and all 30 routes built in production Turbopack.
 - **Phase 16 (Live Real-Time Device Notifications, Luxury Audio Chime, and Automated Broadcast System)**:
   - Enabled native OS-level notifications on mobile (iOS 16.4+ PWA, Android Standalone) and desktop via Service Worker `showNotification`.
   - Implemented executive 3-tone acoustic chime (F5 -> A5 -> C6) using Web Audio API with audio autoplay unlock (`initAudioUnlock`).

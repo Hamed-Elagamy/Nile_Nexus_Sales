@@ -183,7 +183,7 @@ export async function createTask(
 
     if (!isSupabaseConfigured()) {
       const newTask: any = {
-        id: `tsk-${Date.now()}`,
+        id: crypto.randomUUID(),
         title: parsed.title,
         notes: parsed.notes || null,
         priority: parsed.priority || "NORMAL",

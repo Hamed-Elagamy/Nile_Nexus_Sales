@@ -347,7 +347,7 @@ export async function createDeal(input: CreateDealInput): Promise<ActionResult<D
     const validated = createDealSchema.parse(input);
 
     if (!isSupabaseConfigured()) {
-      const newDealId = `d-${Date.now().toString().slice(-4)}`;
+      const newDealId = crypto.randomUUID();
       const businessId = `DEAL-00${300 + demoDeals.length + 1}`;
       const owner = demoProfiles.find((p) => p.id === validated.sales_owner_id) || demoProfiles[2];
 

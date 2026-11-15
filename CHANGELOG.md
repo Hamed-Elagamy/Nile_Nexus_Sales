@@ -2,7 +2,34 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.12.0] - 2026-11-15
+## [1.13.0] - 2026-11-16
+
+### Added & Enhanced
+- **Autonomous Full-System Diagnosis, Stabilization, Hardening & End-to-End Validation**:
+  - **Comprehensive Multi-Role Privilege Escalation Hardening (`src/lib/actions/team.ts`)**:
+    - Strictly restricted role promotion and demotion in `updateMemberRole` to General Managers (`GM`).
+    - Enforced GM and Admin restrictions on user status toggles (`toggleMemberStatus`) with strict self-deactivation prevention.
+    - Authored unit test suite `src/lib/actions/__tests__/team.test.ts` (8/8 tests passing, 100% coverage of role boundaries).
+    - Authored PostgreSQL security migration `supabase/migrations/015_harden_profile_role_security.sql` with trigger `check_profile_role_modification()` enforcing role immutability at the database engine level.
+  - **End-to-End Employee Business Workflow Test Suite (`src/lib/__tests__/e2e-employee-workflows.test.ts`)**:
+    - Validated complete Lead-to-Cash sales cycle: Potential Client (Lead) ➡ Converted Client ➡ Deal ➡ Follow-up ➡ Executive Task ➡ Multi-item Proposal ➡ WON.
+    - Validated Financial Regulation Proposal Immutability: strictly prevents downward modification or deletion of `ACCEPTED` commercial proposals.
+    - Validated Multi-client search filtration and pagination resilience.
+    - Validated Deal Won/Lost pipeline transitions with structured loss reason tracking and resurfacing dates.
+    - Validated Role & Security authorization boundaries.
+  - **UUID Standard Conformance & Downstream Zod Alignment**:
+    - Replaced all non-UUID fallback string generators (`c-1234`, `tsk-1234`, `flw-1234`, `prop-1234`, `v-1234`, `li-1234`) with compliant RFC 4122 v4 `crypto.randomUUID()` in `clients.ts`, `deals.ts`, `tasks.ts`, `potential-clients.ts`, `follow-ups.ts`, and `proposals.ts`.
+    - Eliminated downstream validation aborts during client-to-deal or lead-to-client automated conversions.
+  - **Codebase Linting & Compiler Health Overhaul**:
+    - Resolved all 53 ESLint compiler errors across React 19 rules, variable hoisting temporal dead zones in `theme-accent-provider.tsx`, Next.js link components in `error.tsx`, unescaped quotes in `objection-battlecards-dialog.tsx`, and impure render timestamps in `client-detail.tsx`, `clients-table.tsx`, and `task-card.tsx`.
+    - Cleaned up build scripts and configurations in `eslint.config.mjs`.
+  - **Notification Auto-Dispatch Integration**:
+    - Wired real-time multi-device broadcast dispatch into `createClient`, `convertPotentialClientToClient`, `createProposal`, `updateProposalVersionStatus` (on ACCEPTED), and `createPotentialClient`.
+  - **Verification Metrics**:
+    - **147/147 Vitest tests passing (100% across all 26 test suites)**.
+    - **0 TypeScript compiler errors across all 217 source files (`npm run typecheck`)**.
+    - **0 ESLint errors across repository (`npm run lint`)**.
+    - **All 30 Next.js 15 App Router routes built and optimized with 0 errors (`npm run build`)**.
 
 ### Added & Enhanced
 - **Live Real-Time Device Notifications & Automated Multi-Device Dispatch System**:

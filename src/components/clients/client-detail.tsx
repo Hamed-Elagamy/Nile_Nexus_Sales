@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, useMemo } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -46,10 +46,10 @@ export function ClientDetail({ client }: ClientDetailProps) {
   const [address, setAddress] = useState(client.address || "");
   const [notes, setNotes] = useState(client.notes || "");
 
-  const cleanPhone = phone.replace(/[^0-9]/g, "");
-  const whatsappUrl = cleanPhone
-    ? `https://wa.me/${cleanPhone.startsWith("0") ? "2" + cleanPhone : cleanPhone}`
-    : null;
+  const daysSinceLastContact = useMemo(() => {
+    const timestamp = new Date(client.updated_at || client.created_at).getTime();
+    return Math.floor((Date.now() - timestamp) / (1000 * 60 * 60 * 24));
+  }, [client.updated_at, client.created_at]);
 
   const handleSaveInfo = () => {
     startTransition(async () => {
@@ -94,7 +94,7 @@ export function ClientDetail({ client }: ClientDetailProps) {
             <ClientHealthBadge
               wonDealsCount={client.deals?.filter((d) => d.stage === "WON").length}
               activeDealsCount={client.deals?.filter((d) => d.stage !== "WON" && d.stage !== "LOST").length}
-              daysSinceLastContact={Math.floor((Date.now() - new Date(client.updated_at || client.created_at).getTime()) / (1000 * 60 * 60 * 24))}
+              daysSinceLastContact={daysSinceLastContact}
             />
           </div>
           {client.industry && (

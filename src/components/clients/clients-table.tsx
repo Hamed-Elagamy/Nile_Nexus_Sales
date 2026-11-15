@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
@@ -40,6 +40,11 @@ interface ClientsTableProps {
 export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
   const t = useTranslations("clients");
   const tCommon = useTranslations("common");
+  const now = useMemo(() => Date.now(), []);
+  const getDaysSinceContact = (updatedAt?: string | null, createdAt?: string) => {
+    const ts = new Date(updatedAt || createdAt || 0).getTime();
+    return ts > 0 ? Math.floor((now - ts) / (1000 * 60 * 60 * 24)) : 0;
+  };
 
   if (loading) {
     return (
@@ -90,10 +95,6 @@ export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
             {clients.map((client) => {
               const primaryContact = client.contacts?.find((c) => c.is_primary) || client.contacts?.[0];
               const phone = primaryContact?.phone || client.phone;
-              const cleanPhone = phone?.replace(/[^0-9]/g, "");
-              const whatsappUrl = cleanPhone
-                ? `https://wa.me/${cleanPhone.startsWith("0") ? "2" + cleanPhone : cleanPhone}`
-                : null;
 
               return (
                 <TableRow
@@ -131,7 +132,7 @@ export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
                     <ClientHealthBadge
                       wonDealsCount={client.deals?.filter((d) => d.stage === "WON").length}
                       activeDealsCount={client.deals?.filter((d) => d.stage !== "WON" && d.stage !== "LOST").length}
-                      daysSinceLastContact={Math.floor((Date.now() - new Date(client.updated_at || client.created_at).getTime()) / (1000 * 60 * 60 * 24))}
+                      daysSinceLastContact={getDaysSinceContact(client.updated_at, client.created_at)}
                     />
                   </TableCell>
 
@@ -237,10 +238,6 @@ export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
         {clients.map((client) => {
           const primaryContact = client.contacts?.find((c) => c.is_primary) || client.contacts?.[0];
           const phone = primaryContact?.phone || client.phone;
-          const cleanPhone = phone?.replace(/[^0-9]/g, "");
-          const whatsappUrl = cleanPhone
-            ? `https://wa.me/${cleanPhone.startsWith("0") ? "2" + cleanPhone : cleanPhone}`
-            : null;
 
           return (
             <Card
@@ -269,7 +266,7 @@ export function ClientsTable({ clients, loading = false }: ClientsTableProps) {
                     compact
                     wonDealsCount={client.deals?.filter((d) => d.stage === "WON").length}
                     activeDealsCount={client.deals?.filter((d) => d.stage !== "WON" && d.stage !== "LOST").length}
-                    daysSinceLastContact={Math.floor((Date.now() - new Date(client.updated_at || client.created_at).getTime()) / (1000 * 60 * 60 * 24))}
+                    daysSinceLastContact={getDaysSinceContact(client.updated_at, client.created_at)}
                   />
                 </div>
               </div>

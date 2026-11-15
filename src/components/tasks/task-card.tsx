@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useTransition } from "react";
+import React, { useTransition, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import {
   CheckCircle2,
@@ -53,11 +53,10 @@ export function TaskCard({
   const isImportant = task.priority === "IMPORTANT";
 
   // Check if overdue
-  const isOverdue =
-    task.deadline &&
-    !isDone &&
-    task.status !== "CANCELLED" &&
-    new Date(task.deadline).getTime() < Date.now();
+  const isOverdue = useMemo(() => {
+    if (!task.deadline || isDone || task.status === "CANCELLED") return false;
+    return new Date(task.deadline).getTime() < Date.now();
+  }, [task.deadline, isDone, task.status]);
 
   const handleToggleDone = () => {
     startTransition(() => {

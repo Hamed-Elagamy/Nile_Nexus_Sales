@@ -441,12 +441,12 @@ export async function broadcastNotification(params: {
 
     if (params.notifyAdminsAndGMs !== false) {
       try {
-        let query = supabase.from("profiles").select("id, role, is_active");
-        if (typeof (query as unknown as { in?: Function }).in === "function") {
-          query = (query as unknown as { in: Function }).in("role", ["GM", "ADMIN"]);
+        let query: any = supabase.from("profiles").select("id, role, is_active");
+        if (typeof query?.in === "function") {
+          query = query.in("role", ["GM", "ADMIN"]);
         }
-        if (typeof (query as unknown as { eq?: Function }).eq === "function") {
-          query = (query as unknown as { eq: Function }).eq("is_active", true);
+        if (typeof query?.eq === "function") {
+          query = query.eq("is_active", true);
         }
         const { data: profiles } = await query;
         if (Array.isArray(profiles)) {

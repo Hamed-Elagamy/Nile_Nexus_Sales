@@ -270,7 +270,7 @@ export function ObjectionBattlecardsDialog({ open, onOpenChange }: ObjectionBatt
                   </Button>
                 </div>
                 <div className="p-3.5 rounded-lg bg-muted/40 border text-xs leading-relaxed font-medium">
-                  "{activeCard.winningResponse}"
+                  &ldquo;{activeCard.winningResponse}&rdquo;
                 </div>
               </div>
 
@@ -280,7 +280,7 @@ export function ObjectionBattlecardsDialog({ open, onOpenChange }: ObjectionBatt
                   <HelpCircle className="h-3.5 w-3.5" />
                   <span>سؤال استرجاع السيطرة (Take Back Control):</span>
                 </div>
-                <p className="text-foreground font-medium">"{activeCard.reversalQuestion}"</p>
+                <p className="text-foreground font-medium">&ldquo;{activeCard.reversalQuestion}&rdquo;</p>
               </div>
 
               {/* Smart Concessions */}

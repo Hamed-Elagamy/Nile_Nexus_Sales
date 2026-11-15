@@ -279,7 +279,7 @@ export async function createFollowUp(
 
     if (!isSupabaseConfigured()) {
       const newFlw: FollowUp = {
-        id: `flw-${Date.now().toString().slice(-4)}`,
+        id: crypto.randomUUID(),
         client_id: validated.client_id,
         deal_id: validated.deal_id || null,
         responsible_id: validated.responsible_id || demoProfiles[2].id,
@@ -387,7 +387,7 @@ export async function completeFollowUp(
       let nextFollowUp: FollowUp | undefined;
       if (validated.schedule_next && validated.next_action && validated.next_due_at) {
         nextFollowUp = {
-          id: `flw-${Date.now().toString().slice(-4)}`,
+          id: crypto.randomUUID(),
           client_id: flw.client_id,
           deal_id: flw.deal_id,
           responsible_id: flw.responsible_id,

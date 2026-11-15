@@ -23,6 +23,7 @@ import {
   type ProposalStatus,
 } from "@/lib/schemas/proposal";
 import type { Proposal, ProposalVersion, ProposalItem, Client, Deal } from "@/types/domain";
+import { broadcastNotification } from "@/lib/actions/notifications";
 
 export type ActionResult<T = unknown> = {
   success: boolean;
@@ -303,7 +304,8 @@ export async function createProposal(
 
     if (!isSupabaseConfigured()) {
       const businessId = `PROP-00${100 + demoProposals.length + 1}`;
-      const newPropId = `prop-${Date.now().toString().slice(-4)}`;
+      const newPropId = crypto.randomUUID();
+      const newVersionId = crypto.randomUUID();
       const client = demoClients.find((c) => c.id === validated.client_id);
       const deal = demoDeals.find((d) => d.id === validated.deal_id);
       const owner = demoProfiles[2];
@@ -316,8 +318,8 @@ export async function createProposal(
       );
 
       const itemsRows: ProposalItem[] = validated.items.map((item, index) => ({
-        id: `li-${Date.now().toString().slice(-4)}-${index}`,
-        proposal_version_id: `v-${Date.now().toString().slice(-4)}`,
+        id: crypto.randomUUID(),
+        proposal_version_id: newVersionId,
         service_id: item.service_id || null,
         description_ar: item.description_ar,
         description_en: item.description_en || null,
@@ -329,7 +331,7 @@ export async function createProposal(
       }));
 
       const newVersion: ProposalVersionWithItems = {
-        id: `v-${Date.now().toString().slice(-4)}`,
+        id: newVersionId,
         proposal_id: newPropId,
         version_number: 1,
         status: "DRAFT",
@@ -485,6 +487,20 @@ export async function createProposal(
       metadata: { proposal_id: proposal.id, version_id: version.id },
     });
 
+    // Live notification dispatch across team devices
+    try {
+      await broadcastNotification({
+        title: `📄 عرض سعر جديد: ${businessId}`,
+        body: `تم إنشاء عرض سعر رسمي جديد بقيمة إجمالية ${Number(calc.grandTotal).toLocaleString()} ${validated.currency}.`,
+        category: "UPDATE",
+        type: "INFO",
+        link: `/proposals/${proposal.id}`,
+        notifyAdminsAndGMs: true,
+      });
+    } catch {
+      // Non-blocking
+    }
+
     revalidatePath("/proposals");
     revalidatePath(`/clients/${validated.client_id}`);
     revalidatePath(`/deals/${validated.deal_id}`);
@@ -512,6 +528,7 @@ export async function createProposalVersion(
       if (!prop) return { success: false, error: "Proposal not found" };
 
       const nextVersionNumber = prop.versions.length + 1;
+      const newVersionId = crypto.randomUUID();
       const calc = calculateFinancials(
         validated.items,
         validated.discount_percentage,
@@ -520,8 +537,8 @@ export async function createProposalVersion(
       );
 
       const itemsRows: ProposalItem[] = validated.items.map((item, index) => ({
-        id: `li-${Date.now().toString().slice(-4)}-${index}`,
-        proposal_version_id: `v-${Date.now().toString().slice(-4)}`,
+        id: crypto.randomUUID(),
+        proposal_version_id: newVersionId,
         service_id: item.service_id || null,
         description_ar: item.description_ar,
         description_en: item.description_en || null,
@@ -533,7 +550,7 @@ export async function createProposalVersion(
       }));
 
       const newVersion: ProposalVersionWithItems = {
-        id: `v-${Date.now().toString().slice(-4)}`,
+        id: newVersionId,
         proposal_id: validated.proposal_id,
         version_number: nextVersionNumber,
         status: "DRAFT",
@@ -723,6 +740,21 @@ export async function updateProposalVersionStatus(
 
     if (error) {
       return { success: false, error: error.message };
+    }
+
+    if (validated.status === "ACCEPTED") {
+      try {
+        await broadcastNotification({
+          title: "📄 تم قبول واعتماد عرض السعر!",
+          body: `تمت الموافقة الرسمية وقبول عرض السعر (إصدار ${currentVersion.version_number}) بقيمة ${Number(currentVersion.grand_total).toLocaleString()} ${currentVersion.currency}.`,
+          category: "UPDATE",
+          type: "SUCCESS",
+          link: `/proposals/${currentVersion.proposal_id}`,
+          notifyAdminsAndGMs: true,
+        });
+      } catch {
+        // Non-blocking
+      }
     }
 
     revalidatePath("/proposals");
