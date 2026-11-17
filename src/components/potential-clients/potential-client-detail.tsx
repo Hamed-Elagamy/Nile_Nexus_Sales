@@ -19,6 +19,9 @@ import {
   Rocket,
   Pencil,
   Trash2,
+  Building2,
+  Users,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -33,6 +36,7 @@ import {
 import { PotentialClientStatusBadge } from "./status-badge";
 import { WhatsAppQuickDialog } from "@/components/shared/whatsapp-quick-dialog";
 import { EditPotentialClientDialog } from "./edit-potential-client-dialog";
+import { convertPotentialClientToClient } from "@/lib/actions/clients";
 import {
   updatePotentialClient,
   updatePotentialClientStatus,
@@ -66,6 +70,12 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
   );
 
   const [convertModalOpen, setConvertModalOpen] = useState(false);
+  const [isConverting, setIsConverting] = useState(false);
+  const [clientType, setClientType] = useState<"COMPANY" | "INDIVIDUAL">("COMPANY");
+  const [createDeal, setCreateDeal] = useState(false);
+  const [dealTitle, setDealTitle] = useState("");
+  const [dealEstimatedValue, setDealEstimatedValue] = useState("");
+
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -76,6 +86,37 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
   const whatsappUrl = cleanPhone
     ? `https://wa.me/${cleanPhone.startsWith("0") ? "2" + cleanPhone : cleanPhone}`
     : null;
+
+  const openConvertModal = () => {
+    setDealTitle(`صفقة جديدة مع ${currentClient.name}`);
+    setConvertModalOpen(true);
+  };
+
+  const handleConfirmConversion = async () => {
+    setIsConverting(true);
+    try {
+      const res = await convertPotentialClientToClient(currentClient.id, {
+        clientType,
+        createDeal,
+        dealTitle: createDeal ? (dealTitle.trim() || `صفقة جديدة مع ${currentClient.name}`) : undefined,
+        dealEstimatedValue: createDeal && dealEstimatedValue ? Number(dealEstimatedValue) : undefined,
+        dealCurrency: "EGP",
+      });
+
+      if (res.success && res.data?.client) {
+        toast.success(t("convertSuccess") || "تم تحويل العميل بنجاح ونقله إلى قسم العملاء! 🎉");
+        setConvertModalOpen(false);
+        router.refresh();
+        router.push(`/clients/${res.data.client.id}`);
+      } else {
+        toast.error(res.error || tCommon("error") || "فشل تحويل العميل");
+      }
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "فشل تحويل العميل");
+    } finally {
+      setIsConverting(false);
+    }
+  };
 
   const handleStatusChange = (newStatus: PotentialClientStatusType) => {
     startTransition(async () => {
@@ -216,19 +257,66 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
             </Button>
           )}
 
-          {currentStatus !== "CONVERTED" && (
+          {/* If already converted and has converted_client_id */}
+          {currentClient.converted_client_id ? (
+            <Link href={`/clients/${currentClient.converted_client_id}`}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-1.5 text-xs border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 cursor-pointer"
+              >
+                <Building2 className="h-3.5 w-3.5" />
+                <span>عرض العميل المؤكد 🏢</span>
+              </Button>
+            </Link>
+          ) : (
             <Button
               size="sm"
-              disabled={isPending}
-              onClick={() => setConvertModalOpen(true)}
-              className="gap-1.5 text-xs bg-primary text-primary-foreground font-medium shadow-xs"
+              disabled={isPending || isConverting}
+              onClick={openConvertModal}
+              className="gap-1.5 text-xs bg-primary text-primary-foreground font-medium shadow-xs cursor-pointer"
             >
               <Rocket className="h-3.5 w-3.5" />
-              <span>{t("convert")}</span>
+              <span>
+                {currentStatus === "CONVERTED"
+                  ? "إكمال النقل لقسم العملاء 🚀"
+                  : t("convert")}
+              </span>
             </Button>
           )}
         </div>
       </div>
+
+      {/* Converted Status Banner */}
+      {currentClient.converted_client_id ? (
+        <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 text-xs text-emerald-800 dark:text-emerald-300">
+            <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span>تم تحويل هذا العميل المحتمل بنجاح إلى عميل رسمي مؤكد في المنظومة.</span>
+          </div>
+          <Link href={`/clients/${currentClient.converted_client_id}`}>
+            <Button size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-medium shrink-0 cursor-pointer">
+              <Building2 className="h-3.5 w-3.5" />
+              <span>عرض ملف العميل 🏢</span>
+            </Button>
+          </Link>
+        </div>
+      ) : currentStatus === "CONVERTED" ? (
+        <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 text-xs text-amber-800 dark:text-amber-300">
+            <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+            <span>تم تعيين الحالة كـ &quot;متحول&quot; ولكن لم يتم إنشاء سجل العميل الرسمي بعد. اضغط لنقله إلى قسم العملاء الآن.</span>
+          </div>
+          <Button
+            size="sm"
+            onClick={openConvertModal}
+            className="h-8 text-xs bg-amber-600 hover:bg-amber-700 text-white font-medium shrink-0 cursor-pointer"
+          >
+            <Rocket className="h-3.5 w-3.5" />
+            <span>إكمال النقل لقسم العملاء 🚀</span>
+          </Button>
+        </div>
+      ) : null}
 
       {/* Main Grid: Info + Opportunities + Notes */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -448,31 +536,110 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
               <span>{t("convert")}</span>
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 py-2 text-sm text-foreground">
-            <p>{t("convertConfirm")}</p>
-            <div className="p-3 bg-muted rounded-lg text-xs space-y-1">
+          <div className="space-y-4 py-2 text-sm text-foreground">
+            <p className="text-muted-foreground">{t("convertConfirm")}</p>
+
+            <div className="p-3 bg-muted/60 border border-border rounded-lg text-xs space-y-1.5">
               <p className="font-semibold text-foreground">{t("dataToTransfer")}</p>
-              <p className="text-muted-foreground">{t("clientNamePrefix", { name: client.name })}</p>
-              {client.phone && <p className="text-muted-foreground">{t("clientPhonePrefix", { phone: client.phone })}</p>}
+              <p className="text-muted-foreground">{t("clientNamePrefix", { name: currentClient.name })}</p>
+              {currentClient.phone && <p className="text-muted-foreground">{t("clientPhonePrefix", { phone: currentClient.phone })}</p>}
+              {currentClient.area && <p className="text-muted-foreground">📍 المنطقة: {currentClient.area}</p>}
               <p className="text-muted-foreground">{t("allOpportunitiesTransferred")}</p>
             </div>
+
+            {/* Client Type Choice */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">نوع العميل الرسمي</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setClientType("COMPANY")}
+                  className={`p-2.5 text-xs rounded-lg border text-center transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    clientType === "COMPANY"
+                      ? "border-primary bg-primary/10 text-primary font-bold shadow-xs"
+                      : "border-border bg-background hover:bg-muted text-muted-foreground"
+                  }`}
+                >
+                  <Building2 className="h-4 w-4" />
+                  <span>شركة (Company)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setClientType("INDIVIDUAL")}
+                  className={`p-2.5 text-xs rounded-lg border text-center transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    clientType === "INDIVIDUAL"
+                      ? "border-primary bg-primary/10 text-primary font-bold shadow-xs"
+                      : "border-border bg-background hover:bg-muted text-muted-foreground"
+                  }`}
+                >
+                  <Users className="h-4 w-4" />
+                  <span>فرد (Individual)</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Optional Deal Creation Checkbox */}
+            <div className="pt-2 border-t border-border space-y-3">
+              <label className="flex items-center gap-2 text-xs font-medium text-foreground cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={createDeal}
+                  onChange={(e) => setCreateDeal(e.target.checked)}
+                  className="rounded border-border text-primary focus:ring-primary h-4 w-4 cursor-pointer"
+                />
+                <span>فتح صفقة تجارية أولية في المسار البيعي (Pipeline) تلقائياً</span>
+              </label>
+
+              {createDeal && (
+                <div className="space-y-2.5 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-semibold text-foreground">عنوان الصفقة</label>
+                    <input
+                      type="text"
+                      value={dealTitle}
+                      onChange={(e) => setDealTitle(e.target.value)}
+                      placeholder="مثال: ترخيص نظام نقاط البيع والمخازن"
+                      className="w-full text-xs px-2.5 py-1.5 rounded-md border border-border bg-background focus:outline-hidden focus:ring-1 focus:ring-primary"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-semibold text-foreground">القيمة المتوقعة (ج.م)</label>
+                    <input
+                      type="number"
+                      value={dealEstimatedValue}
+                      onChange={(e) => setDealEstimatedValue(e.target.value)}
+                      placeholder="50000"
+                      className="w-full text-xs px-2.5 py-1.5 rounded-md border border-border bg-background focus:outline-hidden focus:ring-1 focus:ring-primary"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2 sm:gap-0 pt-2">
             <Button
               variant="outline"
+              disabled={isConverting}
               onClick={() => setConvertModalOpen(false)}
             >
               {tCommon("cancel")}
             </Button>
             <Button
-              onClick={() => {
-                setConvertModalOpen(false);
-                handleStatusChange("CONVERTED");
-              }}
-              className="gap-2 bg-primary text-primary-foreground font-medium"
+              onClick={handleConfirmConversion}
+              disabled={isConverting}
+              className="gap-2 bg-primary text-primary-foreground font-medium cursor-pointer"
             >
-              <Rocket className="h-4 w-4" />
-              <span>{t("confirmConversion")}</span>
+              {isConverting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>جاري إنشاء ونقل العميل...</span>
+                </>
+              ) : (
+                <>
+                  <Rocket className="h-4 w-4" />
+                  <span>{t("confirmConversion")}</span>
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

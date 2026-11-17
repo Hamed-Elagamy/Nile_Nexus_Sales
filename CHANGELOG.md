@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.13.1] - 2026-11-17
+
+### Fixed & Enhanced
+- **Official Client Conversion Wiring & Retroactive Recovery (`PotentialClientDetail`)**:
+  - **Root Cause Resolution**: The UI confirmation button previously executed `handleStatusChange("CONVERTED")` which only altered the status column in `potential_clients` without creating rows in `clients` or `contacts`.
+  - **Wired Server Action**: Connected `convertPotentialClientToClient` to the conversion dialog with full configuration:
+    - Official Client Type selection: Company (شركة) or Individual (فرد).
+    - Optional automated Initial Deal creation in the sales pipeline with custom title and estimated value in EGP.
+    - Automated creation of `clients` record, primary `contacts` record, and `deals` record.
+    - Real-time `activities` logging and distributed live notification dispatch to management and team devices.
+    - Automatic redirection upon conversion to the newly created official client profile (`/clients/[id]`).
+  - **Retroactive Recovery for Previously Marked Leads**:
+    - For leads previously marked as `CONVERTED` without a corresponding client record (e.g., `Moamen El badry`), added an alert banner with a 1-click recovery button: `إكمال النقل لقسم العملاء 🚀`.
+    - Added link `عرض ملف العميل 🏢` directly on converted leads to navigate instantly to their client profile.
+  - **Table & Directory Synchronization**: Updated `PotentialClientsTable` dropdown menu to link directly to the official client profile for converted leads.
+  - **Testing**: Maintained 100% test pass rate across all 26 test suites (147/147 tests passing) and 0 TypeScript errors.
+
 ## [1.13.0] - 2026-11-16
 
 ### Added & Enhanced

@@ -22,6 +22,7 @@ function createMockQuery(defaultData: unknown = null, defaultError: unknown = nu
   query.is = vi.fn().mockImplementation(() => query);
   query.limit = vi.fn().mockImplementation(() => Promise.resolve({ data: defaultData, error: defaultError }));
   query.single = vi.fn().mockImplementation(() => Promise.resolve({ data: defaultData, error: defaultError }));
+  query.maybeSingle = vi.fn().mockImplementation(() => Promise.resolve({ data: defaultData, error: defaultError }));
   query.then = (resolve: (val: unknown) => void) => resolve({ data: defaultData, error: defaultError, count: 1 });
   return query;
 }

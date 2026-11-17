@@ -292,17 +292,31 @@ export function PotentialClientsTable({
 
                         <DropdownMenuSeparator />
 
-                        <DropdownMenuItem
-                          render={
-                            <Link
-                              href={`/potential-clients/${client.id}`}
-                              className="flex items-center gap-2 cursor-pointer font-medium text-primary"
-                            >
-                              <span>🚀</span>
-                              <span>{t("convert")}</span>
-                            </Link>
-                          }
-                        />
+                        {client.converted_client_id ? (
+                          <DropdownMenuItem
+                            render={
+                              <Link
+                                href={`/clients/${client.converted_client_id}`}
+                                className="flex items-center gap-2 cursor-pointer font-medium text-emerald-600 dark:text-emerald-400"
+                              >
+                                <span>🏢</span>
+                                <span>عرض العميل المؤكد</span>
+                              </Link>
+                            }
+                          />
+                        ) : (
+                          <DropdownMenuItem
+                            render={
+                              <Link
+                                href={`/potential-clients/${client.id}`}
+                                className="flex items-center gap-2 cursor-pointer font-medium text-primary"
+                              >
+                                <span>🚀</span>
+                                <span>{client.status === "CONVERTED" ? "إكمال نقل العميل 🚀" : t("convert")}</span>
+                              </Link>
+                            }
+                          />
+                        )}
 
                         {canDelete && (
                           <>

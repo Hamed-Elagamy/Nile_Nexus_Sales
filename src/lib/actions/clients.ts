@@ -563,6 +563,13 @@ export async function convertPotentialClientToClient(
       const pc = demoPotentialClients.find((p) => p.id === potentialClientId);
       if (!pc) return { success: false, error: "Potential client not found" };
 
+      if (pc.converted_client_id) {
+        const existing = demoClients.find((c) => c.id === pc.converted_client_id);
+        if (existing) {
+          return { success: true, data: { client: existing } };
+        }
+      }
+
       const newClientId = crypto.randomUUID();
       const newBusinessId = `CLIENT-00${200 + demoClients.length + 1}`;
 
@@ -647,6 +654,30 @@ export async function convertPotentialClientToClient(
       return { success: false, error: "Potential client not found" };
     }
 
+    // If already converted and client exists, return it
+    if (pc.converted_client_id) {
+      try {
+        const { data: existingClient } = await supabase
+          .from("clients")
+          .select("*")
+          .eq("id", pc.converted_client_id)
+          .single();
+
+        if (existingClient) {
+          return {
+            success: true,
+            data: { client: existingClient as unknown as Client },
+          };
+        }
+      } catch {
+        // continue to create if not found
+      }
+    }
+
+    const accountOwnerId = pc.research_owner_id || user.id;
+    const creatorId = user.id;
+    const validSourceId = pc.source_id || null;
+
     let clientBusinessId = `CLIENT-${Date.now().toString().slice(-5)}`;
     try {
       const { data: rpcId } = await supabase.rpc("generate_business_id", {
@@ -667,10 +698,10 @@ export async function convertPotentialClientToClient(
         phone: pc.phone || null,
         phone_normalized: pc.phone_normalized || null,
         website: pc.website || null,
-        source_id: pc.source_id || null,
-        account_owner_id: pc.research_owner_id || user.id,
+        source_id: validSourceId,
+        account_owner_id: accountOwnerId,
         notes: pc.notes || null,
-        created_by: user.id,
+        created_by: creatorId,
       })
       .select()
       .single();

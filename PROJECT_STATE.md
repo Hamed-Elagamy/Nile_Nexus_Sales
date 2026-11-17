@@ -1,9 +1,14 @@
 # Project State — Tammlo Sales (formerly Nile Nexus Sales)
 
 ## Current Phase
-Stabilized & Hardened — Autonomous Full-System Validation Complete (Branch: `fix/tammlo-full-system-stabilization`)
+Production Deployed & Verified — Live on Vercel & Connected to Supabase
 
 ## Completed Phases
+- **Phase 18 (Real Client Conversion System & Retroactive Lead Recovery)**:
+  - Resolved "fake conversion" bug where clicking Convert previously only marked `status = 'CONVERTED'` in `potential_clients` without creating rows in `clients` or `contacts`.
+  - Fully wired `convertPotentialClientToClient` to the UI with Company/Individual selection and optional automated initial deal creation in pipeline.
+  - Added retroactive recovery for leads previously marked as converted (such as `Moamen El badry`) with 1-click completion button (`إكمال النقل لقسم العملاء 🚀`) and official profile link (`عرض ملف العميل 🏢`).
+  - Tested and verified: 147/147 automated tests passing, 0 TypeScript errors across 217 files, 0 ESLint errors.
 - **Phase 17 (Autonomous Full-System Diagnosis, Security Hardening, and E2E Workflow Validation)**:
   - Resolved privilege escalation vulnerability in `src/lib/actions/team.ts` by strictly enforcing GM-only authority for role modifications and GM/Admin authority for member activation/deactivation with self-deactivation prevention.
   - Authored PostgreSQL security migration `015_harden_profile_role_security.sql` with trigger `check_profile_role_modification()` ensuring role integrity at database level.
