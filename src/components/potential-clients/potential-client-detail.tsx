@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -57,6 +57,7 @@ interface PotentialClientDetailProps {
 export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialClientDetailProps) {
   const t = useTranslations("potentialClients");
   const tCommon = useTranslations("common");
+  const locale = useLocale();
   const router = useRouter();
 
   const [currentClient, setCurrentClient] = useState<PotentialClientWithRelations>(client);
@@ -87,8 +88,13 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
     ? `https://wa.me/${cleanPhone.startsWith("0") ? "2" + cleanPhone : cleanPhone}`
     : null;
 
+  const defaultDealTitle =
+    locale === "ar"
+      ? `صفقة جديدة مع ${currentClient.name}`
+      : `New deal with ${currentClient.name}`;
+
   const openConvertModal = () => {
-    setDealTitle(`صفقة جديدة مع ${currentClient.name}`);
+    setDealTitle(defaultDealTitle);
     setConvertModalOpen(true);
   };
 
@@ -98,21 +104,21 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
       const res = await convertPotentialClientToClient(currentClient.id, {
         clientType,
         createDeal,
-        dealTitle: createDeal ? (dealTitle.trim() || `صفقة جديدة مع ${currentClient.name}`) : undefined,
+        dealTitle: createDeal ? (dealTitle.trim() || defaultDealTitle) : undefined,
         dealEstimatedValue: createDeal && dealEstimatedValue ? Number(dealEstimatedValue) : undefined,
         dealCurrency: "EGP",
       });
 
       if (res.success && res.data?.client) {
-        toast.success(t("convertSuccess") || "تم تحويل العميل بنجاح ونقله إلى قسم العملاء! 🎉");
+        toast.success(t("convertSuccess"));
         setConvertModalOpen(false);
         router.refresh();
         router.push(`/clients/${res.data.client.id}`);
       } else {
-        toast.error(res.error || tCommon("error") || "فشل تحويل العميل");
+        toast.error(res.error || t("conversionFailed"));
       }
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "فشل تحويل العميل");
+      toast.error(err instanceof Error ? err.message : t("conversionFailed"));
     } finally {
       setIsConverting(false);
     }
@@ -266,7 +272,7 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
                 className="gap-1.5 text-xs border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 cursor-pointer"
               >
                 <Building2 className="h-3.5 w-3.5" />
-                <span>عرض العميل المؤكد 🏢</span>
+                <span>{t("viewConvertedClient")}</span>
               </Button>
             </Link>
           ) : (
@@ -279,7 +285,7 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
               <Rocket className="h-3.5 w-3.5" />
               <span>
                 {currentStatus === "CONVERTED"
-                  ? "إكمال النقل لقسم العملاء 🚀"
+                  ? t("completeTransfer")
                   : t("convert")}
               </span>
             </Button>
@@ -292,12 +298,12 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
         <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 text-xs text-emerald-800 dark:text-emerald-300">
             <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <span>تم تحويل هذا العميل المحتمل بنجاح إلى عميل رسمي مؤكد في المنظومة.</span>
+            <span>{t("convertedBannerTitle")}</span>
           </div>
           <Link href={`/clients/${currentClient.converted_client_id}`}>
             <Button size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-medium shrink-0 cursor-pointer">
               <Building2 className="h-3.5 w-3.5" />
-              <span>عرض ملف العميل 🏢</span>
+              <span>{t("viewConvertedClient")}</span>
             </Button>
           </Link>
         </div>
@@ -305,7 +311,7 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
         <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 text-xs text-amber-800 dark:text-amber-300">
             <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
-            <span>تم تعيين الحالة كـ &quot;متحول&quot; ولكن لم يتم إنشاء سجل العميل الرسمي بعد. اضغط لنقله إلى قسم العملاء الآن.</span>
+            <span>{t("incompleteConversionBanner")}</span>
           </div>
           <Button
             size="sm"
@@ -313,7 +319,7 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
             className="h-8 text-xs bg-amber-600 hover:bg-amber-700 text-white font-medium shrink-0 cursor-pointer"
           >
             <Rocket className="h-3.5 w-3.5" />
-            <span>إكمال النقل لقسم العملاء 🚀</span>
+            <span>{t("completeTransfer")}</span>
           </Button>
         </div>
       ) : null}
@@ -543,13 +549,13 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
               <p className="font-semibold text-foreground">{t("dataToTransfer")}</p>
               <p className="text-muted-foreground">{t("clientNamePrefix", { name: currentClient.name })}</p>
               {currentClient.phone && <p className="text-muted-foreground">{t("clientPhonePrefix", { phone: currentClient.phone })}</p>}
-              {currentClient.area && <p className="text-muted-foreground">📍 المنطقة: {currentClient.area}</p>}
+              {currentClient.area && <p className="text-muted-foreground">{t("areaPrefix", { area: currentClient.area })}</p>}
               <p className="text-muted-foreground">{t("allOpportunitiesTransferred")}</p>
             </div>
 
             {/* Client Type Choice */}
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-foreground">نوع العميل الرسمي</label>
+              <label className="text-xs font-semibold text-foreground">{t("officialClientType")}</label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
@@ -561,7 +567,7 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
                   }`}
                 >
                   <Building2 className="h-4 w-4" />
-                  <span>شركة (Company)</span>
+                  <span>{t("typeCompany")}</span>
                 </button>
                 <button
                   type="button"
@@ -573,7 +579,7 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
                   }`}
                 >
                   <Users className="h-4 w-4" />
-                  <span>فرد (Individual)</span>
+                  <span>{t("typeIndividual")}</span>
                 </button>
               </div>
             </div>
@@ -587,23 +593,23 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
                   onChange={(e) => setCreateDeal(e.target.checked)}
                   className="rounded border-border text-primary focus:ring-primary h-4 w-4 cursor-pointer"
                 />
-                <span>فتح صفقة تجارية أولية في المسار البيعي (Pipeline) تلقائياً</span>
+                <span>{t("createInitialDeal")}</span>
               </label>
 
               {createDeal && (
                 <div className="space-y-2.5 p-3 rounded-lg bg-primary/5 border border-primary/20">
                   <div className="space-y-1">
-                    <label className="text-[11px] font-semibold text-foreground">عنوان الصفقة</label>
+                    <label className="text-[11px] font-semibold text-foreground">{t("dealTitleLabel")}</label>
                     <input
                       type="text"
                       value={dealTitle}
                       onChange={(e) => setDealTitle(e.target.value)}
-                      placeholder="مثال: ترخيص نظام نقاط البيع والمخازن"
+                      placeholder={t("dealTitlePlaceholder")}
                       className="w-full text-xs px-2.5 py-1.5 rounded-md border border-border bg-background focus:outline-hidden focus:ring-1 focus:ring-primary"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[11px] font-semibold text-foreground">القيمة المتوقعة (ج.م)</label>
+                    <label className="text-[11px] font-semibold text-foreground">{t("dealValueLabel")}</label>
                     <input
                       type="number"
                       value={dealEstimatedValue}
@@ -632,7 +638,7 @@ export function PotentialClientDetail({ client, userRole = "SALES" }: PotentialC
               {isConverting ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>جاري إنشاء ونقل العميل...</span>
+                  <span>{t("converting")}</span>
                 </>
               ) : (
                 <>

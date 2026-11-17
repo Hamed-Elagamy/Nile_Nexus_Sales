@@ -4,6 +4,14 @@
 Production Deployed & Verified — Live on Vercel & Connected to Supabase
 
 ## Completed Phases
+- **Phase 19 (Bilingual English & Arabic UI Parity & Automatic Converted Lead Archival)**:
+  - Fixed localization issue where conversion modal, banners, and buttons displayed hardcoded Arabic text when the application was set to English.
+  - Fully localized conversion UI across `messages/en.json` and `messages/ar.json` with 100% dictionary key parity.
+  - Implemented automatic removal of converted prospects from the active Potential Clients pool (`getPotentialClients` automatically excludes `status = 'CONVERTED'`, and sets `archived_at` on conversion).
+  - Maintained direct lookup resilience in `getPotentialClientById` so converted leads display the official client link banner without 404ing.
+  - Removed `CONVERTED` tab from potential client filter pills, keeping the section strictly for active prospects.
+  - Optimized Vitest test suite (`src/lib/__tests__/export-csv.test.ts`), achieving 100% test pass rate (147/147 tests across all 26 suites) in ~10 seconds.
+  - Verified 100% clean Next.js 15 production build with all 30 routes compiling cleanly.
 - **Phase 18 (Real Client Conversion System & Retroactive Lead Recovery)**:
   - Resolved "fake conversion" bug where clicking Convert previously only marked `status = 'CONVERTED'` in `potential_clients` without creating rows in `clients` or `contacts`.
   - Fully wired `convertPotentialClientToClient` to the UI with Company/Individual selection and optional automated initial deal creation in pipeline.

@@ -9,6 +9,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     pool: "forks",
+    fileParallelism: false,
     environment: "node",
     globals: true,
     include: ["src/**/*.{test,spec}.{ts,tsx}"],

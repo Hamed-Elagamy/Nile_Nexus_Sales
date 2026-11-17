@@ -30,7 +30,7 @@ export function PotentialClientsFilter({
 
   const statuses: Array<PotentialClientStatusType | "ALL"> = [
     "ALL",
-    ...POTENTIAL_CLIENT_STATUSES.filter((s) => s !== "ARCHIVED"),
+    ...POTENTIAL_CLIENT_STATUSES.filter((s) => s !== "ARCHIVED" && s !== "CONVERTED"),
   ];
 
   const hasActiveFilters = searchQuery.trim() !== "" || selectedStatus !== "ALL";

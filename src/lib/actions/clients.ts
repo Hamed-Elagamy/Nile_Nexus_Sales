@@ -597,6 +597,7 @@ export async function convertPotentialClientToClient(
       demoClients.unshift(newClient);
       pc.status = "CONVERTED";
       pc.converted_client_id = newClientId;
+      pc.archived_at = new Date().toISOString();
 
       let createdDeal: Deal | undefined;
       if (options.createDeal && options.dealTitle) {
@@ -715,6 +716,7 @@ export async function convertPotentialClientToClient(
       .update({
         status: "CONVERTED",
         converted_client_id: client.id,
+        archived_at: new Date().toISOString(),
       })
       .eq("id", potentialClientId);
 
@@ -786,7 +788,9 @@ export async function convertPotentialClientToClient(
     }
 
     revalidatePath("/potential-clients");
+    revalidatePath(`/potential-clients/${potentialClientId}`);
     revalidatePath("/clients");
+    revalidatePath(`/clients/${client.id}`);
     revalidatePath("/pipeline");
 
     return {

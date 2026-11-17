@@ -300,7 +300,7 @@ export function PotentialClientsTable({
                                 className="flex items-center gap-2 cursor-pointer font-medium text-emerald-600 dark:text-emerald-400"
                               >
                                 <span>🏢</span>
-                                <span>عرض العميل المؤكد</span>
+                                <span>{t("viewConvertedClient")}</span>
                               </Link>
                             }
                           />
@@ -312,7 +312,7 @@ export function PotentialClientsTable({
                                 className="flex items-center gap-2 cursor-pointer font-medium text-primary"
                               >
                                 <span>🚀</span>
-                                <span>{client.status === "CONVERTED" ? "إكمال نقل العميل 🚀" : t("convert")}</span>
+                                <span>{client.status === "CONVERTED" ? t("completeTransfer") : t("convert")}</span>
                               </Link>
                             }
                           />

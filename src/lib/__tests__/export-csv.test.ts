@@ -1,4 +1,3 @@
-// @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { exportToCsv } from "@/lib/utils/export-csv";
 
@@ -17,10 +16,31 @@ describe("exportToCsv utility", () => {
     });
     global.URL.revokeObjectURL = vi.fn();
 
-    // Mock HTMLAnchorElement click
-    vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (this: HTMLAnchorElement) {
-      clickedUrl = this.getAttribute("href") || "";
-    });
+    const mockAnchor = {
+      href: "",
+      download: "",
+      style: { display: "" },
+      click: vi.fn(function () {
+        clickedUrl = mockAnchor.href;
+      }),
+      setAttribute: vi.fn((k: string, v: string) => {
+        if (k === "href") mockAnchor.href = v;
+      }),
+      getAttribute: vi.fn((k: string) => (k === "href" ? mockAnchor.href : null)),
+    };
+
+    (global as unknown as { window: unknown }).window = {
+      document: {
+        createElement: vi.fn(() => mockAnchor),
+        body: {
+          appendChild: vi.fn(),
+          removeChild: vi.fn(),
+        },
+      },
+    };
+    (global as unknown as { document: unknown }).document = (
+      global as unknown as { window: { document: unknown } }
+    ).window.document;
   });
 
   afterEach(() => {

@@ -182,6 +182,9 @@ export async function getPotentialClients(
 
       if (parsedFilters.status) {
         filtered = filtered.filter((p) => p.status === parsedFilters.status);
+      } else {
+        // Exclude converted prospects from default active pool
+        filtered = filtered.filter((p) => p.status !== "CONVERTED");
       }
 
       if (parsedFilters.research_owner_id) {
@@ -243,6 +246,9 @@ export async function getPotentialClients(
 
     if (parsedFilters.status) {
       query = query.eq("status", parsedFilters.status);
+    } else {
+      // Exclude converted prospects from default active pool
+      query = query.neq("status", "CONVERTED");
     }
 
     if (parsedFilters.research_owner_id) {
@@ -297,7 +303,7 @@ export async function getPotentialClientById(
 ): Promise<ActionResult<PotentialClientWithRelations>> {
   try {
     if (!isSupabaseConfigured()) {
-      const pc = demoPotentialClients.find((p) => p.id === id && !p.archived_at);
+      const pc = demoPotentialClients.find((p) => p.id === id);
       if (!pc) {
         return { success: false, error: "Potential client not found" };
       }
@@ -327,7 +333,6 @@ export async function getPotentialClientById(
       `
       )
       .eq("id", id)
-      .is("archived_at", null)
       .single();
 
     if (error || !data) {

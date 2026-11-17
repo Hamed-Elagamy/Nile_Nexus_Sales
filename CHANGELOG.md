@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.13.2] - 2026-11-17
+
+### Fixed & Enhanced
+- **Bilingual English & Arabic UI Parity (`messages/en.json` & `messages/ar.json`)**:
+  - Replaced all hardcoded Arabic UI strings in the Lead Conversion workflow with full bilingual keys matching both Arabic and English locales.
+  - Added 14 paired localization keys covering:
+    - Status badges, banners, and recovery actions (`viewConvertedClient`, `completeTransfer`, `converting`, `convertedBannerTitle`, `incompleteConversionBanner`).
+    - Conversion dialog form fields (`officialClientType`, `typeCompany`, `typeIndividual`, `areaPrefix`, `createInitialDeal`, `dealTitleLabel`, `dealTitlePlaceholder`, `dealValueLabel`, `conversionFailed`).
+  - Added locale-aware default deal title generation (`صفقة جديدة مع ...` in Arabic, `New deal with ...` in English).
+  - Maintained 100% dictionary key parity verified by `src/i18n/__tests__/config.test.ts`.
+- **Automatic Lead Removal Upon Client Conversion (`getPotentialClients` & `convertPotentialClientToClient`)**:
+  - Automatically excludes `CONVERTED` prospects from the default active prospect pool in both Supabase query (`query.neq("status", "CONVERTED")`) and demo mode.
+  - Automatically sets `archived_at` on converted potential client records upon successful conversion.
+  - Preserves direct lookup in `getPotentialClientById` so that navigating to a converted lead profile displays the official client link banner.
+  - Removed `CONVERTED` from the quick status filter pills so the Potential Clients module remains dedicated solely to active prospects.
+- **Test Suite Stability & Build Optimization**:
+  - Streamlined `src/lib/__tests__/export-csv.test.ts` to mock DOM APIs safely in node environment, resolving worker spawn timeouts on Windows.
+  - Vitest test suite now runs all 26 suites (147/147 tests) in ~10 seconds.
+  - Verified full production build (`npm run build`) with all 30 routes compiling cleanly.
+
 ## [1.13.1] - 2026-11-17
 
 ### Fixed & Enhanced
